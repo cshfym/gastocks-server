@@ -20,7 +20,5 @@ class QuoteResource {
     @ResponseBody Quote getQuote(@RequestParam(value="symbol", required=true) String symbol) {
 
         quoteService.getQuote(symbol)
-
-        new Quote("XYZ", 1.0d, 2.0d, 3.0d)
     }
 }

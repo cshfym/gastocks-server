@@ -1,6 +1,9 @@
 package com.gastocks.server.services
 
+import com.gastocks.server.converters.QuoteConverter
 import com.gastocks.server.models.Quote
+import groovy.json.JsonSlurper
+import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 //import org.springframework.boot.web.client.RestTemplateBuilder
@@ -18,7 +21,6 @@ import java.net.URL
 @CompileStatic
 class QuoteService {
 
-    private static final String alphaVantageGlobalQuoteSymbolUri = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="
     private static final String apiKey = "W2OXJLZJ9W0O5K1M"
 
 
@@ -29,8 +31,16 @@ class QuoteService {
          Quote quote = restTemplate.getForObject(alphaVantageGlobalQuoteSymbolUri + symbol + apiKeyParam, Quote.class)
          **/
 
-        try {
+        /*
+        def params = [method: 'flickr.photos.search', api_key: key,
+    format: 'json', tags: 'cat', nojsoncallback: 1,
+    media: 'photos', per_page: 6]
+    // def qs = params.collect { k,v -> "$k=$v" }.join('&')
+         */
 
+        Quote quote = new Quote()
+
+        try {
             URL url = new URL("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}")
             HttpURLConnection conn = (HttpURLConnection) url.openConnection()
             conn.setRequestMethod("GET")
@@ -41,34 +51,23 @@ class QuoteService {
                         + conn.getResponseCode())
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())))
+            def slurped = new JsonSlurper().parse(url)
 
-            String output
-            System.out.println("Output from Server .... \n")
-            while ((output = br.readLine()) != null) {
-                System.out.println(output)
-            }
+            quote = QuoteConverter.from(slurped)
+
+            println "[${slurped}]"
+            println "[${quote}]"
 
             conn.disconnect()
 
         } catch (MalformedURLException e) {
-
             e.printStackTrace()
-
         } catch (IOException e) {
-
             e.printStackTrace()
-
         }
 
-        new Quote("XYZ", new Double(0.1), new Double(0.2), new Double(0.3))
+        quote
     }
 
-/*
-  @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-	return builder.build()
-  }
-  */
+
 }
