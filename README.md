@@ -1,3 +1,3 @@
 # gastocks-server
 
-java -jar build/libs/server-1.0.0-SNAPSHOT.jar
+java -jar build/libs/gastocks-server-1.0.0-SNAPSHOT.jar
