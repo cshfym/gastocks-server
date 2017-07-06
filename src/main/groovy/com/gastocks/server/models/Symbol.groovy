@@ -12,8 +12,8 @@ class Symbol {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    private String id
+    String id
 
-    private String identifier
-    private String description
+    String identifier
+    String description
 }

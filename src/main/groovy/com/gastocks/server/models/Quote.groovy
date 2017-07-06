@@ -1,19 +1,21 @@
 package com.gastocks.server.models
 
+import groovy.transform.ToString
 import org.joda.time.DateTime
 
+@ToString
 class Quote {
 
     String symbol
     String exchangeName
-    double latestPrice
-    double currentTradingDayOpen
-    double currentTradingDayHigh
-    double currentTradingDayLow
-    double previousTradingDayClose
-    double priceChange
-    double priceChangePercentage
-    int volume
+    Double latestPrice
+    Double currentTradingDayOpen
+    Double currentTradingDayHigh
+    Double currentTradingDayLow
+    Double previousTradingDayClose
+    Double priceChange
+    Double priceChangePercentage
+    Integer volume
     DateTime lastUpdated
 
 }
