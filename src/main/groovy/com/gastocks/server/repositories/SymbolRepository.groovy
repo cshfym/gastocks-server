@@ -9,4 +9,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource
 interface SymbolRepository extends CrudRepository<Symbol, String> {
 
     Symbol findByIdentifier(String identifier)
+
+    List<Symbol> findAllByActive(Boolean active)
 }

@@ -14,7 +14,7 @@ class Quote {
     Double currentTradingDayLow
     Double previousTradingDayClose
     Double priceChange
-    Double priceChangePercentage
+    Float priceChangePercentage
     Integer volume
     DateTime lastUpdated
 
