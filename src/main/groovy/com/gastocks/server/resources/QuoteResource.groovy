@@ -1,6 +1,7 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.Quote
+import com.gastocks.server.models.QuoteResponse
 import com.gastocks.server.services.QuoteService
 import org.springframework.stereotype.Controller
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,9 +17,20 @@ class QuoteResource {
     @Autowired
     QuoteService quoteService
 
+    @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
-    @ResponseBody Quote getQuote(@RequestParam(value="symbol", required=true) String symbol) {
+    QuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
 
-        quoteService.getQuote(symbol)
+        def quote = quoteService.getQuote(symbol)
+
+        if (quote) {
+            new QuoteResponse(
+                success: true,
+                response: "",
+                quote: quote)
+        } else {
+            new QuoteResponse(success: false, response: "Not found")
+        }
+
     }
 }

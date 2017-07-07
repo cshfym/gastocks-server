@@ -8,9 +8,7 @@ import org.springframework.data.jpa.domain.AbstractAuditable_
 class QuoteConverter {
 
     static boolean hasData(Object obj) {
-
         Map objRoot = obj."${RGSQConstants.MAP_ROOT}"
-
         !objRoot.isEmpty()
     }
 
