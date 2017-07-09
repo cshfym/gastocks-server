@@ -1,6 +1,6 @@
 package com.gastocks.server.converters
 
-class ConverterUtils {
+class BaseConverter {
 
     static Double parseToDouble(String val) {
         try {

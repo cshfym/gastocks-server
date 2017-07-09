@@ -1,13 +1,13 @@
 package com.gastocks.server.converters.avglobalquote
 
-import com.gastocks.server.converters.ConverterUtils
+import com.gastocks.server.converters.BaseConverter
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
-class AVGlobalQuoteConverter extends ConverterUtils {
+class AVGlobalQuoteConverter extends BaseConverter {
 
     final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d, K:mma zzz") // i.e. Jul 6, 4:04PM EDT
 
