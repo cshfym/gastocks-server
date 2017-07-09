@@ -45,18 +45,17 @@ class AVGlobalQuoteFetchAndPersistService {
             if (index > 2) { return }
             AVGlobalQuote quote = avGlobalQuoteService.getQuote(symbol.identifier)
             if (quote) {
-                def existingQuote = findQuote(symbol, new LocalDate(quote.lastUpdated.millis).toString())
+                def existingQuote = findQuote(symbol, new Date(quote.lastUpdated.millis))
                 if (existingQuote) {
                     updateQuote(existingQuote, quote)
                 } else {
                     persistNewQuote(quote, symbol)
                 }
-
             }
         }
     }
 
-    PersistableQuote findQuote(Symbol symbol, String lastUpdated) {
+    PersistableQuote findQuote(Symbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndLastMarketDate(symbol, lastUpdated)
     }
 
@@ -91,7 +90,7 @@ class AVGlobalQuoteFetchAndPersistService {
             priceChangePercentage: quote.priceChangePercentage,
             volume: quote.volume,
             createTimestamp: new DateTime().millis,
-            lastMarketDate: new LocalDate(quote.lastUpdated.millis).toString())
+            lastMarketDate: new Date(quote.lastUpdated.millis))
 
         log.info("Saving quote: ${persistableQuote.toString()}")
 

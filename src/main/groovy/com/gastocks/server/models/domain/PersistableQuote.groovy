@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 
 /**
  * Domain object compatible with any quote
@@ -43,6 +45,7 @@ class PersistableQuote {
      * Last market date presented as YYYY-MM-dd
      * Incoming quotes with the same market date will overwrite existing quotes
      */
-    String lastMarketDate
+    @Temporal(TemporalType.DATE)
+    Date lastMarketDate
 
 }
