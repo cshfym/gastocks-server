@@ -1,8 +1,8 @@
 package com.gastocks.server.services
 
-import com.gastocks.server.converters.QuoteConverter
-
-import com.gastocks.server.models.Quote
+import com.gastocks.server.converters.avglobalquote.AVGlobalQuoteConverter
+import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
+import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -11,27 +11,21 @@ import org.springframework.stereotype.Service
 @Service
 @Slf4j
 @CompileStatic
-class QuoteService {
+class AVGlobalQuoteService {
 
-    // private static final String apiKey
+    private static final String API_KEY = "W2OXJLZJ9W0O5K1M"
+    private static final String API_KEY_PARAM = "&apikey="
 
-    Quote getQuote(String symbol) {
+    AVGlobalQuote getQuote(String symbol) {
 
-        /**
-         // https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=MSFT&apikey=demo
-         Quote quote = restTemplate.getForObject(alphaVantageGlobalQuoteSymbolUri + symbol + apiKeyParam, Quote.class)
-         **/
-
-        String apiKey = "W2OXJLZJ9W0O5K1M"
-
-        Quote quote = new Quote()
+        AVGlobalQuote quote = new AVGlobalQuote()
 
         HttpURLConnection conn
 
         def startStopwatch = System.currentTimeMillis()
 
         try {
-            URL url = new URL("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}")
+            URL url = new URL("${AVGlobalQuoteConstants.AV_GLOBAL_QUOTE_URI}${symbol}${API_KEY_PARAM}${API_KEY}")
             conn = (HttpURLConnection) url.openConnection()
             conn.setRequestMethod("GET")
             conn.setRequestProperty("Accept", "application/json")
@@ -44,12 +38,12 @@ class QuoteService {
 
             log.info "Slurped data for symbol [${symbol}]: [${slurped}]"
 
-            if (!QuoteConverter.hasData(slurped)) {
+            if (!AVGlobalQuoteConverter.hasData(slurped)) {
                 log.warn("No quote data found for symbol [${symbol}]")
                 return null
             } else {
-                quote = QuoteConverter.from(slurped)
-                log.info "Quote: [${quote}]"
+                quote = AVGlobalQuoteConverter.fromAVGlobalQuote(slurped)
+                log.info "AVGlobalQuote: [${quote}]"
             }
 
         } catch (Exception ex) {
@@ -59,7 +53,7 @@ class QuoteService {
             conn?.disconnect()
         }
 
-        log.info "Quote retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
+        log.info "AVGlobalQuote retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
         quote
     }
 

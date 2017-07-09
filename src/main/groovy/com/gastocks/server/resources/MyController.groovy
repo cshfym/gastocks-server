@@ -1,6 +1,6 @@
 package com.gastocks.server.resources
 
-import com.gastocks.server.services.QuoteFetchService
+import com.gastocks.server.services.AVGlobalQuoteFetchAndPersistService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 class MyController {
 
     @Autowired
-    QuoteFetchService quoteFetchService
+    AVGlobalQuoteFetchAndPersistService quoteFetchService
 
     @RequestMapping(value = "/")
     def @ResponseBody hello() {

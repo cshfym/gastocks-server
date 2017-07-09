@@ -1,8 +1,7 @@
 package com.gastocks.server.resources
 
-import com.gastocks.server.models.Quote
-import com.gastocks.server.models.QuoteResponse
-import com.gastocks.server.services.QuoteService
+import com.gastocks.server.models.avglobalquote.AVGlobalQuoteResponse
+import com.gastocks.server.services.AVGlobalQuoteService
 import org.springframework.stereotype.Controller
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
@@ -11,25 +10,25 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
-@RequestMapping("/quote")
-class QuoteResource {
+@RequestMapping("/avglobalquote")
+class AVGlobalQuoteResource {
 
     @Autowired
-    QuoteService quoteService
+    AVGlobalQuoteService quoteService
 
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
-    QuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
+    AVGlobalQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
 
         def quote = quoteService.getQuote(symbol)
 
         if (quote) {
-            new QuoteResponse(
+            new AVGlobalQuoteResponse(
                 success: true,
                 response: "",
                 quote: quote)
         } else {
-            new QuoteResponse(success: false, response: "Not found")
+            new AVGlobalQuoteResponse(success: false, response: "Not found")
         }
 
     }

@@ -1,9 +1,8 @@
-package com.gastocks.server.models
+package com.gastocks.server.models.domain
 
+import com.gastocks.server.models.Symbol
 import groovy.transform.ToString
 import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.Type
-import org.joda.time.DateTime
 
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -11,6 +10,9 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
+/**
+ * Domain object compatible with any quote
+ */
 @ToString
 @Entity (name="quote")
 class PersistableQuote {
@@ -21,21 +23,26 @@ class PersistableQuote {
     String id
 
 
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
-    DateTime createDateTime
+    // Unix Milliseconds
+    Long createTimestamp
 
     @ManyToOne
     @JoinColumn(name = "symbol_id")
     Symbol symbol
 
-    Double latestPrice
-    Double currentTradingDayOpen
-    Double currentTradingDayHigh
-    Double currentTradingDayLow
-    Double previousTradingDayClose
+    Double price
+    Double dayOpen
+    Double dayHigh
+    Double dayLow
+    Double previousDayClose
     Double priceChange
     Float priceChangePercentage
     Integer volume
-    DateTime lastMarketDateTime
+
+    /**
+     * Last market date presented as YYYY-MM-dd
+     * Incoming quotes with the same market date will overwrite existing quotes
+     */
+    String lastMarketDate
 
 }

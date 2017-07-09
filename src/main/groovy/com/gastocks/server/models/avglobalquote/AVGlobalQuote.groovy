@@ -1,10 +1,10 @@
-package com.gastocks.server.models
+package com.gastocks.server.models.avglobalquote
 
 import groovy.transform.ToString
 import org.joda.time.DateTime
 
 @ToString
-class Quote {
+class AVGlobalQuote {
 
     String symbol
     String exchangeName

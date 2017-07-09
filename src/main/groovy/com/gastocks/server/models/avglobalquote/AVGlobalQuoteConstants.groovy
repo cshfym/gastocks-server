@@ -1,4 +1,4 @@
-package com.gastocks.server.models
+package com.gastocks.server.models.avglobalquote
 
 /**
  * Realtime Global Securities Quote - JSON HashMap Constants
@@ -19,9 +19,9 @@ package com.gastocks.server.models
  * ]
  **/
 
-class RGSQConstants {
+class AVGlobalQuoteConstants {
 
-    private static final String AV_GLOBAL_QUOTE_URI = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="
+    static final String AV_GLOBAL_QUOTE_URI = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="
 
     static final String MAP_ROOT = "Realtime Global Securities Quote"
 
