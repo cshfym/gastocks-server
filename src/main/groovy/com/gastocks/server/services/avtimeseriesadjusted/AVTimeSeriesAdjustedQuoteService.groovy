@@ -19,7 +19,7 @@ class AVTimeSeriesAdjustedQuoteService extends QuoteService {
 
     @Override
     String getResourceUrlString() {
-        "${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_URI}${API_KEY_PARAM}${API_KEY}"
+        "${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_URI}${API_KEY_PARAM}${API_KEY}${OUTPUT_SIZE_PARAM}"
     }
 
     @Override

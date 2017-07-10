@@ -1,10 +1,7 @@
 package com.gastocks.server.services
 
 import com.gastocks.server.converters.IConverter
-import com.gastocks.server.converters.avglobalquote.AVGlobalQuoteConverter
 import com.gastocks.server.models.IQuote
-import com.gastocks.server.models.avglobalquote.AVGlobalQuote
-import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 
@@ -13,6 +10,7 @@ abstract class QuoteService implements IQuoteService {
 
     static final String API_KEY = "W2OXJLZJ9W0O5K1M"
     static final String API_KEY_PARAM = "&apikey="
+    static final String OUTPUT_SIZE_PARAM = "&outputsize=full"
 
     abstract String getResourceUrlString()
 
