@@ -1,7 +1,10 @@
 package com.gastocks.server.converters
 
+import com.gastocks.server.models.IQuote
+
 interface IConverter {
 
-    boolean hasData(Object obj)
+    abstract boolean hasData(Object obj)
 
+    abstract <T extends IQuote> T fromObject(Object obj)
 }

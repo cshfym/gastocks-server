@@ -6,22 +6,26 @@ import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.springframework.stereotype.Component
 
+@Component
 class AVGlobalQuoteConverter extends BaseConverter {
 
     final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d, K:mma zzz") // i.e. Jul 6, 4:04PM EDT
 
-    static boolean hasData(Object obj) {
+    @Override
+    boolean hasData(Object obj) {
         Map objRoot = obj."${AVGlobalQuoteConstants.MAP_ROOT}"
         !objRoot?.isEmpty()
     }
 
     /**
-     * Accepts an object conforming to the AVGlobalQuote JSON hashmap convention
+     * Converts an object conforming to the AVGlobalQuote JSON hashmap convention
      * @param obj
      * @return
      */
-    static AVGlobalQuote fromAVGlobalQuote(Object obj) {
+    @Override
+    AVGlobalQuote fromObject(Object obj) {
 
         def quote = new AVGlobalQuote()
 

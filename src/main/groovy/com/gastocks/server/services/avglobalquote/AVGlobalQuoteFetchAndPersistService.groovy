@@ -1,5 +1,6 @@
 package com.gastocks.server.services.avglobalquote
 
+import com.gastocks.server.models.IQuote
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.Symbol
@@ -43,13 +44,14 @@ class AVGlobalQuoteFetchAndPersistService {
 
         activeSymbols.eachWithIndex { symbol, index ->
             if (index > 2) { return }
-            AVGlobalQuote quote = avGlobalQuoteService.getQuote(symbol.identifier)
+            def quote = avGlobalQuoteService.getQuote(symbol.identifier)
+            def avQuote = (AVGlobalQuote) quote
             if (quote) {
-                def existingQuote = findQuote(symbol, new Date(quote.lastUpdated.millis))
+                def existingQuote = findQuote(symbol, new Date(avQuote.lastUpdated.millis))
                 if (existingQuote) {
-                    updateQuote(existingQuote, quote)
+                    updateQuote(existingQuote, avQuote)
                 } else {
-                    persistNewQuote(quote, symbol)
+                    persistNewQuote(avQuote, symbol)
                 }
             }
         }

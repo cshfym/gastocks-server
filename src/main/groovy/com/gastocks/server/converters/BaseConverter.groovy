@@ -1,6 +1,12 @@
 package com.gastocks.server.converters
 
-class BaseConverter {
+import com.gastocks.server.models.IQuote
+
+abstract class BaseConverter implements IConverter {
+
+    abstract boolean hasData(Object obj)
+
+    abstract <T extends IQuote> T fromObject(Object obj)
 
     static Double parseToDouble(String val) {
         try {

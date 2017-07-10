@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter implements IConverter {
+class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
 
     @Override
     boolean hasData(Object obj) {
@@ -20,11 +20,12 @@ class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter implements IConve
     }
 
     /**
-     * Accepts an object conforming to the {@AVTimeSeriesAdjustedQuote} JSON hashmap convention
+     * Converts an object conforming to the {@AVTimeSeriesAdjustedQuote} JSON hashmap convention
      * @param obj
      * @return
      */
-    AVTimeSeriesAdjustedQuote fromAVTimeSeriesAdjustedQuote(Object obj) {
+    @Override
+    AVTimeSeriesAdjustedQuote fromObject(Object obj) {
 
         def metadataRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.METADATA_ROOT}"
         def timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"
