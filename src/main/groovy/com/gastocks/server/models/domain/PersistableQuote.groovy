@@ -24,9 +24,8 @@ class PersistableQuote {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     String id
 
-
-    // Unix Milliseconds
-    Long createTimestamp
+    @Temporal(TemporalType.DATE)
+    Date createTimestamp
 
     @ManyToOne
     @JoinColumn(name = "symbol_id")
@@ -40,6 +39,8 @@ class PersistableQuote {
     Double priceChange
     Float priceChangePercentage
     Integer volume
+    Double dividend
+    Double splitCoefficient
 
     /**
      * Last market date presented as YYYY-MM-dd

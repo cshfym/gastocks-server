@@ -1,15 +1,12 @@
 package com.gastocks.server.services.avglobalquote
 
-import com.gastocks.server.models.IQuote
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.Symbol
 import com.gastocks.server.repositories.QuoteRepository
 import com.gastocks.server.repositories.SymbolRepository
-import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -91,7 +88,7 @@ class AVGlobalQuoteFetchAndPersistService {
             priceChange: quote.priceChange,
             priceChangePercentage: quote.priceChangePercentage,
             volume: quote.volume,
-            createTimestamp: new DateTime().millis,
+            createTimestamp: new Date(),
             lastMarketDate: new Date(quote.lastUpdated.millis))
 
         log.info("Saving quote: ${persistableQuote.toString()}")
