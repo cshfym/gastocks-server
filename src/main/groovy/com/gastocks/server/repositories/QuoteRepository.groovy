@@ -8,5 +8,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource
 @RepositoryRestResource
 interface QuoteRepository extends CrudRepository<PersistableQuote, String> {
 
-    PersistableQuote findBySymbolAndLastMarketDate(Symbol symbol, Date lastMarketDate)
+    PersistableQuote findBySymbolAndQuoteDate(Symbol symbol, Date date)
+
 }

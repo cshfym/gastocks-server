@@ -55,7 +55,7 @@ class AVGlobalQuoteFetchAndPersistService {
     }
 
     PersistableQuote findQuote(Symbol symbol, Date lastUpdated) {
-        quoteRepository.findBySymbolAndLastMarketDate(symbol, lastUpdated)
+        quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
 
     void updateQuote(PersistableQuote existingQuote, AVGlobalQuote quote) {
@@ -89,7 +89,7 @@ class AVGlobalQuoteFetchAndPersistService {
             priceChangePercentage: quote.priceChangePercentage,
             volume: quote.volume,
             createTimestamp: new Date(),
-            lastMarketDate: new Date(quote.lastUpdated.millis))
+            quoteDate: new Date(quote.lastUpdated.millis))
 
         log.info("Saving quote: ${persistableQuote.toString()}")
 

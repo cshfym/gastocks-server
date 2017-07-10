@@ -47,6 +47,6 @@ class PersistableQuote {
      * Incoming quotes with the same market date will overwrite existing quotes
      */
     @Temporal(TemporalType.DATE)
-    Date lastMarketDate
+    Date quoteDate
 
 }
