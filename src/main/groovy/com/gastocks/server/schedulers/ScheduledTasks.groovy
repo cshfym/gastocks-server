@@ -1,12 +1,10 @@
 package com.gastocks.server.schedulers
 
 import com.gastocks.server.repositories.SymbolRepository
-import com.gastocks.server.services.AVGlobalQuoteService
+import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-
-import java.text.SimpleDateFormat
 
 @Slf4j
 @Component

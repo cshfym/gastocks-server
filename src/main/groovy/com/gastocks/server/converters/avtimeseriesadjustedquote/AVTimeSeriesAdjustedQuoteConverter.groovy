@@ -1,24 +1,22 @@
 package com.gastocks.server.converters.avtimeseriesadjustedquote
 
 import com.gastocks.server.converters.BaseConverter
+import com.gastocks.server.converters.IConverter
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteConstants
 import com.gastocks.server.util.DateUtility
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
-class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
+@Component
+class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter implements IConverter {
 
-    @Autowired
-    DateUtility dateUtility
-
-    @Autowired
-    BaseConverter converterUtils
-
-    static boolean hasData(Object obj) {
+    @Override
+    boolean hasData(Object obj) {
         Map timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"
-        !timeSeriesRoot.isEmpty()
+        !timeSeriesRoot?.isEmpty()
     }
 
     /**
@@ -26,7 +24,7 @@ class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
      * @param obj
      * @return
      */
-    static AVTimeSeriesAdjustedQuote fromAVTimeSeriesAdjustedQuote(Object obj) {
+    AVTimeSeriesAdjustedQuote fromAVTimeSeriesAdjustedQuote(Object obj) {
 
         def metadataRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.METADATA_ROOT}"
         def timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"

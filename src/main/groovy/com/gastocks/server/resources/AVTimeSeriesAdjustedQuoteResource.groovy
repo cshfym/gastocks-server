@@ -1,7 +1,7 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteResponse
-import com.gastocks.server.services.AVTimeSeriesAdjustedQuoteService
+import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
-@RequestMapping("/avtimeseriesadjustedquote")
+@RequestMapping("/avtimeseriesadjusted")
 class AVTimeSeriesAdjustedQuoteResource {
 
     @Autowired

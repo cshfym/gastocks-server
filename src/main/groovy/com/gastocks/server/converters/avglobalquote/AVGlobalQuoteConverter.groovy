@@ -13,7 +13,7 @@ class AVGlobalQuoteConverter extends BaseConverter {
 
     static boolean hasData(Object obj) {
         Map objRoot = obj."${AVGlobalQuoteConstants.MAP_ROOT}"
-        !objRoot.isEmpty()
+        !objRoot?.isEmpty()
     }
 
     /**

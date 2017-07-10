@@ -1,11 +1,9 @@
-package com.gastocks.server.services
+package com.gastocks.server.services.avglobalquote
 
 import com.gastocks.server.converters.avglobalquote.AVGlobalQuoteConverter
-import com.gastocks.server.converters.avtimeseriesadjustedquote.AVTimeSeriesAdjustedQuoteConverter
-import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
-import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
-import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteConstants
+import com.gastocks.server.models.avglobalquote.AVGlobalQuote
+import com.gastocks.server.services.IQuoteService
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -14,21 +12,21 @@ import org.springframework.stereotype.Service
 @Service
 @Slf4j
 @CompileStatic
-class AVTimeSeriesAdjustedQuoteService {
+class AVGlobalQuoteService implements IQuoteService {
 
     private static final String API_KEY = "W2OXJLZJ9W0O5K1M"
     private static final String API_KEY_PARAM = "&apikey="
 
-    AVTimeSeriesAdjustedQuote getQuote(String symbol) {
+    AVGlobalQuote getQuote(String symbol) {
 
-        AVTimeSeriesAdjustedQuote quote = new AVTimeSeriesAdjustedQuote()
+        AVGlobalQuote quote = new AVGlobalQuote()
 
         HttpURLConnection conn
 
         def startStopwatch = System.currentTimeMillis()
 
         try {
-            URL url = new URL("${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_URI}${symbol}${API_KEY_PARAM}${API_KEY}")
+            URL url = new URL("${AVGlobalQuoteConstants.AV_GLOBAL_QUOTE_URI}${symbol}${API_KEY_PARAM}${API_KEY}")
             conn = (HttpURLConnection) url.openConnection()
             conn.setRequestMethod("GET")
             conn.setRequestProperty("Accept", "application/json")
@@ -41,12 +39,12 @@ class AVTimeSeriesAdjustedQuoteService {
 
             log.info "Slurped data for symbol [${symbol}]: [${slurped}]"
 
-            if (!AVTimeSeriesAdjustedQuoteConverter.hasData(slurped)) {
+            if (!AVGlobalQuoteConverter.hasData(slurped)) {
                 log.warn("No quote data found for symbol [${symbol}]")
                 return null
             } else {
-                quote = AVTimeSeriesAdjustedQuoteConverter.fromAVTimeSeriesAdjustedQuote(slurped)
-                log.info "AVTimeSeriesAdjustedQuote: [${quote}]"
+                quote = AVGlobalQuoteConverter.fromAVGlobalQuote(slurped)
+                log.info "AVGlobalQuote: [${quote}]"
             }
 
         } catch (Exception ex) {
@@ -56,7 +54,7 @@ class AVTimeSeriesAdjustedQuoteService {
             conn?.disconnect()
         }
 
-        log.info "AVTimeSeriesAdjustedQuote retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
+        log.info "AVGlobalQuote retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
         quote
     }
 

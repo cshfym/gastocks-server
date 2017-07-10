@@ -1,10 +1,10 @@
 package com.gastocks.server.models.avtimeseriesadjusted
 
+import com.gastocks.server.models.IQuote
 import groovy.transform.ToString
-import org.joda.time.DateTime
 
 @ToString
-class  AVTimeSeriesAdjustedQuote {
+class  AVTimeSeriesAdjustedQuote implements IQuote {
 
     String symbol
     List<AVTimeSeriesAdjustedDay> dailyQuoteList
