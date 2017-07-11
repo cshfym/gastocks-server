@@ -46,46 +46,86 @@ class AVTimeSeriesAdjustedFetchAndPersistService {
         log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, fetching quotes.")
 
         activeSymbols.eachWithIndex { symbol, index ->
-            if (index > 2) { return }
-
-            def startStopwatch = System.currentTimeMillis()
-
-            def quote = quoteService.getQuote(symbol.identifier)
-            def avQuote = (AVTimeSeriesAdjustedQuote) quote
-            if (quote) {
-                avQuote.dailyQuoteList.eachWithIndex { dailyQuote, ix ->
-                    if (ix > MAX_QUOTE_DAYS) { return }
-                    persistNewQuote(dailyQuote, symbol)
-                }
-            }
-            log.info "Quotes for symbol [${symbol}] stored in [${System.currentTimeMillis() - startStopwatch} ms]"
+            // if (index > 0) { return }
+            processSymbol(symbol)
         }
     }
 
-    /*
+    /**
+     * Fetch all active symbols matching the partial symbol, if available.
+     * @param partial
+     */
+    void fetchAndPersistQuotesPartial(String partial) {
+
+        List<Symbol> activeSymbols = symbolRepository.findAllByActiveAndIdentifierStartsWith(partial)
+
+        log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, fetching quotes.")
+
+        activeSymbols.eachWithIndex { symbol, index ->
+            // if (index > 0) { return }
+            processSymbol(symbol)
+        }
+    }
+
+    /**
+     * Fetch a single symbol and persist quote response, if available.
+     * @param symbol
+     */
+    void fetchAndPersistQuote(String sym) {
+
+        Symbol symbol = symbolRepository.findByIdentifier(sym)
+        if (!symbol) {
+            log.error("Could not find symbol with identifier [${sym}]!")
+            return
+        }
+
+        processSymbol(symbol)
+    }
+
+    void processSymbol(Symbol symbol) {
+
+        log.info("Begin processing for symbol [${symbol.identifier}]")
+
+        def startStopwatch = System.currentTimeMillis()
+
+        def quote = quoteService.getQuote(symbol.identifier)
+        if (!quote) {
+            // Flag symbol as inactive.
+            log.warn("Quote could not be located for symbol [${symbol?.identifier}], marking symbol as inactive.")
+            inactivateSymbol(symbol)
+            return
+        }
+
+        int daysPersisted = 0
+        int daysBypassed = 0
+
+        def avQuote = (AVTimeSeriesAdjustedQuote) quote
+        if (quote) {
+            avQuote.dailyQuoteList.eachWithIndex { dailyQuote, ix ->
+                if (ix > MAX_QUOTE_DAYS) { return }
+                if (findQuote(symbol, new Date(dailyQuote.date.millis))) {
+                    log.trace("Bypassing quote for symbol [${symbol.identifier}] on [${dailyQuote.date.toString()}] as it already exists.")
+                    daysBypassed++
+                    return
+                }
+
+                persistNewQuote(dailyQuote, symbol)
+                daysPersisted++
+            }
+        }
+
+        log.info "${daysPersisted} quotes for symbol [${symbol.identifier}] stored in [${System.currentTimeMillis() - startStopwatch} ms], " +
+                "${daysBypassed} existing quotes bypassed."
+    }
+
     PersistableQuote findQuote(Symbol symbol, Date quoteDate) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, quoteDate)
     }
-    */
 
-    /*
-    void updateQuote(PersistableQuote existingQuote, AVTimeSeriesAdjustedDay quote) {
-
-        existingQuote.with {
-            price = quote.close
-            dayOpen = quote.dayOpen
-            dayHigh = quote.dayHigh
-            dayLow = quote.dayLow
-            volume = quote.volume
-            dividend = quote.dividend
-            splitCoefficient = quote.splitCoefficient
-        }
-
-        // log.info("Updating existing quote: ${existingQuote.toString()}")
-
-        quoteRepository.save(existingQuote)
+    void inactivateSymbol(Symbol symbol) {
+        symbol.active = false
+        symbolRepository.save(symbol)
     }
-    */
 
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, Symbol symbol) {
 

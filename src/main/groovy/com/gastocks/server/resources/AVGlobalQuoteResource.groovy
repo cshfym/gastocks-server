@@ -1,34 +1,35 @@
 package com.gastocks.server.resources
 
-import com.gastocks.server.models.avglobalquote.AVGlobalQuoteResponse
+import com.gastocks.server.models.BasicQuoteResponse
 import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
-import org.springframework.stereotype.Controller
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 
 @Controller
-@RequestMapping("/avglobalquote")
+@RequestMapping("/avtsaq")
 class AVGlobalQuoteResource {
 
     @Autowired
     AVGlobalQuoteService quoteService
 
     @ResponseBody
-    @RequestMapping(method=RequestMethod.GET)
-    AVGlobalQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
+    @RequestMapping(value="/quote", method=RequestMethod.GET)
+    BasicQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
 
         def quote = quoteService.getQuote(symbol)
 
         if (quote) {
-            new AVGlobalQuoteResponse(
+            new BasicQuoteResponse(
                 success: true,
-                response: "",
+                message: "",
                 quote: quote)
         } else {
-            new AVGlobalQuoteResponse(success: false, response: "Not found")
+            new BasicQuoteResponse(success: false, message: "Not found")
         }
 
     }

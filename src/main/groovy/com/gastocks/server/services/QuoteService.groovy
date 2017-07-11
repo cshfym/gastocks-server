@@ -37,14 +37,14 @@ abstract class QuoteService implements IQuoteService {
 
             def slurped = new JsonSlurper().parse(url)
 
-            log.info "Slurped data at [${url.path}]for symbol [${symbol}]: [${slurped}]"
+            log.trace "Slurped data at [${url.path}]for symbol [${symbol}]: [${slurped}]"
 
             if (!converter.hasData(slurped)) {
                 log.warn("No quote data found for symbol [${symbol}]")
                 return null
             } else {
                 quote = converter.fromObject(slurped)
-                log.info "Constructed quote object: [${quote}]"
+                log.trace "Constructed quote object: [${quote}]"
             }
 
         } catch (Exception ex) {
@@ -54,7 +54,7 @@ abstract class QuoteService implements IQuoteService {
             conn?.disconnect()
         }
 
-        log.info "Quote retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
+        log.info "Quote for symbol [${symbol}] retrieved in [${System.currentTimeMillis() - startStopwatch}] ms"
 
         quote
     }

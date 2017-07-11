@@ -6,17 +6,22 @@ import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteConstants
 import com.gastocks.server.util.DateUtility
+import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
 
     @Override
     boolean hasData(Object obj) {
-        Map timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"
-        !timeSeriesRoot?.isEmpty()
+
+        def timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"
+        def metadataRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.METADATA_ROOT}"
+
+        timeSeriesRoot && metadataRoot
     }
 
     /**
@@ -31,14 +36,14 @@ class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
         def timeSeriesRoot = obj."${AVTimeSeriesAdjustedQuoteConstants.TIME_SERIES_ROOT}"
 
         def quote = new AVTimeSeriesAdjustedQuote(
-                symbol: metadataRoot."${AVTimeSeriesAdjustedQuoteConstants.META_SYMBOL}",
-                dailyQuoteList: []
+            symbol: metadataRoot."${AVTimeSeriesAdjustedQuoteConstants.META_SYMBOL}",
+            dailyQuoteList: []
         )
 
         timeSeriesRoot.each { day, attributes ->
-            def adjustedDay = new AVTimeSeriesAdjustedDay()
+            def adjustedDay = new AVTimeSeriesAdjustedDay() // 2017-07-10 13:53:00
             adjustedDay.with {
-                date = DateTime.parse(day as String)
+                date = parseDateString(day as String)
                 dayOpen = parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_OPEN}" as String)
                 dayHigh = parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_HIGH}" as String)
                 dayLow =  parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_LOW}" as String)
@@ -50,6 +55,8 @@ class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
             }
             quote.dailyQuoteList << adjustedDay
         }
+
+        quote.dailyQuoteList.sort { a, b -> b.date <=> a.date }
 
         quote
     }
