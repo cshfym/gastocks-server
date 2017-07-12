@@ -1,6 +1,5 @@
 package com.gastocks.server.models.domain
 
-import com.gastocks.server.models.Symbol
 import groovy.transform.ToString
 import org.hibernate.annotations.GenericGenerator
 

@@ -1,4 +1,4 @@
-package com.gastocks.server.models
+package com.gastocks.server.models.domain
 
 import org.hibernate.annotations.GenericGenerator
 

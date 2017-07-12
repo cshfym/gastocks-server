@@ -1,15 +1,20 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.BasicQuoteResponse
+import com.gastocks.server.models.domain.jms.QueueableQuote
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedFetchAndPersistService
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
+import org.springframework.jms.core.JmsTemplate
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
+@Slf4j
 @Controller
 @RequestMapping("/avtsa")
 class AVTimeSeriesAdjustedQuoteResource {
@@ -62,5 +67,20 @@ class AVTimeSeriesAdjustedQuoteResource {
         fetchAndPersistService.fetchAndPersistAllQuotes()
 
         new BasicQuoteResponse(success: true, message: "")
+    }
+
+    @Autowired
+    ApplicationContext applicationContext
+
+    @ResponseBody
+    @RequestMapping(value="/queue", method=RequestMethod.GET)
+    BasicQuoteResponse doQueueSymbol(@RequestParam(value="symbol", required=true) String symbol) {
+
+        JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
+
+        def queueObject = new QueueableQuote(symbol: symbol)
+
+        log.info "Queueing a symbol for processing: <{ ${queueObject} }>"
+        jmsTemplate.convertAndSend("quote_queue", queueObject)
     }
 }

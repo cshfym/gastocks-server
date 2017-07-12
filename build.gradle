@@ -28,6 +28,11 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '1.5.4.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.4.RELEASE'
 
+    // ActiveMQ Support
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '1.4.0.RELEASE'
+    compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.0'
+    //compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0.pr4'
+
     compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
     compile group: 'joda-time', name: 'joda-time-hibernate', version: '1.4'
 

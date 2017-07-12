@@ -2,9 +2,11 @@ package com.gastocks.server.services.avglobalquote
 
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
-import com.gastocks.server.models.Symbol
+import com.gastocks.server.models.domain.Symbol
 import com.gastocks.server.repositories.QuoteRepository
 import com.gastocks.server.repositories.SymbolRepository
+import com.gastocks.server.services.domain.QuotePersistenceService
+import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,17 +27,17 @@ class AVGlobalQuoteFetchAndPersistService {
     AVGlobalQuoteService avGlobalQuoteService
 
     @Autowired
-    QuoteRepository quoteRepository
+    QuotePersistenceService quotePersistenceService
 
     @Autowired
-    SymbolRepository symbolRepository
+    SymbolPersistenceService symbolPersistenceService
 
     /**
      * Fetch all active symbols and persist quote response, if available.
      */
     void fetchAndPersistAllQuotes() {
 
-        List<Symbol> activeSymbols = symbolRepository.findAllByActive(true)
+        List<Symbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, fetching quotes.")
 
@@ -44,56 +46,14 @@ class AVGlobalQuoteFetchAndPersistService {
             def quote = avGlobalQuoteService.getQuote(symbol.identifier)
             def avQuote = (AVGlobalQuote) quote
             if (quote) {
-                def existingQuote = findQuote(symbol, new Date(avQuote.lastUpdated.millis))
+                def existingQuote = quotePersistenceService.findQuote(symbol, new Date(avQuote.lastUpdated.millis))
                 if (existingQuote) {
-                    updateQuote(existingQuote, avQuote)
+                    quotePersistenceService.updateQuote(existingQuote, avQuote)
                 } else {
-                    persistNewQuote(avQuote, symbol)
+                    quotePersistenceService.persistNewQuote(avQuote, symbol)
                 }
             }
         }
-    }
-
-    PersistableQuote findQuote(Symbol symbol, Date lastUpdated) {
-        quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
-    }
-
-    void updateQuote(PersistableQuote existingQuote, AVGlobalQuote quote) {
-
-        existingQuote.with {
-            price = quote.latestPrice
-            dayOpen = quote.currentTradingDayOpen
-            dayHigh = quote.currentTradingDayHigh
-            dayLow = quote.currentTradingDayLow
-            previousDayClose = quote.previousTradingDayClose
-            priceChange = quote.priceChange
-            priceChangePercentage = quote.priceChangePercentage
-            volume = quote.volume
-        }
-
-        log.info("Updating existing quote: ${existingQuote.toString()}")
-
-        quoteRepository.save(existingQuote)
-    }
-    
-    void persistNewQuote(AVGlobalQuote quote, Symbol symbol) {
-
-        def persistableQuote = new PersistableQuote(
-            symbol: symbol,
-            price: quote.latestPrice,
-            dayOpen: quote.currentTradingDayOpen,
-            dayHigh: quote.currentTradingDayHigh,
-            dayLow: quote.currentTradingDayLow,
-            previousDayClose: quote.previousTradingDayClose,
-            priceChange: quote.priceChange,
-            priceChangePercentage: quote.priceChangePercentage,
-            volume: quote.volume,
-            createTimestamp: new Date(),
-            quoteDate: new Date(quote.lastUpdated.millis))
-
-        log.info("Saving quote: ${persistableQuote.toString()}")
-
-        quoteRepository.save(persistableQuote)
     }
 
 }
