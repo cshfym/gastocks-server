@@ -16,14 +16,14 @@ abstract class QuoteService implements IQuoteService {
 
     abstract <T extends IConverter> T getConverter()
 
-    HttpURLConnection conn = null
-
     @Override
     public <T extends IQuote> T getQuote(String symbol) {
 
         T quote = null
 
         def startStopwatch = System.currentTimeMillis()
+
+        HttpURLConnection conn = null
 
         try {
             URL url = new URL(resourceUrlString + "&symbol=${symbol}")

@@ -23,7 +23,7 @@ class ScheduledTasks {
     void reportCurrentTime() {
         //log.info("The time is now {}", dateFormat.format(new Date()))
 
-        Symbol agilent = symbolRepository.findByIdentifier("A")
+        PersistableSymbol agilent = symbolRepository.findByIdentifier("A")
 
         if (!agilent) {
             log.error("No symbol found for identifier [A]!")

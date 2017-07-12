@@ -31,6 +31,7 @@ class Application {
     JmsListenerContainerFactory<?> quoteFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
         
         def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency("10")
         configurer.configure(factory, connectionFactory)
         factory
     }

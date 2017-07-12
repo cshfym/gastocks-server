@@ -28,7 +28,7 @@ class PersistableQuote {
 
     @ManyToOne
     @JoinColumn(name = "symbol_id")
-    Symbol symbol
+    PersistableSymbol symbol
 
     Double price
     Double dayOpen

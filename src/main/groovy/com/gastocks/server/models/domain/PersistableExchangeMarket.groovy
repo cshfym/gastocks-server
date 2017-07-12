@@ -6,8 +6,8 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
-@Entity
-class ExchangeMarket {
+@Entity(name="exchange_market")
+class PersistableExchangeMarket {
 
     @Id
     @GeneratedValue(generator = "system-uuid")

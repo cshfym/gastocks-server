@@ -1,6 +1,6 @@
 package com.gastocks.server.services.domain
 
-import com.gastocks.server.models.domain.Symbol
+import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.SymbolRepository
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,19 +16,23 @@ class SymbolPersistenceService {
     @Autowired
     SymbolRepository symbolRepository
 
-    Symbol findByIdentifier(String identifier) {
+    PersistableSymbol findById(String id) {
+        symbolRepository.findOne(id)
+    }
+
+    PersistableSymbol findByIdentifier(String identifier) {
         symbolRepository.findByIdentifier(identifier)
     }
 
-    List<Symbol> findAllActiveSymbols() {
+    List<PersistableSymbol> findAllActiveSymbols() {
         symbolRepository.findAllByActive(true)
     }
 
-    List<Symbol> findAllByActiveAndIdentifierStartsWith(String partial) {
+    List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(String partial) {
         symbolRepository.findAllByActiveAndIdentifierStartsWith(partial)
     }
 
-    void inactivateSymbol(Symbol symbol) {
+    void inactivateSymbol(PersistableSymbol symbol) {
         symbol.active = false
         symbolRepository.save(symbol)
     }

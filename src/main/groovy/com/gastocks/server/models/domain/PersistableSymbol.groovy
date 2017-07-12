@@ -8,8 +8,8 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
-@Entity
-class Symbol {
+@Entity(name="symbol")
+class PersistableSymbol {
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -22,5 +22,5 @@ class Symbol {
 
     @ManyToOne
     @JoinColumn(name = "exchange_market_id")
-    ExchangeMarket exchangeMarket
+    PersistableExchangeMarket exchangeMarket
 }

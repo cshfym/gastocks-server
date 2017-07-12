@@ -1,6 +1,7 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.BasicQuoteResponse
+import com.gastocks.server.services.avglobalquote.AVGlobalQuoteHandlerService
 import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -11,26 +12,21 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 @Controller
-@RequestMapping("/avtsaq")
+@RequestMapping("/avgq")
 class AVGlobalQuoteResource {
 
     @Autowired
-    AVGlobalQuoteService quoteService
+    AVGlobalQuoteHandlerService quoteHandlerService
 
     @ResponseBody
-    @RequestMapping(value="/quote", method=RequestMethod.GET)
-    BasicQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
+    @RequestMapping(value="/batchAll", method=RequestMethod.GET)
+    BasicQuoteResponse getQuote() {
 
-        def quote = quoteService.getQuote(symbol)
+        def quote = quoteHandlerService.fetchAndQueueAllQuotesForAllSymbols()
 
-        if (quote) {
-            new BasicQuoteResponse(
-                success: true,
-                message: "",
-                quote: quote)
-        } else {
-            new BasicQuoteResponse(success: false, message: "Not found")
-        }
-
+        new BasicQuoteResponse(
+            success: true,
+            message: "",
+            quote: quote)
     }
 }

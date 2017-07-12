@@ -3,7 +3,7 @@ package com.gastocks.server.services.domain
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.domain.PersistableQuote
-import com.gastocks.server.models.domain.Symbol
+import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.QuoteRepository
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +19,7 @@ class QuotePersistenceService {
     @Autowired
     QuoteRepository quoteRepository
 
-    void persistNewQuote(AVTimeSeriesAdjustedDay quote, Symbol symbol) {
+    void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
 
         def persistableQuote = new PersistableQuote(
                 symbol: symbol,
@@ -36,7 +36,7 @@ class QuotePersistenceService {
         quoteRepository.save(persistableQuote)
     }
 
-    void persistNewQuote(AVGlobalQuote quote, Symbol symbol) {
+    void persistNewQuote(AVGlobalQuote quote, PersistableSymbol symbol) {
 
         def persistableQuote = new PersistableQuote(
                 symbol: symbol,
@@ -75,7 +75,7 @@ class QuotePersistenceService {
         quoteRepository.save(existingQuote)
     }
 
-    PersistableQuote findQuote(Symbol symbol, Date lastUpdated) {
+    PersistableQuote findQuote(PersistableSymbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
 }
