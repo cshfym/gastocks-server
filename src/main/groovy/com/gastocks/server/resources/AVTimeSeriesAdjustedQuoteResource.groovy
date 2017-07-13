@@ -29,7 +29,8 @@ class AVTimeSeriesAdjustedQuoteResource {
      */
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
-    BasicQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
+    BasicQuoteResponse getQuote(
+            @RequestParam(value="symbol", required=true) String symbol) {
 
         def quote = quoteService.getQuote(symbol)
 
@@ -65,9 +66,11 @@ class AVTimeSeriesAdjustedQuoteResource {
      */
     @ResponseBody
     @RequestMapping(value="/partial", method=RequestMethod.GET)
-    BasicQuoteResponse doPartial(@RequestParam(value="symbol", required=true) String symbol) {
+    BasicQuoteResponse doPartial(
+            @RequestParam(value="symbol", required=true) String symbol,
+            @RequestParam(value="exchange", required=true) String exchange) {
 
-       fetchAndPersistService.fetchAndPersistQuotesPartial(symbol)
+       fetchAndPersistService.fetchAndPersistQuotesPartial(symbol, exchange)
 
         new BasicQuoteResponse(success: true, message: "")
     }

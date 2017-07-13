@@ -1,7 +1,9 @@
 package com.gastocks.server.services.avtimeseriesadjusted
 
-import com.gastocks.server.jms.services.SymbolQueueService
+import com.gastocks.server.jms.services.SymbolQueueSender
+import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableSymbol
+import com.gastocks.server.services.domain.ExchangeMarketPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -23,7 +25,10 @@ class AVTimeSeriesAdjustedHandlerService {
     SymbolPersistenceService symbolPersistenceService
 
     @Autowired
-    SymbolQueueService queueService
+    SymbolQueueSender queueService
+
+    @Autowired
+    ExchangeMarketPersistenceService exchangeMarketPersistenceService
 
     /**
      * Fetch all active symbols and persist quote response, if available.
@@ -36,7 +41,7 @@ class AVTimeSeriesAdjustedHandlerService {
 
         activeSymbols.eachWithIndex { symbol, index ->
             // if (index > 0) { return }
-            queueService.queueSymbol(symbol, SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVTSA)
+            queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
     }
 
@@ -44,15 +49,27 @@ class AVTimeSeriesAdjustedHandlerService {
      * Fetch all active symbols matching the partial symbol, if available.
      * @param partial
      */
-    void fetchAndPersistQuotesPartial(String partial) {
+    void fetchAndPersistQuotesPartial(String partial, String exchangeName) {
 
-        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllByActiveAndIdentifierStartsWith(partial)
+        PersistableExchangeMarket market = exchangeMarketPersistenceService.findByShortName(exchangeName)
+        if (!market) {
+            log.error "Could not find market by exchange name [${exchangeName}]!"
+            return
+        }
 
-        log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, queueing symbols for quote processing.")
+        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllByActiveAndIdentifierStartsWith(partial, market)
+
+        if (activeSymbols?.size() == 0) {
+          log.info("No active symbols loaded for partial match [${partial}] and exchange market [${exchangeName}], exiting.")
+            return
+        }
+
+        log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols for partial match [${partial}] and exchange market [${exchangeName}], " +
+                "queueing symbols for quote processing.")
 
         activeSymbols.eachWithIndex { symbol, index ->
             // if (index > 0) { return }
-            queueService.queueSymbol(symbol, SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVTSA)
+            queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
     }
 
@@ -68,7 +85,7 @@ class AVTimeSeriesAdjustedHandlerService {
             return
         }
 
-        queueService.queueSymbol(symbol, SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVTSA)
+        queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
     }
 
 }

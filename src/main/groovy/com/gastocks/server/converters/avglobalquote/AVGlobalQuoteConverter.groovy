@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class AVGlobalQuoteConverter extends BaseConverter {
 
-    final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d, K:mma zzz") // i.e. Jul 6, 4:04PM EDT
+    final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d, k:mma zzz") // i.e. Jul 6, 4:04PM EDT
 
     @Override
     boolean hasData(Object obj) {

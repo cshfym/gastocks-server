@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Slf4j
 @Service
-class SymbolQueueService {
+class SymbolQueueSender {
 
     @Autowired
     ApplicationContext applicationContext
@@ -27,11 +27,11 @@ class SymbolQueueService {
      * @param symbol
      * @return
      */
-    BasicQuoteResponse queueSymbol(PersistableSymbol symbol, String destination) {
+    void queueSymbol(PersistableSymbol symbol, String destination) {
 
         JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
 
-        def queueableSymbol = new QueueableSymbol(id: symbol.id, identifier: symbol.identifier)
+        def queueableSymbol = new QueueableSymbol(symbolId: symbol.id, identifier: symbol.identifier)
 
         log.info "Queueing a symbol for processing: <{ ${queueableSymbol} }>"
         jmsTemplate.convertAndSend(destination, queueableSymbol)

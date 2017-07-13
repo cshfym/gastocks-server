@@ -1,9 +1,9 @@
 package com.gastocks.server.jms.services
 
+import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol
 import com.gastocks.server.services.IQuoteService
-import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -14,15 +14,13 @@ import javax.transaction.Transactional
 
 @Slf4j
 @Service
-class SymbolProcessingService {
+class AVGlobalQuoteProcessingService {
 
     @Autowired
     QuotePersistenceService quotePersistenceService
 
     @Autowired
     SymbolPersistenceService symbolPersistenceService
-
-    static final int MAX_QUOTE_DAYS = 365
 
     /**
      * Primary method for processing a symbol into a quote and persisting it. (Move from JMS package later?)
@@ -33,9 +31,7 @@ class SymbolProcessingService {
 
         log.info("Begin processing for symbol [${symbol.identifier}]")
 
-        def startStopwatch = System.currentTimeMillis()
-
-        def persistableSymbol = symbolPersistenceService.findById(symbol.id)
+        def persistableSymbol = symbolPersistenceService.findById(symbol.symbolId)
 
         def quote = quoteService.getQuote(persistableSymbol.identifier)
         if (!quote) {
@@ -45,26 +41,20 @@ class SymbolProcessingService {
             return
         }
 
-        int daysPersisted = 0
-        int daysBypassed = 0
-
-        def avQuote = (AVTimeSeriesAdjustedQuote) quote
-        if (quote) {
-            avQuote.dailyQuoteList.eachWithIndex { dailyQuote, ix ->
-            if (ix > MAX_QUOTE_DAYS) { return }
-            if (quotePersistenceService.findQuote(persistableSymbol, new Date(dailyQuote.date.millis))) {
-               log.trace("Bypassing quote for symbol [${symbol.identifier}] on [${dailyQuote.date.toString()}] as it already exists.")
-               daysBypassed++
-               return
-           }
-
-           quotePersistenceService.persistNewQuote(dailyQuote, persistableSymbol)
-           daysPersisted++
+        def avQuote = (AVGlobalQuote) quote
+        if (avQuote) {
+            def existingQuote = quotePersistenceService.findQuote(persistableSymbol, new Date(avQuote.lastUpdated.millis))
+            if (existingQuote) {
+                quotePersistenceService.updateQuote(existingQuote, avQuote)
+                log.info ("Updating existing quote for [${persistableSymbol.identifier} - ${persistableSymbol.exchangeMarket.shortName}] on [${avQuote.lastUpdated.toString()}]")
+            } else {
+               quotePersistenceService.persistNewQuote(avQuote, persistableSymbol)
+                log.info ("Persisting new quote for [${persistableSymbol.identifier} - ${persistableSymbol.exchangeMarket.shortName}] on [${avQuote.lastUpdated.toString()}]")
            }
         }
 
-        log.info "${daysPersisted} quotes for symbol [${symbol.identifier}] stored in [${System.currentTimeMillis() - startStopwatch} ms], " +
-           "${daysBypassed} existing quotes bypassed."
+
+
     }
 
 }

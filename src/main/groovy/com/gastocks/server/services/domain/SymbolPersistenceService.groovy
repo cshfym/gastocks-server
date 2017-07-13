@@ -1,5 +1,6 @@
 package com.gastocks.server.services.domain
 
+import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.SymbolRepository
 import groovy.util.logging.Slf4j
@@ -28,8 +29,8 @@ class SymbolPersistenceService {
         symbolRepository.findAllByActive(true)
     }
 
-    List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(String partial) {
-        symbolRepository.findAllByActiveAndIdentifierStartsWith(partial)
+    List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(String partial, PersistableExchangeMarket exchangeMarket) {
+        symbolRepository.findAllByActiveAndIdentifierStartsWith(partial, exchangeMarket.id)
     }
 
     void inactivateSymbol(PersistableSymbol symbol) {

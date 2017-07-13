@@ -20,13 +20,19 @@ class AVGlobalQuoteResource {
 
     @ResponseBody
     @RequestMapping(value="/batchAll", method=RequestMethod.GET)
-    BasicQuoteResponse getQuote() {
+    BasicQuoteResponse batchAll() {
 
-        def quote = quoteHandlerService.fetchAndQueueAllQuotesForAllSymbols()
+        quoteHandlerService.fetchAndQueueAllQuotesForAllSymbols()
 
-        new BasicQuoteResponse(
-            success: true,
-            message: "",
-            quote: quote)
+        new BasicQuoteResponse(success: true, message: "", quote: null)
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/single", method=RequestMethod.GET)
+    BasicQuoteResponse doSingle(@RequestParam(value="symbol", required=true) String symbol) {
+
+        quoteHandlerService.fetchAndQueueQuoteForSymbol(symbol)
+
+        new BasicQuoteResponse(success: true, message: "", quote: null)
     }
 }

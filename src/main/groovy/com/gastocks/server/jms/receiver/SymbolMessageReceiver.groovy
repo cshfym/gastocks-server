@@ -1,8 +1,9 @@
 package com.gastocks.server.jms.receiver
 
-import com.gastocks.server.jms.services.SymbolProcessingService
+import com.gastocks.server.jms.services.AVGlobalQuoteProcessingService
+import com.gastocks.server.jms.services.AVTimeSeriesAdjustedProcessingService
 import com.gastocks.server.models.domain.jms.QueueableSymbol
-import com.gastocks.server.jms.services.SymbolQueueService
+import com.gastocks.server.jms.services.SymbolQueueSender
 import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
 import groovy.util.logging.Slf4j
@@ -21,21 +22,24 @@ class SymbolMessageReceiver {
     AVGlobalQuoteService globalQuoteService
 
     @Autowired
-    SymbolProcessingService symbolProcessingService
+    AVTimeSeriesAdjustedProcessingService timeSeriesAdjustedProcessingService
 
-    @JmsListener(destination = SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVTSA, containerFactory = "quoteFactory")
+    @Autowired
+    AVGlobalQuoteProcessingService globalQuoteProcessingService
+
+    @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA, containerFactory = "quoteFactory")
     void receiveAVTSAQueuedSymbol(QueueableSymbol symbol) {
 
-        log.info "Received <{ ${symbol} }> in ${SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVTSA}"
+        log.info "Received <{ ${symbol} }> in ${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA}"
 
-        symbolProcessingService.processSymbol(symbol, timeSeriesAdjustedQuoteService)
+        timeSeriesAdjustedProcessingService.processSymbol(symbol, timeSeriesAdjustedQuoteService)
     }
 
-    @JmsListener(destination = SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVGQ, containerFactory = "quoteFactory")
+    @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ, containerFactory = "quoteFactory")
     void receiveGQQueuedSymbol(QueueableSymbol symbol) {
 
-        log.info "Received <{ ${symbol} }> in ${SymbolQueueService.SYMBOL_QUEUE_DESTINATION_AVGQ}"
+        log.info "Received <{ ${symbol} }> in ${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ}"
 
-        symbolProcessingService.processSymbol(symbol, globalQuoteService)
+        globalQuoteProcessingService.processSymbol(symbol, globalQuoteService)
     }
 }

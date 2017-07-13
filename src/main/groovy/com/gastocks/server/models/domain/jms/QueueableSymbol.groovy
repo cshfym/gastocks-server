@@ -2,7 +2,7 @@ package com.gastocks.server.models.domain.jms
 
 class QueueableSymbol {
 
-    String id
+    String symbolId
     String identifier
 
     @Override
