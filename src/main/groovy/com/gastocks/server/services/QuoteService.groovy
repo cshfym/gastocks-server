@@ -4,11 +4,12 @@ import com.gastocks.server.converters.IConverter
 import com.gastocks.server.models.IQuote
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
 
 @Slf4j
 abstract class QuoteService implements IQuoteService {
 
-    static final String API_KEY = "W2OXJLZJ9W0O5K1M"
+    abstract String API_KEY
     static final String API_KEY_PARAM = "&apikey="
     static final String OUTPUT_SIZE_PARAM = "&outputsize=full"
 

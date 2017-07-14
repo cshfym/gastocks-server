@@ -7,12 +7,16 @@ import com.gastocks.server.services.QuoteService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 @Slf4j
 @CompileStatic
 class AVTimeSeriesAdjustedQuoteService extends QuoteService {
+
+    @Value('${alphavantage.apikey}')
+    String API_KEY
 
     @Autowired
     AVTimeSeriesAdjustedQuoteConverter converter

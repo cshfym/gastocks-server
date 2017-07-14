@@ -1,5 +1,6 @@
 package com.gastocks.server
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer
@@ -21,6 +22,9 @@ import javax.jms.ConnectionFactory
 @SpringBootApplication
 class Application {
 
+    @Value('${queue.concurrency}')
+    String QUEUE_CONCURRENCY
+
     static void main(String[] args) {
         ApplicationContext context = SpringApplication.run Application, args
         DispatcherServlet dispatcherServlet = (DispatcherServlet)context.getBean("dispatcherServlet")
@@ -31,7 +35,7 @@ class Application {
     JmsListenerContainerFactory<?> quoteFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
         
         def factory = new DefaultJmsListenerContainerFactory()
-        factory.setConcurrency("10")
+        factory.setConcurrency(QUEUE_CONCURRENCY)
         configurer.configure(factory, connectionFactory)
         factory
     }
