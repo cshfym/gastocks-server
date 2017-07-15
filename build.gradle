@@ -7,7 +7,7 @@ apply plugin: 'war'
 
 war {
     baseName = 'gastocks-server'
-    version =  '1.0.0'
+    version =  "${version}"
 }
 
 buildscript {

@@ -2,10 +2,18 @@ package com.gastocks.server
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer
+import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.boot.web.support.SpringBootServletInitializer
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.context.annotation.PropertySource
+import org.springframework.context.annotation.PropertySources
 import org.springframework.jms.annotation.EnableJms
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
 import org.springframework.jms.config.JmsListenerContainerFactory
@@ -19,8 +27,14 @@ import javax.jms.ConnectionFactory
 
 @EnableJms
 @EnableScheduling
-@SpringBootApplication
-class Application {
+@SpringBootApplication(exclude = SpringDataWebAutoConfiguration.class)
+@PropertySources([
+    @PropertySource(value = "classpath:application.properties"),
+    @PropertySource(value = "file:/usr/local/conf/gastocks-server/application.properties", ignoreResourceNotFound = true)
+])
+@EnableAutoConfiguration(exclude = FlywayAutoConfiguration.class)
+@EnableAspectJAutoProxy(proxyTargetClass=true)
+class Application extends SpringBootServletInitializer {
 
     @Value('${queue.concurrency}')
     String QUEUE_CONCURRENCY
@@ -29,6 +43,11 @@ class Application {
         ApplicationContext context = SpringApplication.run Application, args
         DispatcherServlet dispatcherServlet = (DispatcherServlet)context.getBean("dispatcherServlet")
         dispatcherServlet.setThrowExceptionIfNoHandlerFound(true)
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class)
     }
 
     @Bean
