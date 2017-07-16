@@ -1,2 +1,3 @@
 rootProject.name = 'gastocks-server'
+include 'scheduler'
 

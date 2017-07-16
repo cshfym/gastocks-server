@@ -46,6 +46,9 @@ abstract class QuoteService implements IQuoteService {
             } else {
                 quote = converter.fromObject(slurped)
                 log.trace "Constructed quote object: [${quote}]"
+                if (!quote) {
+                    return null
+                }
             }
 
         } catch (Exception ex) {

@@ -17,6 +17,9 @@ class SymbolPersistenceService {
     @Autowired
     SymbolRepository symbolRepository
 
+    @Autowired
+    QuotePersistenceService quotePersistenceService
+
     PersistableSymbol findById(String id) {
         symbolRepository.findOne(id)
     }
@@ -31,6 +34,22 @@ class SymbolPersistenceService {
 
     List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(String partial, PersistableExchangeMarket exchangeMarket) {
         symbolRepository.findAllByActiveAndIdentifierStartsWith(partial, exchangeMarket.id)
+    }
+
+    // Quote fill-in - find missing quotes for all symbols
+    List<PersistableSymbol> findSymbolsWithMissingQuotes() {
+
+        List<PersistableSymbol> activeSymbols = symbolRepository.findAllByActive(true)
+
+        List<PersistableSymbol> symbolsWithMissingQuotes = []
+
+        activeSymbols.each { symbol ->
+            if (quotePersistenceService.missingQuotesForSymbol()) {
+                symbolsWithMissingQuotes << symbol
+            }
+        }
+
+        symbolsWithMissingQuotes
     }
 
     void inactivateSymbol(PersistableSymbol symbol) {

@@ -1,9 +1,11 @@
 package com.gastocks.server.schedulers
 
-import com.gastocks.server.repositories.SymbolRepository
+import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
+import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Slf4j
@@ -11,28 +13,18 @@ import org.springframework.stereotype.Component
 class ScheduledTasks {
 
     @Autowired
-    SymbolRepository symbolRepository
+    SymbolPersistenceService symbolPersistenceService
 
     @Autowired
     AVGlobalQuoteService quoteService
 
-    //private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class)
-
-    /*
     @Scheduled(fixedRate = 5000L)
-    void reportCurrentTime() {
-        //log.info("The time is now {}", dateFormat.format(new Date()))
+    void process() {
 
-        PersistableSymbol agilent = symbolRepository.findByIdentifier("A")
+        List<PersistableSymbol> symbolsWithMissingQuotes = symbolPersistenceService.findSymbolsWithMissingQuotes()
 
-        if (!agilent) {
-            log.error("No symbol found for identifier [A]!")
-            return
+        symbolsWithMissingQuotes.each { symbol ->
+            log.info("Missing quote for symbol: [${symbol.identifier}]")
         }
-
-        AVGlobalQuote q = avGlobalQuoteService.getQuote(agilent.identifier)
-
-        log.info("Pulled quote for: \n ${q.toString()}\n")
     }
-    */
 }

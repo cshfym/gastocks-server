@@ -3,11 +3,13 @@ package com.gastocks.server.converters.avglobalquote
 import com.gastocks.server.converters.BaseConverter
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avglobalquote.AVGlobalQuoteConstants
+import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 class AVGlobalQuoteConverter extends BaseConverter {
 
@@ -31,8 +33,14 @@ class AVGlobalQuoteConverter extends BaseConverter {
 
         def objRoot = obj."${AVGlobalQuoteConstants.MAP_ROOT}"
 
-        DateTime parsedDateTime = DATE_FORMAT.parseDateTime(objRoot."${AVGlobalQuoteConstants.LAST_UPDATED_DATE}" as String)
-            .withYear(new DateTime().year)
+        def parsedDateTime
+        try {
+            parsedDateTime = DATE_FORMAT.parseDateTime(objRoot."${AVGlobalQuoteConstants.LAST_UPDATED_DATE}" as String)
+                    .withYear(new DateTime().year)
+        } catch (Exception ex) {
+            log.warn ("Could not parse date time [${AVGlobalQuoteConstants.LAST_UPDATED_DATE}] during quote conversion.")
+            return null
+        }
 
         quote.with {
             symbol = objRoot."${AVGlobalQuoteConstants.SYMBOL}"
