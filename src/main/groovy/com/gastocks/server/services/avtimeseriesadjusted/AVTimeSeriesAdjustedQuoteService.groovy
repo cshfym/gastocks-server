@@ -3,7 +3,7 @@ package com.gastocks.server.services.avtimeseriesadjusted
 import com.gastocks.server.converters.IConverter
 import com.gastocks.server.converters.avtimeseriesadjustedquote.AVTimeSeriesAdjustedQuoteConverter
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteConstants
-import com.gastocks.server.services.QuoteService
+import com.gastocks.server.services.AbstractExternalQuoteService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 @Slf4j
 @CompileStatic
-class AVTimeSeriesAdjustedQuoteService extends QuoteService {
+class AVTimeSeriesAdjustedQuoteService extends AbstractExternalQuoteService {
 
     @Value('${alphavantage.apikey}')
     String API_KEY

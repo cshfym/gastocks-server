@@ -10,16 +10,17 @@ import org.joda.time.format.DateTimeFormatter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import javax.annotation.PostConstruct
-
 @Component
 class DateUtility {
+
+    final DateTimeFormatter LONG_DATE_FORMAT = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss")
+    final DateTimeFormatter SHORT_DATE_FORMAT = DateTimeFormat.forPattern("YYYY-MM-dd")
+    final static int MAX_DAYS_BACK = 365
+
 
     @Autowired
     HolidayCalendarPersistenceService holidayCalendarPersistenceService
 
-    final static DateTimeFormatter SHORT_DATE_FORMAT = DateTimeFormat.forPattern("YYYY-MM-dd")
-    final static int MAX_DAYS_BACK = 365
 
 
     List<String> buildChronologicalDateListNoWeekends(PersistableExchangeMarket exchangeMarket, DateTime startDate, DateTime endDate = null) {
@@ -45,7 +46,10 @@ class DateUtility {
 
         if (isDateOnWeekend(date)) { return }
 
-        if (holidayCalendarPersistenceService.findByExchangeMarketAndHolidayDate(exchangeMarket, new Date(date.millis))) {
+        String dateToShortString = date.toString(SHORT_DATE_FORMAT)
+
+        if (holidayCalendarPersistenceService.findByExchangeMarketAndHolidayDate(
+                exchangeMarket, new Date(SHORT_DATE_FORMAT.parseDateTime(dateToShortString).millis))) {
             return
         }
 
@@ -53,13 +57,34 @@ class DateUtility {
     }
 
     boolean isDateOnWeekend(DateTime date) {
-        (Integer.valueOf(date.dayOfWeek().toString()) == DateTimeConstants.SATURDAY) ||
-                (Integer.valueOf(date.dayOfWeek().toString()) == DateTimeConstants.SUNDAY)
+        (Integer.valueOf(date.dayOfWeek().getAsString()) == DateTimeConstants.SATURDAY) ||
+                (Integer.valueOf(date.dayOfWeek().getAsString()) == DateTimeConstants.SUNDAY)
     }
 
     boolean isDateBeforeToday(DateTime date) {
         def today = new LocalDate()
         def localDate = new LocalDate(date.millis)
         localDate.isBefore(today)
+    }
+
+    DateTime parseDateStringDate(String dateString) {
+
+        DateTime dateTime
+
+        try {
+            dateTime = DateTime.parse(dateString, SHORT_DATE_FORMAT)
+        } catch (Exception ex) {
+            // Swallow
+        }
+
+        if (dateTime) { return dateTime }
+
+        try {
+            dateTime = DateTime.parse(dateString, LONG_DATE_FORMAT)
+        } catch (Exception ex) {
+            // Swallow
+        }
+
+        dateTime
     }
 }

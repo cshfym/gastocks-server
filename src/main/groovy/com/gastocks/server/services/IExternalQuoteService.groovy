@@ -3,7 +3,7 @@ package com.gastocks.server.services
 import com.gastocks.server.converters.IConverter
 import com.gastocks.server.models.IQuote
 
-interface IQuoteService {
+interface IExternalQuoteService {
 
     abstract String getResourceUrlString()
 

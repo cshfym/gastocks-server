@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 /**
- *
+ * Service layer for quote-related persistence operations.
  */
 @Slf4j
 @Service
@@ -20,9 +20,6 @@ class QuotePersistenceService {
 
     @Autowired
     QuoteRepository quoteRepository
-
-    @Autowired
-    DateUtility dateUtility
 
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
 
@@ -84,16 +81,4 @@ class QuotePersistenceService {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
 
-    boolean missingQuotesForSymbol(PersistableSymbol symbol) {
-
-        List<String> searchForDates = dateUtility.buildChronologicalDateListNoWeekends(symbol.exchangeMarket, new DateTime())
-
-        searchForDates.each { dateString ->
-            if (!quoteRepository.findBySymbolAndQuoteDate(symbol, new Date(dateString))) {
-                return true
-            }
-        }
-
-        false
-    }
 }

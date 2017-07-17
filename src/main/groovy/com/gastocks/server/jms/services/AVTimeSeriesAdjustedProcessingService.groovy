@@ -2,7 +2,7 @@ package com.gastocks.server.jms.services
 
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol
-import com.gastocks.server.services.IQuoteService
+import com.gastocks.server.services.IExternalQuoteService
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -28,7 +28,7 @@ class AVTimeSeriesAdjustedProcessingService {
      * @param symbol
     */
     @Transactional
-    void processSymbol(QueueableSymbol symbol, IQuoteService quoteService) {
+    void processSymbol(QueueableSymbol symbol, IExternalQuoteService quoteService) {
 
         log.info("Begin processing for symbol [${symbol.identifier}]")
 

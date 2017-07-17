@@ -1,5 +1,6 @@
 package com.gastocks.server
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.jms.config.JmsConfiguration
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -26,7 +27,7 @@ import org.springframework.web.servlet.DispatcherServlet
 ])
 @EnableAutoConfiguration(exclude = FlywayAutoConfiguration.class)
 @EnableAspectJAutoProxy(proxyTargetClass=true)
- @Import([JmsConfiguration.class])
+@Import([JmsConfiguration.class, CacheConfiguration.class])
 class Application extends SpringBootServletInitializer {
 
     static void main(String[] args) {

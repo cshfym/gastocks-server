@@ -7,9 +7,6 @@ import org.joda.time.format.DateTimeFormatter
 
 abstract class BaseConverter implements IConverter {
 
-    DateTimeFormatter shortDateformat = DateTimeFormat.forPattern("YYYY-MM-dd")
-    DateTimeFormatter longDateFormat = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss")
-
     abstract boolean hasData(Object obj)
 
     abstract <T extends IQuote> T fromObject(Object obj)
@@ -38,24 +35,4 @@ abstract class BaseConverter implements IConverter {
         }
     }
 
-    DateTime parseDateString(String dateString) {
-
-        DateTime dateTime
-
-        try {
-            dateTime = DateTime.parse(dateString, shortDateformat)
-        } catch (Exception ex) {
-            // Swallow
-        }
-
-        if (dateTime) { return dateTime }
-
-        try {
-            dateTime = DateTime.parse(dateString, longDateFormat)
-        } catch (Exception ex) {
-            // Swallow
-        }
-
-        dateTime
-    }
 }

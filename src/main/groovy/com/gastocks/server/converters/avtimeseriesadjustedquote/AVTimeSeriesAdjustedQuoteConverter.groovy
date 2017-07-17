@@ -1,19 +1,20 @@
 package com.gastocks.server.converters.avtimeseriesadjustedquote
 
 import com.gastocks.server.converters.BaseConverter
-import com.gastocks.server.converters.IConverter
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteConstants
 import com.gastocks.server.util.DateUtility
 import groovy.util.logging.Slf4j
-import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
 class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
+
+    @Autowired
+    DateUtility dateUtility
 
     @Override
     boolean hasData(Object obj) {
@@ -43,7 +44,7 @@ class AVTimeSeriesAdjustedQuoteConverter extends BaseConverter {
         timeSeriesRoot.each { day, attributes ->
             def adjustedDay = new AVTimeSeriesAdjustedDay() // 2017-07-10 13:53:00
             adjustedDay.with {
-                date = parseDateString(day as String)
+                date = dateUtility.parseDateStringDate(day as String)
                 dayOpen = parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_OPEN}" as String)
                 dayHigh = parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_HIGH}" as String)
                 dayLow =  parseToDouble(attributes."${AVTimeSeriesAdjustedQuoteConstants.TS_LOW}" as String)
