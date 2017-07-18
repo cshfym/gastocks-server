@@ -1,7 +1,10 @@
 package com.gastocks.server
 
 import com.gastocks.server.config.CacheConfiguration
+import com.gastocks.server.config.TaskExecutorConfiguration
 import com.gastocks.server.jms.config.JmsConfiguration
+import com.gastocks.server.services.PreFetchService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -10,13 +13,17 @@ import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.web.support.SpringBootServletInitializer
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
 import org.springframework.jms.annotation.EnableJms
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.web.servlet.DispatcherServlet
+
+import javax.annotation.PostConstruct
 
 @EnableJms
 @EnableScheduling
@@ -27,7 +34,11 @@ import org.springframework.web.servlet.DispatcherServlet
 ])
 @EnableAutoConfiguration(exclude = FlywayAutoConfiguration.class)
 @EnableAspectJAutoProxy(proxyTargetClass=true)
-@Import([JmsConfiguration.class, CacheConfiguration.class])
+@Import([
+        JmsConfiguration.class,
+        CacheConfiguration.class,
+        TaskExecutorConfiguration.class
+])
 class Application extends SpringBootServletInitializer {
 
     static void main(String[] args) {

@@ -9,6 +9,7 @@ import com.gastocks.server.util.DateUtility
 import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 /**
@@ -79,6 +80,13 @@ class QuotePersistenceService {
 
     PersistableQuote findQuote(PersistableSymbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
+    }
+
+    // @Cacheable(value = "allQuotesForSymbol", key="#symbol.identifier")
+    List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
+        def startStopwatch = System.currentTimeMillis()
+        def quotes = quoteRepository.findAllBySymbol(symbol)
+        log.info("Loaded [${quotes?.size()}] quotes for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
 }

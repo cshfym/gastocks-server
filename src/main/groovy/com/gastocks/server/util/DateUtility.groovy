@@ -2,14 +2,17 @@ package com.gastocks.server.util
 
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.services.domain.HolidayCalendarPersistenceService
+import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 class DateUtility {
 
@@ -21,9 +24,9 @@ class DateUtility {
     @Autowired
     HolidayCalendarPersistenceService holidayCalendarPersistenceService
 
-
-
     List<String> buildChronologicalDateListNoWeekends(PersistableExchangeMarket exchangeMarket, DateTime startDate, DateTime endDate = null) {
+
+        log.info ("Executed buildChronologicalDateListNoWeekends [${exchangeMarket.shortName}] startDate:[${startDate.toString()}] endDate:[${endDate?.toString()}]")
 
         List<String> dateList = []
         int daysBack = 1
@@ -48,8 +51,7 @@ class DateUtility {
 
         String dateToShortString = date.toString(SHORT_DATE_FORMAT)
 
-        if (holidayCalendarPersistenceService.findByExchangeMarketAndHolidayDate(
-                exchangeMarket, new Date(SHORT_DATE_FORMAT.parseDateTime(dateToShortString).millis))) {
+        if (holidayCalendarPersistenceService.isHolidayDate(exchangeMarket, new Date(SHORT_DATE_FORMAT.parseDateTime(dateToShortString).millis))) {
             return
         }
 

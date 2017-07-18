@@ -7,14 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
+import javax.annotation.PostConstruct
+
 @Slf4j
 @Component
-class ScheduledTasks {
+class MissingQuoteScheduledTask {
 
     @Autowired
     SymbolService symbolService
 
-    @Scheduled(fixedRate = 5000L)
+    @PostConstruct
+    void onPostConstruct() {
+        process()
+    }
+
+    @Scheduled(cron = "0 1 1 * * ?") // Every day at 1:01 AM
     void process() {
 
         List<PersistableSymbol> symbolsWithMissingQuotes = symbolService.findSymbolsWithMissingQuotes()

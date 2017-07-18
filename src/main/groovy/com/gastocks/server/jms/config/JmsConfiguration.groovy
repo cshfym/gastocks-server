@@ -15,14 +15,20 @@ import javax.jms.ConnectionFactory
 @Configuration
 class JmsConfiguration {
 
-    @Value('${queue.concurrency}')
-    String QUEUE_CONCURRENCY
+    @Value('${symbol.consumer.queue.concurrency}')
+    String SYMBOL_CONSUMER_QUEUE_CONCURRENCY
 
+    /**
+     * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
     @Bean
     JmsListenerContainerFactory<?> quoteFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
 
         def factory = new DefaultJmsListenerContainerFactory()
-        factory.setConcurrency(QUEUE_CONCURRENCY)
+        factory.setConcurrency(SYMBOL_CONSUMER_QUEUE_CONCURRENCY)
         configurer.configure(factory, connectionFactory)
         factory
     }

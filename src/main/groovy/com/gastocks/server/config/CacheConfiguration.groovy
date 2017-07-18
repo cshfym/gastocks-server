@@ -12,6 +12,6 @@ class CacheConfiguration {
 
     @Bean
     CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("activeSymbols")
+        return new ConcurrentMapCacheManager("activeSymbols", "allHolidayCalendars")
     }
 }
