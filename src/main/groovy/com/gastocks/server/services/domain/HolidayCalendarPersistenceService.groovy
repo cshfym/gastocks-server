@@ -4,6 +4,7 @@ import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableHolidayCalendar
 import com.gastocks.server.repositories.HolidayCalendarRepository
 import groovy.util.logging.Slf4j
+import org.joda.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -20,31 +21,40 @@ class HolidayCalendarPersistenceService {
     @Autowired
     HolidayCalendarRepository holidayCalendarRepository
 
-    Map<Date,List<PersistableExchangeMarket>> exchangeHolidayCalendar
+    Map<LocalDate,List<String>> exchangeHolidayCalendarMap
 
+    /**
+     * Executed on {@PostConstruct} to pre-load the exchange market holiday calendars.
+     */
     @PostConstruct
     void initializeHolidayCalendarMap() {
 
-        exchangeHolidayCalendar = new HashMap<Date,List<PersistableExchangeMarket>>()
+        exchangeHolidayCalendarMap = new HashMap<LocalDate,List<String>>()
 
         def holidayCalendarDates = findAll()
 
         holidayCalendarDates.each { holidayCalendar ->
-            def supportedMarkets = exchangeHolidayCalendar.get(holidayCalendar.holidayDate)
+            def supportedMarkets = exchangeHolidayCalendarMap.get(new LocalDate(holidayCalendar.holidayDate))
             if (supportedMarkets) {
-                supportedMarkets << holidayCalendar.exchangeMarket
+                supportedMarkets << holidayCalendar.exchangeMarket.shortName
             } else {
-                supportedMarkets = [holidayCalendar.exchangeMarket]
+                supportedMarkets = [holidayCalendar.exchangeMarket.shortName]
             }
 
-            exchangeHolidayCalendar.put(holidayCalendar.holidayDate, supportedMarkets)
+            exchangeHolidayCalendarMap.put(new LocalDate(holidayCalendar.holidayDate), supportedMarkets)
         }
     }
 
+    /**
+     * Returns true if the date passed is considered a holiday for the specified market.
+     * @param exchangeMarket
+     * @param holidayDate
+     * @return boolean
+     */
     boolean isHolidayDate(PersistableExchangeMarket exchangeMarket, Date holidayDate) {
-        def supportedMarketsForDate = exchangeHolidayCalendar.get(holidayDate)
-        if (!supportedMarketsForDate) { return false }
-        if (supportedMarketsForDate.contains(exchangeMarket)) { return true }
+        def holidayDateEntry = exchangeHolidayCalendarMap.get(new LocalDate(holidayDate))
+        if (!holidayDateEntry) { return false }
+        if (holidayDateEntry.contains(exchangeMarket.shortName)) { return true }
 
         false
     }

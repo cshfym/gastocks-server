@@ -81,8 +81,7 @@ class QuotePersistenceService {
     PersistableQuote findQuote(PersistableSymbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
-
-    // @Cacheable(value = "allQuotesForSymbol", key="#symbol.identifier")
+    
     List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
         def startStopwatch = System.currentTimeMillis()
         def quotes = quoteRepository.findAllBySymbol(symbol)
