@@ -24,7 +24,7 @@ class SymbolService {
      */
     List<PersistableSymbol> findSymbolsWithMissingQuotes() {
 
-        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols() // Ensure cache is used
+        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         List<PersistableSymbol> symbolsWithMissingQuotes = []
 

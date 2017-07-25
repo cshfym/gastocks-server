@@ -61,4 +61,8 @@
         <appender-ref ref="FILE-ERROR" />
     </root>
 
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
 </configuration>
