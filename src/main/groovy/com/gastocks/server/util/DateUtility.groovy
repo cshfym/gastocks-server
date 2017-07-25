@@ -26,7 +26,7 @@ class DateUtility {
 
     List<String> buildChronologicalDateListNoWeekends(PersistableExchangeMarket exchangeMarket, DateTime startDate, DateTime endDate = null) {
 
-        log.info ("Executed buildChronologicalDateListNoWeekends [${exchangeMarket.shortName}] startDate:[${startDate.toString()}] endDate:[${endDate?.toString()}]")
+        log.debug("Executed buildChronologicalDateListNoWeekends [${exchangeMarket.shortName}] startDate:[${startDate.toString()}] endDate:[${endDate?.toString()}]")
 
         List<String> dateList = []
         int daysBack = 1
@@ -55,7 +55,7 @@ class DateUtility {
             return
         }
 
-        dateList << date.toString(SHORT_DATE_FORMAT)
+        dateList << dateToShortString
     }
 
     boolean isDateOnWeekend(DateTime date) {
@@ -67,6 +67,10 @@ class DateUtility {
         def today = new LocalDate()
         def localDate = new LocalDate(date.millis)
         localDate.isBefore(today)
+    }
+
+    boolean equalDates(Date dateOne, Date dateTwo) {
+
     }
 
     DateTime parseDateStringDate(String dateString) {

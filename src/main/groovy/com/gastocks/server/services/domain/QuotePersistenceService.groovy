@@ -81,11 +81,12 @@ class QuotePersistenceService {
     PersistableQuote findQuote(PersistableSymbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
-    
+
     List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
         def startStopwatch = System.currentTimeMillis()
         def quotes = quoteRepository.findAllBySymbol(symbol)
         log.info("Loaded [${quotes?.size()}] quotes for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        quotes
     }
 
 }
