@@ -14,7 +14,7 @@ class AVQuoteScheduledTask {
     @Autowired
     AVGlobalQuoteHandlerService quoteHandlerService
 
-    @Scheduled(cron = "0 1 1 * * ?")
+    @Scheduled(cron = '${av.quote.daily.schedule}')
     void process() {
         quoteHandlerService.fetchAndQueueAllQuotesForAllSymbols()
     }
