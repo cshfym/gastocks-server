@@ -32,6 +32,11 @@ class SymbolPersistenceService {
         symbolRepository.findAllByActive(true)
     }
 
+    @Cacheable(value = "allSymbols")
+    List<PersistableSymbol> findAllSymbols() {
+        symbolRepository.findAll()
+    }
+
     List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(String partial, PersistableExchangeMarket exchangeMarket) {
         symbolRepository.findAllByActiveAndIdentifierStartsWith(partial, exchangeMarket.id)
     }

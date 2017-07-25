@@ -13,6 +13,8 @@ interface SymbolRepository extends CrudRepository<PersistableSymbol, String> {
 
     List<PersistableSymbol> findAllByActive(Boolean active)
 
+    List<PersistableSymbol> findAll()
+
     @Query("SELECT s from symbol s WHERE s.identifier LIKE CONCAT(:partial,'%') AND active = true AND exchange_market_id = :exId")
     List<PersistableSymbol> findAllByActiveAndIdentifierStartsWith(@Param("partial") String partial, @Param("exId") String exId)
 

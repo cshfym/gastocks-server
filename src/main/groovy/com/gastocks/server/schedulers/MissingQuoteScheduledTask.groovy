@@ -18,10 +18,10 @@ class MissingQuoteScheduledTask {
 
     @PostConstruct
     void onPostConstruct() {
-        process()
+        // process()
     }
 
-    @Scheduled(cron = "0 1 1 * * ?") // Every day at 1:01 AM
+    // @Scheduled(cron = "0 1 1 * * ?") // Every day at 1:01 AM
     void process() {
 
         List<PersistableSymbol> symbolsWithMissingQuotes = symbolService.findSymbolsWithMissingQuotes()
