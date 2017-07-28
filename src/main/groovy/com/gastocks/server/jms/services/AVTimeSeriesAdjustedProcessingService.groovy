@@ -38,9 +38,7 @@ class AVTimeSeriesAdjustedProcessingService {
 
         def quote = quoteService.getQuote(persistableSymbol.identifier)
         if (!quote) {
-            // Flag symbol as inactive.
-            log.warn("Quote could not be located for symbol [${persistableSymbol?.identifier}], marking symbol as inactive.")
-            symbolPersistenceService.inactivateSymbol(persistableSymbol)
+            log.warn("Quote could not be located for symbol [${persistableSymbol?.identifier}].")
             return
         }
 

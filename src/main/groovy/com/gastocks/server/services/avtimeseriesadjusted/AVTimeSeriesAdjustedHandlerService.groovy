@@ -35,11 +35,11 @@ class AVTimeSeriesAdjustedHandlerService {
      */
     void fetchAndPersistAllQuotes() {
 
-        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols()
+        List<PersistableSymbol> symbols = symbolPersistenceService.findAllSymbols()
 
-        log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, queueing symbols for quote processing.")
+        log.info("Loaded [${String.valueOf(symbols.size())}] active symbols, queueing symbols for quote processing.")
 
-        activeSymbols.eachWithIndex { symbol, index ->
+        symbols.eachWithIndex { symbol, index ->
             // if (index > 0) { return }
             queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
