@@ -13,6 +13,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 import java.text.DateFormat
@@ -43,6 +44,7 @@ class QuoteService {
      * @param identifier
      * @return List<Quote>
      */
+    @Cacheable(value = "getQuotesForSymbol", key="#identifier")
     List<Quote> getQuotesForSymbol(String identifier) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
