@@ -40,7 +40,7 @@ class QuoteService {
 
     /**
      * Retrieve all quotes for a given symbol identifier
-     * Implicitly ordered by quote date ascending
+     * Implicitly ordered by quote date descending
      * @param identifier
      * @return List<Quote>
      */
@@ -60,7 +60,7 @@ class QuoteService {
             quoteConverter.fromPersistableQuote(persistableQuote)
         }
 
-        quotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
+        quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
     }
 
 
