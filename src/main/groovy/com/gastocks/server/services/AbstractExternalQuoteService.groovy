@@ -57,7 +57,7 @@ abstract class AbstractExternalQuoteService implements IExternalQuoteService {
             conn?.disconnect()
         }
 
-        log.info "Quote for symbol [${symbol}] retrieved in [${System.currentTimeMillis() - startStopwatch}] ms"
+        log.info "Quote for symbol [${symbol}] retrieved in [${System.currentTimeMillis() - startStopwatch} ms]"
 
         quote
     }
