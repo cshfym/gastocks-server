@@ -64,6 +64,7 @@ class QuoteService {
     }
 
 
+
     boolean missingQuotesForSymbol(PersistableSymbol symbol) {
 
         def startStopwatch = System.currentTimeMillis()

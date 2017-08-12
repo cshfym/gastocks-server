@@ -12,6 +12,12 @@ class CacheConfiguration {
 
     @Bean
     CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("activeSymbols", "allSymbols", "allHolidayCalendars","getQuotesForSymbol")
+        return new ConcurrentMapCacheManager(
+                "activeSymbols",
+                "allSymbols",
+                "allHolidayCalendars",
+                "getQuotesForSymbol",
+                "getEMAQuotesForSymbol"
+        )
     }
 }

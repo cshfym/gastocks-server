@@ -23,6 +23,10 @@ repositories {
     mavenCentral()
 }
 
+springBoot {
+    mainClass = "com.gastocks.server.Application"
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
