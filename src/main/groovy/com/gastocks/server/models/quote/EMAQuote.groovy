@@ -10,5 +10,7 @@ class EMAQuote extends Quote {
     int longParameter
     Double emaShort
     Double emaLong
-
+    Double macd
+    Double macdSignalLine
+    Double macdHist
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class EMAQuoteConverter {
 
     EMAQuote fromPersistableQuote(PersistableQuote persistableQuote, int shortParameter, int longParameter,
-        double emaShort, double emaLong) {
+        double emaShort, double emaLong, double macd, double macdSignalLine) {
 
         new EMAQuote(
             quoteDate: persistableQuote.quoteDate,
@@ -24,7 +24,10 @@ class EMAQuoteConverter {
             shortParameter: shortParameter,
             longParameter: longParameter,
             emaShort: emaShort,
-            emaLong: emaLong
+            emaLong: emaLong,
+            macd: macd,
+            macdSignalLine: macdSignalLine,
+            macdHist: macd - macdSignalLine
         )
     }
 }

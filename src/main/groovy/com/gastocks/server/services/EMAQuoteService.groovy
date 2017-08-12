@@ -50,7 +50,8 @@ class EMAQuoteService {
         // Return sorted collection of EMAQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def emaData = emaDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, emaShort, emaLong, emaData.emaShort, emaData.emaLong)
+            quoteConverter.fromPersistableQuote(persistableQuote, emaShort, emaLong, emaData.emaShort,
+                emaData.emaLong, emaData.macd, emaData.macdSignalLine)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending
@@ -58,21 +59,37 @@ class EMAQuoteService {
 
     List<EMAData> buildEMAData(List<PersistableQuote> quoteData, int emaShortDays, int emaLongDays) {
 
-        List<EMAData> emaData = []
+        List<EMAData> emaDataList = []
 
         quoteData.eachWithIndex { quote, ix ->
             if (ix == 0) {
-                emaData << new EMAData(quoteDate: quote.quoteDate, emaShort: quote.price, emaLong: quote.price)
+                emaDataList << new EMAData(quoteDate: quote.quoteDate, emaShort: quote.price, emaLong: quote.price)
             } else {
-                emaData << new EMAData(
-                    emaShort: calculateEMA(quote.price, emaData.get(ix - 1).emaShort, emaShortDays),
-                    emaLong: calculateEMA(quote.price, emaData.get(ix - 1).emaLong, emaLongDays),
-                    quoteDate: quote.quoteDate
-                )
+                double emaShort = calculateEMA(quote.price, emaDataList.get(ix - 1).emaShort, emaShortDays)
+                double emaLong = calculateEMA(quote.price, emaDataList.get(ix - 1).emaLong, emaLongDays)
+                double macd = (emaShort - emaLong).round(4)
+                emaDataList << new EMAData(emaShort: emaShort, emaLong: emaLong, quoteDate: quote.quoteDate, macd: macd)
             }
         }
 
-        emaData
+        buildMACDSignalData(emaDataList)
+
+        emaDataList
+    }
+
+    /**
+     * The MACD signal line is the 9-day EMA of the MACD.
+     * @param emaDataList
+     */
+    void buildMACDSignalData(List<EMAData> emaDataList) {
+
+        emaDataList.eachWithIndex { emaData, ix ->
+            if (ix == 0) {
+                emaDataList[ix].macdSignalLine = emaData.macd
+            } else {
+                emaDataList[ix].macdSignalLine = calculateEMA(emaData.macd, emaDataList.get(ix - 1).macdSignalLine, 9)
+            }
+        }
     }
 
     /**
@@ -89,6 +106,8 @@ class EMAQuoteService {
         Date quoteDate
         double emaShort
         double emaLong
+        double macd
+        double macdSignalLine
     }
 
 }
