@@ -50,8 +50,7 @@ class EMAQuoteService {
         // Return sorted collection of EMAQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def emaData = emaDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, emaShort, emaLong, emaData.emaShort,
-                emaData.emaLong, emaData.macd, emaData.macdSignalLine)
+            quoteConverter.fromPersistableQuote(persistableQuote, emaData, emaShort, emaLong)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending
@@ -86,8 +85,33 @@ class EMAQuoteService {
         emaDataList.eachWithIndex { emaData, ix ->
             if (ix == 0) {
                 emaDataList[ix].macdSignalLine = emaData.macd
+                emaDataList[ix].macdHist = (emaData.macd - emaDataList[ix].macdSignalLine).round(4)
             } else {
                 emaDataList[ix].macdSignalLine = calculateEMA(emaData.macd, emaDataList.get(ix - 1).macdSignalLine, 9)
+                emaDataList[ix].macdHist = (emaData.macd - emaDataList[ix].macdSignalLine).round(4)
+
+                // Positive MACD center line crossover
+                if ((emaDataList[ix].macd >= 0.0) && (emaDataList[ix - 1].macd < 0.0 )) {
+                    emaDataList[ix].centerCrossoverPositive = true
+                    emaDataList[ix].centerCrossoverNegative = false
+                }
+                // Negative MACD center line crossover
+                if ((emaDataList[ix].macd < 0.0) && (emaDataList[ix - 1].macd >= 0.0 )) {
+                    emaDataList[ix].centerCrossoverNegative = true
+                    emaDataList[ix].centerCrossoverPositive = false
+                }
+                // Positive MACD signal line crossover
+                if ((emaDataList[ix].macd >= emaDataList[ix].macdSignalLine) &&
+                    (emaDataList[ix - 1].macd < emaDataList[ix - 1].macdSignalLine)) {
+                    emaDataList[ix].signalCrossoverPositive = true
+                    emaDataList[ix].signalCrossoverNegative = false
+                }
+                // Positive MACD signal line crossover
+                if ((emaDataList[ix].macd < emaDataList[ix].macdSignalLine) &&
+                        (emaDataList[ix - 1].macd >= emaDataList[ix - 1].macdSignalLine)) {
+                    emaDataList[ix].signalCrossoverNegative = true
+                    emaDataList[ix].signalCrossoverPositive = false
+                }
             }
         }
     }
@@ -108,6 +132,11 @@ class EMAQuoteService {
         double emaLong
         double macd
         double macdSignalLine
+        double macdHist
+        boolean centerCrossoverPositive
+        boolean centerCrossoverNegative
+        boolean signalCrossoverPositive
+        boolean signalCrossoverNegative
     }
 
 }

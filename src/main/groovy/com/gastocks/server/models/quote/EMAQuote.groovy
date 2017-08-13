@@ -13,4 +13,9 @@ class EMAQuote extends Quote {
     Double macd
     Double macdSignalLine
     Double macdHist
+    boolean centerCrossoverPositive
+    boolean centerCrossoverNegative
+    boolean signalCrossoverPositive
+    boolean signalCrossoverNegative
+
 }

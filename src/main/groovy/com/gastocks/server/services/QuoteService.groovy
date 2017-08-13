@@ -63,8 +63,6 @@ class QuoteService {
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
     }
 
-
-
     boolean missingQuotesForSymbol(PersistableSymbol symbol) {
 
         def startStopwatch = System.currentTimeMillis()
