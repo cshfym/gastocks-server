@@ -26,6 +26,8 @@ class TaskExecutorConfiguration {
         threadPoolExecutor.setMaxPoolSize(THREAD_POOL_MAX_POOL_SIZE)
         threadPoolExecutor.setQueueCapacity(THREAD_POOL_QUEUE_CAPACITY)
 
+        threadPoolExecutor.setWaitForTasksToCompleteOnShutdown(true)
+
         threadPoolExecutor
     }
 }
