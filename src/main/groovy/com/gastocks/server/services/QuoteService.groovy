@@ -49,9 +49,7 @@ class QuoteService {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
 
-        if (!symbol) {
-          throw new QuoteNotFoundException(identifier: identifier)
-        }
+        if (!symbol) { throw new QuoteNotFoundException(identifier: identifier) }
 
         List<PersistableQuote> persistableQuotes = quotePersistenceService.findAllQuotesForSymbol(symbol)
 

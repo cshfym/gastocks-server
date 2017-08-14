@@ -14,10 +14,11 @@ class CacheConfiguration {
     CacheManager cacheManager() {
         return new ConcurrentMapCacheManager(
                 "activeSymbols",
-                "allSymbols",
                 "allHolidayCalendars",
+                "allSymbols",
                 "getQuotesForSymbol",
-                "getTechnicalQuotesForSymbol"
+                "getTechnicalQuotesForSymbol",
+                "QuotePersistenceService.findAllQuotesForSymbol"
         )
     }
 }
