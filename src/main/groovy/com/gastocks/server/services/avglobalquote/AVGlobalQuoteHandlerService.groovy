@@ -1,6 +1,6 @@
 package com.gastocks.server.services.avglobalquote
 
-import com.gastocks.server.jms.services.SymbolQueueSender
+import com.gastocks.server.jms.sender.SymbolQueueSender
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.transform.CompileStatic

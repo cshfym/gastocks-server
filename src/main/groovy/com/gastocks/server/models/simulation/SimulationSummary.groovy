@@ -11,4 +11,10 @@ class SimulationSummary {
     double totalCommissionCost
     int transactionCount
 
+    @Override
+    String toString() {
+        "Simulation summary for [${symbol}]: Total Investment [${totalInvestment}], Total Earnings Percentage [${totalEarningsPercentage}], " +
+                "Gross Proceeds [${netProceeds}], Net Proceeds [${grossProceeds}], " +
+            "Total Commission Cost [${totalCommissionCost}], Transaction Count [${transactionCount}]"
+    }
 }

@@ -1,9 +1,6 @@
 package com.gastocks.server.models
 
-class BasicQuoteResponse {
-
-    String message
-    Boolean success
+class BasicQuoteResponse extends BasicResponse {
 
     IQuote quote
 }

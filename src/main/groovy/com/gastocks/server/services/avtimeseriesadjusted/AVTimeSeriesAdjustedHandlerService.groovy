@@ -1,6 +1,6 @@
 package com.gastocks.server.services.avtimeseriesadjusted
 
-import com.gastocks.server.jms.services.SymbolQueueSender
+import com.gastocks.server.jms.sender.SymbolQueueSender
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.services.domain.ExchangeMarketPersistenceService

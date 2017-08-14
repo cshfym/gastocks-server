@@ -1,4 +1,4 @@
-package com.gastocks.server.jms.services
+package com.gastocks.server.jms.services.avtimeseriesadjusted
 
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol

@@ -1,9 +1,9 @@
 package com.gastocks.server.jms.receiver
 
-import com.gastocks.server.jms.services.AVGlobalQuoteProcessingService
-import com.gastocks.server.jms.services.AVTimeSeriesAdjustedProcessingService
+import com.gastocks.server.jms.services.avglobalquote.AVGlobalQuoteProcessingService
+import com.gastocks.server.jms.services.avtimeseriesadjusted.AVTimeSeriesAdjustedProcessingService
 import com.gastocks.server.models.domain.jms.QueueableSymbol
-import com.gastocks.server.jms.services.SymbolQueueSender
+import com.gastocks.server.jms.sender.SymbolQueueSender
 import com.gastocks.server.services.avglobalquote.AVGlobalQuoteService
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
 import groovy.util.logging.Slf4j

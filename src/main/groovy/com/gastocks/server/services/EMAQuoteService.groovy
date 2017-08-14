@@ -5,6 +5,7 @@ import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.quote.EMAQuote
+import com.gastocks.server.models.simulation.macd.MACDParameters
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -32,25 +33,23 @@ class EMAQuoteService {
      * @return List<Quote>
      */
     @Cacheable(value = "getEMAQuotesForSymbol")
-    List<EMAQuote> getEMAQuotesForSymbol(String identifier, int emaShort, int emaLong) {
+    List<EMAQuote> getEMAQuotesForSymbol(String identifier, MACDParameters macdParameters) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
 
-        if (!symbol) {
-          throw new QuoteNotFoundException(identifier: identifier)
-        }
+        if (!symbol) { throw new QuoteNotFoundException(identifier: identifier) }
 
         List<PersistableQuote> persistableQuotes = quotePersistenceService.findAllQuotesForSymbol(symbol)
 
         persistableQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate } // Ascending
 
         // Calculate EMA data
-        List<EMAData> emaDataList = buildEMAData(persistableQuotes, emaShort, emaLong)
+        List<EMAData> emaDataList = buildEMAData(persistableQuotes, macdParameters.macdShortPeriod, macdParameters.macdLongPeriod)
 
         // Return sorted collection of EMAQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def emaData = emaDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, emaData, emaShort, emaLong)
+            quoteConverter.fromPersistableQuote(persistableQuote, emaData, macdParameters.macdShortPeriod, macdParameters.macdLongPeriod)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending

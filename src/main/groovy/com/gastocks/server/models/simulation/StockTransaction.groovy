@@ -11,6 +11,8 @@ class StockTransaction {
         sellPrice = 0.0d
     }
 
+    String symbol
+
     Date purchaseDate
     double purchasePrice
 
@@ -58,7 +60,7 @@ class StockTransaction {
 
     @Override
     String toString() {
-        "Transaction purchase date [${purchaseDate}] for [${purchasePrice}], sell date [${sellDate}] for [${sellPrice}], " +
+        "Transaction purchase of [${symbol}] on date [${purchaseDate}] for [${purchasePrice}], sell date [${sellDate}] for [${sellPrice}], " +
             "gross proceeds of [${grossProceeds}] (${grossPercentage}%), net proceeds of [${netProceeds}] (${netPercentage})%."
     }
 }

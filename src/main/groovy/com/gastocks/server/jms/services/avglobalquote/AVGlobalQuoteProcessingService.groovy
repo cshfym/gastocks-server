@@ -1,4 +1,4 @@
-package com.gastocks.server.jms.services
+package com.gastocks.server.jms.services.avglobalquote
 
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol

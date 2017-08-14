@@ -1,6 +1,5 @@
-package com.gastocks.server.jms.services
+package com.gastocks.server.jms.sender
 
-import com.gastocks.server.models.BasicQuoteResponse
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.jms.QueueableSymbol
 import groovy.util.logging.Slf4j

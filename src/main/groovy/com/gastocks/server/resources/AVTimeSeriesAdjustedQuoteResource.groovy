@@ -1,6 +1,7 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.BasicQuoteResponse
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedHandlerService
 import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuoteService
 import groovy.util.logging.Slf4j
@@ -81,11 +82,11 @@ class AVTimeSeriesAdjustedQuoteResource {
      */
     @ResponseBody
     @RequestMapping(value="batchAll", method=RequestMethod.GET)
-    BasicQuoteResponse doBatchAll() {
+    BasicResponse doBatchAll() {
 
         fetchAndPersistService.fetchAndPersistAllQuotes()
 
-        new BasicQuoteResponse(success: true, message: "")
+        new BasicResponse(success: true, message: "")
     }
 
 }
