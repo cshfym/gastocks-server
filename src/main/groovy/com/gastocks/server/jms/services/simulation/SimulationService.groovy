@@ -1,13 +1,12 @@
 package com.gastocks.server.jms.services.simulation
 
-import com.gastocks.server.jms.sender.SymbolQueueSender
-import com.gastocks.server.models.quote.EMAQuote
+import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.BasicSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.SimulationSummary
 import com.gastocks.server.models.simulation.StockTransaction
 import com.gastocks.server.models.symbol.Symbol
-import com.gastocks.server.services.EMAQuoteService
+import com.gastocks.server.services.TechnicalQuoteService
 import com.gastocks.server.services.SymbolService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service
 class SimulationService {
 
     @Autowired
-    EMAQuoteService emaQuoteService
+    TechnicalQuoteService emaQuoteService
 
     @Autowired
     SymbolService symbolService
@@ -35,7 +34,7 @@ class SimulationService {
 
         allSymbols.eachWithIndex { symbol, ix ->
             if (ix > 99) { return }
-            List<EMAQuote> quotes = emaQuoteService.getEMAQuotesForSymbol(symbol.identifier, request.macdParameters) // Sloppy - re-retrieves symbol in this method.
+            List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol.identifier, request.macdParameters) // Sloppy - re-retrieves symbol in this method.
             def simulation = doSimulationForSymbol(quotes, symbol.identifier, request.macdParameters.macdPositiveTrigger)
             if (simulation) {
                 summaryList << simulation
@@ -49,7 +48,7 @@ class SimulationService {
         }
     }
 
-    SimulationSummary doSimulationForSymbol(List<EMAQuote> quotes, String symbol, boolean aboveCenter) {
+    SimulationSummary doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, boolean aboveCenter) {
 
         log.info ("Starting simulation for symbol [${symbol}]")
 
@@ -96,7 +95,7 @@ class SimulationService {
     /*
     SimulationSummary doSimulationForSymbol(String symbol, int emaShort, int emaLong, boolean aboveCenter) {
 
-        List<EMAQuote> quotes = emaQuoteService.getEMAQuotesForSymbol(symbol, emaShort, emaLong)
+        List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol, emaShort, emaLong)
 
         quotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
 

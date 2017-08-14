@@ -17,7 +17,7 @@ class CacheConfiguration {
                 "allSymbols",
                 "allHolidayCalendars",
                 "getQuotesForSymbol",
-                "getEMAQuotesForSymbol"
+                "getTechnicalQuotesForSymbol"
         )
     }
 }

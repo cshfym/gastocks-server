@@ -1,10 +1,12 @@
-package com.gastocks.server.models.quote
+package com.gastocks.server.models.technical
+
+import com.gastocks.server.models.quote.Quote
 
 
 /**
- * Represents a non-persistent, externally-facing EMAQuote for a single symbol.
+ * Represents a non-persistent, externally-facing TechnicalQuote for a single symbol.
  */
-class EMAQuote extends Quote {
+class TechnicalQuote extends Quote {
 
     int shortParameter
     int longParameter

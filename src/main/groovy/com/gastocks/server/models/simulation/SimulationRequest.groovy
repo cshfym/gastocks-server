@@ -1,13 +1,11 @@
 package com.gastocks.server.models.simulation
 
-import com.gastocks.server.models.simulation.macd.MACDParameters
-
 class SimulationRequest {
 
     String description
     double commissionPrice
 
-    MACDParameters macdParameters
+    MACDRequestParameters macdParameters
 
     @Override
     String toString() {
