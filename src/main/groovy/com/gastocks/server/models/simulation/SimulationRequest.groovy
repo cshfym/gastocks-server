@@ -4,6 +4,8 @@ class SimulationRequest {
 
     String description
     double commissionPrice
+    int shares
+    List<String> symbols
 
     MACDRequestParameters macdParameters
 

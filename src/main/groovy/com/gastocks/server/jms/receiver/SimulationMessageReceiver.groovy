@@ -20,6 +20,6 @@ class SimulationMessageReceiver {
 
         log.info "Received [${request}] from queue ${SimulationQueueSender.QUEUE_SIMULATION_REQUEST}"
 
-        simulationService.doSimulationForAllSymbols(request)
+        simulationService.doSimulationWithRequest(request)
     }
 }

@@ -4,6 +4,7 @@ import com.gastocks.server.converters.quote.TechnicalQuoteConverter
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
+import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.TechnicalQuote
@@ -41,7 +42,7 @@ class TechnicalQuoteService {
      * @return List<Quote>
      */
     @Cacheable(value = "getTechnicalQuotesForSymbol")
-    List<TechnicalQuote> getTechnicalQuotesForSymbol(String identifier, MACDRequestParameters macdParameters) {
+    List<TechnicalQuote> getTechnicalQuotesForSymbol(String identifier, SimulationRequest request) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
 
@@ -52,12 +53,12 @@ class TechnicalQuoteService {
         persistableQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate } // Ascending
 
         // Calculate technical data points for all quotes available.
-        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, macdParameters.macdShortPeriod, macdParameters.macdLongPeriod)
+        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request.macdParameters.macdShortPeriod, request.macdParameters.macdLongPeriod)
 
         // Return sorted collection of TechnicalQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def technicalData = technicalDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, technicalData, macdParameters.macdShortPeriod, macdParameters.macdLongPeriod)
+            quoteConverter.fromPersistableQuote(persistableQuote, technicalData, request.macdParameters.macdShortPeriod, request.macdParameters.macdLongPeriod)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending
@@ -66,6 +67,8 @@ class TechnicalQuoteService {
     protected List<TechnicalDataWrapper> buildTechnicalData(List<PersistableQuote> quoteData, int emaShortDays, int emaLongDays) {
 
         List<TechnicalDataWrapper> technicalDataList = []
+
+        // TODO Split this out into the MACD processing.
 
         quoteData.eachWithIndex { quote, ix ->
             if (ix == 0) {

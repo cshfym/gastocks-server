@@ -24,7 +24,7 @@ class SimulationService {
 
     // final static String CSV_HEADER_ROW = '"Symbol","Total Investment","Total Earnings Percentage","Net Proceeds","Gross Proceeds","Total Commission Cost","Transaction Count"'
 
-    void doSimulationForAllSymbols(SimulationRequest request) {
+    void doSimulationWithRequest(SimulationRequest request) {
 
         def startStopwatch = System.currentTimeMillis()
 
@@ -32,23 +32,36 @@ class SimulationService {
 
         List<Symbol> allSymbols = symbolService.findAllSymbols()
 
-        allSymbols.eachWithIndex { symbol, ix ->
+        List<Symbol> filteredSymbols = []
+        allSymbols.each { symbol ->
+            if (request.symbols) {
+                if (request.symbols.contains(symbol.identifier)) {
+                    filteredSymbols << symbol
+                }
+            } else {
+                filteredSymbols << symbol
+            }
+        }
+
+        filteredSymbols.eachWithIndex { symbol, ix ->
             if (ix > 99) { return }
-            List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol.identifier, request.macdParameters) // Sloppy - re-retrieves symbol in this method.
-            def simulation = doSimulationForSymbol(quotes, symbol.identifier, request.macdParameters.macdPositiveTrigger)
+            if (request.symbols && (!request.symbols.contains(symbol.identifier))) { return } // Only process requested symbols, if specified.
+
+            List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol.identifier, request) // Sloppy - re-retrieves symbol in this method.
+            def simulation = doSimulationForSymbol(quotes, symbol.identifier, request)
             if (simulation) {
                 summaryList << simulation
             }
         }
 
-        log.info("*** All Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
+        log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
         log.info("*** Simulation: [${request.description}]")
         summaryList.each { summary ->
             log.info(summary.toString())
         }
     }
 
-    SimulationSummary doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, boolean aboveCenter) {
+    SimulationSummary doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
 
         log.info ("Starting simulation for symbol [${symbol}]")
 
@@ -62,7 +75,7 @@ class SimulationService {
         BasicSimulation simulation = new BasicSimulation(symbol: symbol, stockTransactions: [])
 
         // Establish starting transaction
-        StockTransaction stockTransaction = new StockTransaction(shares: 100, symbol: symbol)
+        StockTransaction stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
 
         // Iterate each quote ascending, examining and acting on buy/sell signals
         quotes.eachWithIndex { quote, ix ->
@@ -71,7 +84,8 @@ class SimulationService {
 
                 // Initiate a BUY action
                 if (quote.signalCrossoverPositive) {
-                    if (!aboveCenter || (aboveCenter && (quote.macdSignalLine >= 0.0))) { // If aboveCenter parameter, only initiate BUY if signal line is > 0
+                    // If aboveCenter parameter, only initiate BUY if signal line is > 0
+                    if (!request.macdParameters.macdPositiveTrigger || (request.macdParameters.macdPositiveTrigger && (quote.macdSignalLine >= 0.0))) {
                         //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                         stockTransaction.purchaseDate = quote.quoteDate
                         stockTransaction.purchasePrice = quote.price
@@ -84,7 +98,7 @@ class SimulationService {
                     stockTransaction.sellDate = quote.quoteDate
                     stockTransaction.sellPrice = quote.price
                     simulation.stockTransactions << stockTransaction
-                    stockTransaction = new StockTransaction(shares: 100, symbol: symbol)
+                    stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.gastocks.server.resources
 
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.simulation.MACDRequestParameters
+import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.services.TechnicalQuoteService
 import groovy.util.logging.Slf4j
@@ -25,7 +26,8 @@ class TechnicalQuoteResource {
         def quotes = []
 
         try {
-            quotes = quoteService.getTechnicalQuotesForSymbol(symbol, new MACDRequestParameters(macdShortPeriod: emashort, macdLongPeriod: emalong))
+            quotes = quoteService.getTechnicalQuotesForSymbol(symbol,
+                new SimulationRequest(macdParameters: new MACDRequestParameters(macdShortPeriod: emashort, macdLongPeriod: emalong)))
         } catch (QuoteNotFoundException ex) {
             log.info "Quote not found for symbol ${symbol}"
             throw ex
