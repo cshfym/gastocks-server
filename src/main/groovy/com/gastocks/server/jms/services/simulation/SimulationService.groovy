@@ -1,5 +1,6 @@
 package com.gastocks.server.jms.services.simulation
 
+import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.BasicSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
@@ -43,6 +44,7 @@ class SimulationService {
             }
         }
 
+        // TODO: Re-queue this so it can be handled in a multi-threaded context for performance reasons.
         filteredSymbols.eachWithIndex { symbol, ix ->
             if (ix > 99) { return }
             if (request.symbols && (!request.symbols.contains(symbol.identifier))) { return } // Only process requested symbols, if specified.
@@ -80,30 +82,45 @@ class SimulationService {
         // Iterate each quote ascending, examining and acting on buy/sell signals
         quotes.eachWithIndex { quote, ix ->
 
-            if (ix > 0) {
+            boolean buyIndicator = getMACDBuyIndicator(quote, request.macdParameters, ix)
+            // Add future indicators here, inspect all indicators before buying
 
-                // Initiate a BUY action
-                if (quote.signalCrossoverPositive) {
-                    // If aboveCenter parameter, only initiate BUY if signal line is > 0
-                    if (!request.macdParameters.macdPositiveTrigger || (request.macdParameters.macdPositiveTrigger && (quote.macdSignalLine >= 0.0))) {
-                        //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
-                        stockTransaction.purchaseDate = quote.quoteDate
-                        stockTransaction.purchasePrice = quote.price
-                    }
-                }
+            if (buyIndicator) {
+                //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
+                stockTransaction.purchaseDate = quote.quoteDate
+                stockTransaction.purchasePrice = quote.price
+            }
 
-                // Initiate a SELL action, save transaction and reset
-                if (quote.signalCrossoverNegative && stockTransaction.started) {
-                    // log.info("Initiating SELL action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
-                    stockTransaction.sellDate = quote.quoteDate
-                    stockTransaction.sellPrice = quote.price
-                    simulation.stockTransactions << stockTransaction
-                    stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
-                }
+            boolean sellIndicator = getMACDSellIndicator(quote)
+            // Add future indicators here, inspect all indicators before selling
+
+            if (sellIndicator && stockTransaction.started) {
+                // log.info("Initiating SELL action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
+                stockTransaction.sellDate = quote.quoteDate
+                stockTransaction.sellPrice = quote.price
+                simulation.stockTransactions << stockTransaction
+                stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
             }
         }
 
         simulation.summary
+    }
+
+    boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
+
+        if (index > 0 && quote.signalCrossoverPositive) {
+            // If aboveCenter parameter, only initiate BUY if signal line is > 0
+            if (!requestParameters.macdPositiveTrigger || (requestParameters.macdPositiveTrigger && (quote.macdSignalLine >= 0.0))) {
+                return true
+
+            }
+        }
+
+        false
+    }
+
+    boolean getMACDSellIndicator(TechnicalQuote quote) {
+        quote.signalCrossoverNegative
     }
 
     /*
