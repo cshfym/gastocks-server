@@ -26,7 +26,7 @@ class SimulationQueueSender {
 
         JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
 
-        log.info "Queueing a simulation request for processing: ${request}"
+        log.info "Queueing a simulation request for processing: [${request}]"
         jmsTemplate.convertAndSend(QUEUE_SIMULATION_REQUEST, request)
     }
 
