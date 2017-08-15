@@ -1,5 +1,8 @@
 package com.gastocks.server.jms.services.simulation
 
+import com.gastocks.server.models.domain.PersistableSimulation
+import com.gastocks.server.models.domain.PersistableSymbol
+import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
 import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.BasicSimulation
@@ -9,6 +12,10 @@ import com.gastocks.server.models.simulation.StockTransaction
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.TechnicalQuoteService
 import com.gastocks.server.services.SymbolService
+import com.gastocks.server.services.domain.SimulationPersistenceService
+import com.gastocks.server.services.domain.SimulationTransactionPersistenceService
+import com.gastocks.server.services.domain.SymbolPersistenceService
+import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -18,52 +25,45 @@ import org.springframework.stereotype.Service
 class SimulationService {
 
     @Autowired
-    TechnicalQuoteService emaQuoteService
+    SimulationPersistenceService simulationPersistenceService
+
+    @Autowired
+    SimulationTransactionPersistenceService transactionPersistenceService
+
+    @Autowired
+    TechnicalQuoteService technicalQuoteService
 
     @Autowired
     SymbolService symbolService
 
-    // final static String CSV_HEADER_ROW = '"Symbol","Total Investment","Total Earnings Percentage","Net Proceeds","Gross Proceeds","Total Commission Cost","Transaction Count"'
+    @Autowired
+    SymbolPersistenceService symbolPersistenceService
 
-    void doSimulationWithRequest(SimulationRequest request) {
+    void doSimulationWithRequest(QueueableSimulationSymbol simulationSymbol) {
 
         def startStopwatch = System.currentTimeMillis()
 
-        List<SimulationSummary> summaryList = []
+        PersistableSimulation persistableSimulation = simulationPersistenceService.findById(simulationSymbol.simulationId)
+        PersistableSymbol persistableSymbol = symbolPersistenceService.findByIdentifier(simulationSymbol.symbol)
 
-        List<Symbol> allSymbols = symbolService.findAllSymbols()
+        // Reconstitute request from simulation attributes.
+        def jsonSlurper = new JsonSlurper()
+        SimulationRequest simulationRequest = jsonSlurper.parseText(persistableSimulation.attributes)
 
-        List<Symbol> filteredSymbols = []
-        allSymbols.each { symbol ->
-            if (request.symbols) {
-                if (request.symbols.contains(symbol.identifier)) {
-                    filteredSymbols << symbol
-                }
-            } else {
-                filteredSymbols << symbol
-            }
-        }
-
-        // TODO: Re-queue this so it can be handled in a multi-threaded context for performance reasons.
-        filteredSymbols.eachWithIndex { symbol, ix ->
-            if (ix > 99) { return }
-            if (request.symbols && (!request.symbols.contains(symbol.identifier))) { return } // Only process requested symbols, if specified.
-
-            List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol.identifier, request) // Sloppy - re-retrieves symbol in this method.
-            def simulation = doSimulationForSymbol(quotes, symbol.identifier, request)
-            if (simulation) {
-                summaryList << simulation
-            }
-        }
+        List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, simulationRequest)
+        BasicSimulation simulation = doSimulationForSymbol(quotes, simulationSymbol.symbol, simulationRequest)
 
         log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
-        log.info("*** Simulation: [${request.description}]")
-        summaryList.each { summary ->
-            log.info(summary.toString())
+        log.info("*** Simulation: [${persistableSimulation.attributes}]")
+
+        simulation.stockTransactions.each { StockTransaction transaction ->
+            transactionPersistenceService.persistNewSimulationTransaction(
+                persistableSimulation, persistableSymbol, transaction.shares, transaction.commission, transaction.purchasePrice,
+                transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
         }
     }
 
-    SimulationSummary doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
+    BasicSimulation doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
 
         log.info ("Starting simulation for symbol [${symbol}]")
 
@@ -103,7 +103,7 @@ class SimulationService {
             }
         }
 
-        simulation.summary
+        simulation
     }
 
     boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
@@ -112,7 +112,6 @@ class SimulationService {
             // If aboveCenter parameter, only initiate BUY if signal line is > 0
             if (!requestParameters.macdPositiveTrigger || (requestParameters.macdPositiveTrigger && (quote.macdSignalLine >= 0.0))) {
                 return true
-
             }
         }
 
@@ -122,90 +121,5 @@ class SimulationService {
     boolean getMACDSellIndicator(TechnicalQuote quote) {
         quote.signalCrossoverNegative
     }
-
-    /*
-    SimulationSummary doSimulationForSymbol(String symbol, int emaShort, int emaLong, boolean aboveCenter) {
-
-        List<TechnicalQuote> quotes = emaQuoteService.getTechnicalQuotesForSymbol(symbol, emaShort, emaLong)
-
-        quotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
-
-        BasicSimulation simulation = new BasicSimulation(symbol: symbol, stockTransactions: [])
-
-        // Establish starting transaction
-        StockTransaction stockTransaction = new StockTransaction(shares: 100)
-
-        // Iterate each quote ascending, examining and acting on buy/sell signals
-        quotes.eachWithIndex { quote, ix ->
-
-            if (ix > 0) {
-
-                // Initiate a BUY action
-                if (quote.signalCrossoverPositive) {
-                    if (!aboveCenter || (aboveCenter && (quote.macdSignalLine >= 0.0))) { // If aboveCenter parameter, only initiate BUY if signal line is > 0
-                        //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
-                        stockTransaction.purchaseDate = quote.quoteDate
-                        stockTransaction.purchasePrice = quote.price
-                    }
-                }
-
-                // Initiate a SELL action, save transaction and reset
-                if (quote.signalCrossoverNegative && stockTransaction.started) {
-                    // log.info("Initiating SELL action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
-                    stockTransaction.sellDate = quote.quoteDate
-                    stockTransaction.sellPrice = quote.price
-                    simulation.stockTransactions << stockTransaction
-                    stockTransaction = new StockTransaction(shares: 100)
-                }
-            }
-        }
-
-        log.info("*** Simulation Complete ***")
-        log.info("Transactions generated for [${symbol}]: [${simulation.stockTransactions.size()}]")
-        simulation.stockTransactions.each { transaction ->
-            log.info(transaction.toString())
-        }
-        log.info("Simulation gross proceeds: [${simulation.grossProceeds}], net proceeds: [${simulation.netProceeds}]")
-
-        simulation.summary
-    }
-
-    List<String> doSimulationForSymbolWithCSV(String symbol, int emaShort, int emaLong, boolean aboveCenter, boolean headerRow = true) {
-
-        SimulationSummary summary = doSimulationForSymbol(symbol, emaShort, emaLong, aboveCenter)
-
-        List<String> csvSummaries = []
-
-        if (headerRow) {
-            csvSummaries << CSV_HEADER_ROW
-        }
-
-        csvSummaries <<
-            '"' + summary.symbol + '",' +
-            summary.totalInvestment + "," +
-            summary.totalEarningsPercentage + "," +
-            summary.netProceeds + "," +
-            summary.grossProceeds + "," +
-            summary.totalCommissionCost + "," +
-            summary.transactionCount
-
-        csvSummaries
-    }
-
-    List<String> doSimulationForAllSymbolsWithCSV(int emaShort, int emaLong, boolean aboveCenter, int count) {
-
-        List<String> csvSummaries = []
-        csvSummaries << CSV_HEADER_ROW
-
-        List<Symbol> allSymbols = symbolService.findAllSymbols()
-        allSymbols.eachWithIndex { symbol, ix ->
-            if (ix > count) { return }
-            csvSummaries.addAll(doSimulationForSymbolWithCSV(symbol.identifier, emaShort, emaLong, aboveCenter, false))
-        }
-
-        csvSummaries
-    }
-
-    */
 
 }

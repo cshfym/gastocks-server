@@ -3,10 +3,42 @@ start transaction;
 use `ga_stocks`;
 
 -- cleanup --
+DELETE FROM `simulation_transaction`;
+DROP TABLE `simulation_transaction`;
+DELETE FROM `simulation`;
+DROP TABLE `simulation`;
 DELETE FROM `symbol`;
 DROP TABLE `symbol`;
 DELETE FROM `exchange_market`;
 DROP TABLE `exchange_market`;
+
+
+CREATE TABLE `simulation` (
+  `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `run_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
+  `attributes` TEXT COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `IDX_Description` (`description`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+
+CREATE TABLE `simulation_transaction` (
+  `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `simulation_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `create_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
+  `shares` integer COLLATE utf8mb4_bin DEFAULT 0,
+  `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `commission` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
+  `purchase_price` double(9,3) COLLATE utf8mb4_bin NOT NULL,
+  `sell_price` double(9,3) COLLATE utf8mb4_bin NOT NULL,
+  `purchase_date` DATE COLLATE utf8mb4_bin NOT NULL,
+  `sell_date` DATE COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `IDX_Symbol` (`symbol_id`),
+  KEY `FK_SimulationTransaction_Simulation` (`simulation_id`),
+  CONSTRAINT `FK_SimulationTransaction_Simulation` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 
 CREATE TABLE `exchange_market` (

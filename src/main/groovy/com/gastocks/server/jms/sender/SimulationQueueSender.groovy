@@ -1,6 +1,6 @@
 package com.gastocks.server.jms.sender
 
-import com.gastocks.server.models.simulation.SimulationRequest
+import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
@@ -22,12 +22,17 @@ class SimulationQueueSender {
      * @param @SimulationRequest
      * @return
      */
-    void queueRequest(SimulationRequest request) {
+    void queueRequest(String simulationId, String symbol) {
 
         JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
 
-        log.info "Queueing a simulation request for processing: [${request}]"
-        jmsTemplate.convertAndSend(QUEUE_SIMULATION_REQUEST, request)
+        def queuableSimulationSymbol = new QueueableSimulationSymbol(
+            simulationId: simulationId,
+            symbol: symbol
+        )
+
+        log.info "Queueing a simulation request for processing: [${symbol}]"
+        jmsTemplate.convertAndSend(QUEUE_SIMULATION_REQUEST, queuableSimulationSymbol)
     }
 
 }
