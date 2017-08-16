@@ -53,13 +53,15 @@ class SimulationService {
         List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, simulationRequest)
         BasicSimulation simulation = doSimulationForSymbol(quotes, simulationSymbol.symbol, simulationRequest)
 
-        log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
-        log.info("*** Simulation: [${persistableSimulation.attributes}]")
+        if (simulation) {
+            log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
+            log.info("*** Simulation: [${persistableSimulation.attributes}]")
 
-        simulation.stockTransactions.each { StockTransaction transaction ->
-            transactionPersistenceService.persistNewSimulationTransaction(
-                persistableSimulation, persistableSymbol, transaction.shares, transaction.commission, transaction.purchasePrice,
-                transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
+            simulation.stockTransactions?.each { StockTransaction transaction ->
+                transactionPersistenceService.persistNewSimulationTransaction(
+                        persistableSimulation, persistableSymbol, transaction.shares, transaction.commission, transaction.purchasePrice,
+                        transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
+            }
         }
     }
 
@@ -77,18 +79,25 @@ class SimulationService {
         BasicSimulation simulation = new BasicSimulation(symbol: symbol, stockTransactions: [])
 
         // Establish starting transaction
-        StockTransaction stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
+        StockTransaction stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
 
         // Iterate each quote ascending, examining and acting on buy/sell signals
         quotes.eachWithIndex { quote, ix ->
 
-            boolean buyIndicator = getMACDBuyIndicator(quote, request.macdParameters, ix)
-            // Add future indicators here, inspect all indicators before buying
+            if (!stockTransaction.started) {
 
-            if (buyIndicator) {
-                //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
-                stockTransaction.purchaseDate = quote.quoteDate
-                stockTransaction.purchasePrice = quote.price
+                if ((request.maxPurchasePrice > 0.0d) && (quote.price > request.maxPurchasePrice)) {
+                    return
+                }
+
+                boolean buyIndicator = getMACDBuyIndicator(quote, request.macdParameters, ix)
+                // Add future indicators here, inspect all indicators before buying
+
+                if (buyIndicator) {
+                    //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
+                    stockTransaction.purchaseDate = quote.quoteDate
+                    stockTransaction.purchasePrice = quote.price
+                }
             }
 
             boolean sellIndicator = getMACDSellIndicator(quote)
@@ -99,7 +108,7 @@ class SimulationService {
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction
-                stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol)
+                stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
             }
         }
 

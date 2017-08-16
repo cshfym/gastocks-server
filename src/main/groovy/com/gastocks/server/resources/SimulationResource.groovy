@@ -27,30 +27,4 @@ class SimulationResource {
         simulationHandlerService.queueSimulationRequest(request)
     }
 
-    /*
-    @ResponseBody
-    @RequestMapping(value="/{symbol}", method=RequestMethod.GET)
-    SimulationSummary doBasicSimulation(@PathVariable("symbol") String symbol,
-                                        @RequestParam("emaShort") int emaShort, @RequestParam("emaLong") int emaLong,
-                                        @RequestParam("aboveCenter") boolean aboveCenter) {
-        simulationService.doSimulationForSymbol(symbol, emaShort, emaLong, aboveCenter)
-    }
-
-    @ResponseBody
-    @RequestMapping(value="/csvsummary/{symbol}", method=RequestMethod.GET)
-    List<String> doBasicSimulationWithCSV(@PathVariable("symbol") String symbol,
-                                        @RequestParam("emaShort") int emaShort, @RequestParam("emaLong") int emaLong,
-                                        @RequestParam("aboveCenter") boolean aboveCenter) {
-        simulationService.doSimulationForSymbolWithCSV(symbol, emaShort, emaLong, aboveCenter)
-    }
-
-    @ResponseBody
-    @RequestMapping(value="/csvsummary", method=RequestMethod.GET)
-    List<String> doBasicSimulationWithCSVAllSymbols(@RequestParam("emaShort") int emaShort, @RequestParam("emaLong") int emaLong,
-                                          @RequestParam("aboveCenter") boolean aboveCenter, @RequestParam("count") int count) {
-
-        simulationService.doSimulationForAllSymbolsWithCSV(emaShort, emaLong, aboveCenter, count)
-    }
-    */
-
 }
