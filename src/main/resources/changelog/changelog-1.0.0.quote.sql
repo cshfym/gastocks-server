@@ -9,7 +9,6 @@ CREATE TABLE `quote` (
   `price_change` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
   `price_change_percentage` float(7,4) COLLATE utf8mb4_bin DEFAULT NULL,
   `volume` integer COLLATE utf8mb4_bin DEFAULT 0,
-  `create_timestamp` DATE COLLATE utf8mb4_bin DEFAULT NULL,
   `quote_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
   `dividend` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
   `split_coefficient` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,

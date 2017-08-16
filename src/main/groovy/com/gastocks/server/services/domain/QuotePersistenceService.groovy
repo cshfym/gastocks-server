@@ -31,7 +31,6 @@ class QuotePersistenceService {
                 dayHigh: quote.dayHigh,
                 dayLow: quote.dayLow,
                 volume: quote.volume,
-                createTimestamp: new Date(),
                 quoteDate: new Date(quote.date.millis))
 
         log.debug("Saving quote: ${persistableQuote.toString()}")
@@ -51,7 +50,6 @@ class QuotePersistenceService {
                 priceChange: quote.priceChange,
                 priceChangePercentage: quote.priceChangePercentage,
                 volume: quote.volume,
-                createTimestamp: new Date(),
                 quoteDate: new Date(quote.lastUpdated.millis))
 
         log.debug("Saving quote: ${persistableQuote.toString()}")

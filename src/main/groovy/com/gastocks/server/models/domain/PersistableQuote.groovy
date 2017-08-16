@@ -23,9 +23,6 @@ class PersistableQuote {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     String id
 
-    @Temporal(TemporalType.DATE)
-    Date createTimestamp
-
     @ManyToOne
     @JoinColumn(name = "symbol_id")
     PersistableSymbol symbol
