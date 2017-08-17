@@ -78,6 +78,12 @@ class SimulationService {
 
         BasicSimulation simulation = new BasicSimulation(symbol: symbol, stockTransactions: [])
 
+        /**
+         * Establish the "session" max purchase price - once the first purchase transaction occurs, we essentially
+         * establish a much higher limit so as not to prevent subsequent transactions from being capped at the initial max price.
+         */
+        double sessionMaxPurchasePrice = request.maxPurchasePrice
+
         // Establish starting transaction
         StockTransaction stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
 
@@ -86,7 +92,7 @@ class SimulationService {
 
             if (!stockTransaction.started) {
 
-                if ((request.maxPurchasePrice > 0.0d) && (quote.price > request.maxPurchasePrice)) {
+                if ((sessionMaxPurchasePrice > 0.0d) && (quote.price > sessionMaxPurchasePrice)) {
                     return
                 }
 
@@ -97,6 +103,7 @@ class SimulationService {
                     //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                     stockTransaction.purchaseDate = quote.quoteDate
                     stockTransaction.purchasePrice = quote.price
+                    sessionMaxPurchasePrice = 9999999.00d
                 }
             }
 
@@ -110,6 +117,13 @@ class SimulationService {
                 simulation.stockTransactions << stockTransaction
                 stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
             }
+        }
+
+        // Close out any purchased and un-sold stock.
+        if (request.sellOpenPositions && (stockTransaction.started && stockTransaction.purchaseDate && !stockTransaction.sellDate)) {
+            stockTransaction.sellDate = quotes.last().quoteDate
+            stockTransaction.sellPrice = quotes.last().price
+            simulation.stockTransactions << stockTransaction
         }
 
         simulation

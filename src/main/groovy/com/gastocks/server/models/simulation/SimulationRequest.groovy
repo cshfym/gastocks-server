@@ -6,6 +6,12 @@ class SimulationRequest {
 
     String description
     double commissionPrice
+
+    /**
+     * If a stock was purchased but never sold at the end of the simulation, close out the position with the last quote price & date.
+     */
+    boolean sellOpenPositions
+
     int shares
     List<String> symbols
 
