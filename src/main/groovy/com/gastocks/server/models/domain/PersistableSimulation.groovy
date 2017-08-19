@@ -14,6 +14,8 @@ class PersistableSimulation {
     String id
 
     String description
+
+    @Temporal(TemporalType.DATE)
     Date runDate
 
     @Type(type="text")

@@ -20,8 +20,8 @@ class SimulationTransactionPersistenceService {
     @Autowired
     SimulationTransactionRepository transactionRepository
 
-    List<PersistableSimulationTransaction> findAllBySimulation(PersistableSimulation persistableSimulation) {
-        transactionRepository.findAllBySimulation(persistableSimulation)
+    List<PersistableSimulationTransaction> findAllBySimulationAndSymbol(PersistableSimulation persistableSimulation, PersistableSymbol symbol) {
+        transactionRepository.findAllBySimulationAndSymbol(persistableSimulation, symbol)
     }
 
     @Transactional

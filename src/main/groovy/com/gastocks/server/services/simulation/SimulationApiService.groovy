@@ -19,7 +19,7 @@ import javax.transaction.Transactional
 @Service
 @CompileStatic
 @Transactional
-class SimulationHandlerService {
+class SimulationApiService {
 
     @Autowired
     SimulationQueueSender simulationQueueSender
@@ -62,5 +62,9 @@ class SimulationHandlerService {
         }
 
         new BasicResponse(success: true, message: "Queued simulation [${simulation.id}]")
+    }
+
+    List<PersistableSimulation> findAll() {
+        simulationPersistenceService.findAll()
     }
 }
