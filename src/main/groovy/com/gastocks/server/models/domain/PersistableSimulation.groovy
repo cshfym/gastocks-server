@@ -26,6 +26,10 @@ class PersistableSimulation {
      */
     int queuedSymbols
 
+    @JoinColumn (name="simulation_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<PersistableSimulationTransaction> transactions
+
     @Override
     String toString() {
         "PersistableSimulation [${description}]"

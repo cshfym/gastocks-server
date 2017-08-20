@@ -3,6 +3,7 @@ package com.gastocks.server.services.simulation
 import com.gastocks.server.jms.sender.SimulationQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableSimulation
+import com.gastocks.server.models.domain.PersistableSimulationTransaction
 import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.SimulationSummary
@@ -69,8 +70,17 @@ class SimulationApiService {
 
     SimulationSummary getSimulationSummaryById(String id) {
 
-        def simulation = getSimulationById(id)
+        PersistableSimulation simulation = getSimulationById(id)
 
+        def symbolTransactionMap = new HashMap<String,List<PersistableSimulationTransaction>>()
+        simulation.transactions?.each { transaction ->
+            List<PersistableSimulationTransaction> mappedTransactions = []
+            if (symbolTransactionMap.containsKey(transaction.symbol.identifier)) {
+                mappedTransactions = symbolTransactionMap.get(transaction.symbol.identifier)
+            }
+            mappedTransactions << transaction
+            symbolTransactionMap.put(transaction.symbol.identifier, mappedTransactions)
+        }
 
         null
     }
