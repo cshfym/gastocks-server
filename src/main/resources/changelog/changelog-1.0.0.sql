@@ -18,7 +18,6 @@ CREATE TABLE `simulation` (
   `description` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
   `run_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
   `queued_symbols` integer COLLATE utf8mb4_bin DEFAULT 0,
-  `processed_symbols` integer COLLATE utf8mb4_bin DEFAULT 0,
   `attributes` TEXT COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `IDX_Description` (`description`)

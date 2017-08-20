@@ -66,7 +66,7 @@ class SimulationResource {
         try {
             simulationApiService.getSimulationById(id)
         } catch (SimulationNotFoundException ex) {
-            log.info("Simulation not found by id [${simulationId}]")
+            log.info("Simulation not found by id [${id}]")
             throw ex
         }
     }
@@ -78,7 +78,7 @@ class SimulationResource {
         try {
             simulationApiService.getSimulationSummaryById(id)
         } catch (SimulationNotFoundException ex) {
-            log.info("Simulation not found by id [${simulationId}]")
+            log.info("Simulation not found by id [${id}]")
             throw ex
         }
     }

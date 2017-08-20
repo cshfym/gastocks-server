@@ -21,9 +21,6 @@ class JmsConfiguration {
     @Value('${simulation.consumer.queue.concurrency}')
     String SIMULATION_CONSUMER_QUEUE_CONCURRENCY
 
-    @Value('${simulation.update.count.consumer.queue.concurrency}')
-    String SIMULATION_UPDATE_COUNT_CONSUMER_QUEUE_CONCURRENCY
-
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -50,21 +47,6 @@ class JmsConfiguration {
 
         def factory = new DefaultJmsListenerContainerFactory()
         factory.setConcurrency(SIMULATION_CONSUMER_QUEUE_CONCURRENCY)
-        configurer.configure(factory, connectionFactory)
-        factory
-    }
-
-    /**
-     * Bean corresponds to the "simulationUpdateCountFactory" JMS listener for consuming simulation update requests.
-     * @param connectionFactory
-     * @param configurer
-     * @return {@JmsListenerContainerFactory}
-     */
-    @Bean
-    JmsListenerContainerFactory<?> simulationUpdateCountFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
-
-        def factory = new DefaultJmsListenerContainerFactory()
-        factory.setConcurrency(SIMULATION_UPDATE_COUNT_CONSUMER_QUEUE_CONCURRENCY)
         configurer.configure(factory, connectionFactory)
         factory
     }

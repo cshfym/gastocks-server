@@ -3,7 +3,9 @@ package com.gastocks.server.services.simulation
 import com.gastocks.server.jms.sender.SimulationQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableSimulation
+import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
+import com.gastocks.server.models.simulation.SimulationSummary
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.SymbolService
 import com.gastocks.server.services.domain.SimulationPersistenceService
@@ -18,7 +20,6 @@ import javax.transaction.Transactional
 @Slf4j
 @Service
 @CompileStatic
-@Transactional
 class SimulationApiService {
 
     @Autowired
@@ -56,6 +57,8 @@ class SimulationApiService {
             return new BasicResponse(success: false, message: "Could not persist simulation, exception: ${ex.message}")
         }
 
+        Thread.sleep(5000) // Pause for (hopefully) the parent simulation to persist and commit before firing off the queue transactions.
+
         // 3. Queue filtered symbols for simulation, linked to Simulation record so they can be linked.
         filteredSymbols.each { symbol ->
             simulationQueueSender.queueRequest(simulation.id, symbol.identifier)
@@ -64,8 +67,22 @@ class SimulationApiService {
         new BasicResponse(success: true, message: "Queued simulation [${simulation.id}]")
     }
 
+    SimulationSummary getSimulationSummaryById(String id) {
+
+        def simulation = getSimulationById(id)
+
+
+        null
+    }
+
     PersistableSimulation getSimulationById(String id) {
-        simulationPersistenceService.findById(id)
+
+        def simulation = simulationPersistenceService.findById(id)
+        if (!simulation) {
+            throw new SimulationNotFoundException(identifier: id)
+        }
+
+        simulation
     }
 
     List<PersistableSimulation> findAll() {

@@ -26,11 +26,6 @@ class PersistableSimulation {
      */
     int queuedSymbols
 
-    /**
-     * The number of symbols which have completed simulation.
-     */
-    int processedSymbols
-
     @Override
     String toString() {
         "PersistableSimulation [${description}]"

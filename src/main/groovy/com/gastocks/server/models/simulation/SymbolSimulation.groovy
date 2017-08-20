@@ -8,6 +8,8 @@ class SymbolSimulation {
 
     List<SimulationTransaction> stockTransactions
 
+    // TODO Rip all these below methods out into a new summary hierarchy
+
     @Transient
     double getNetProceeds() {
         double totalBalance = 0.0d

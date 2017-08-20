@@ -40,13 +40,4 @@ class SimulationPersistenceService {
         simulationRepository.save(persistableSimulation)
     }
 
-    @Transactional
-    void persistSimulationCountUpdate(String simulationId, int count) {
-
-        PersistableSimulation persistableSimulation = simulationRepository.findOne(simulationId)
-
-        persistableSimulation.processedSymbols += count
-
-        simulationRepository.save(persistableSimulation)
-    }
 }

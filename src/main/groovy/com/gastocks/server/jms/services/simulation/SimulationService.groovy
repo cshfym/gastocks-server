@@ -1,12 +1,9 @@
 package com.gastocks.server.jms.services.simulation
 
-import com.gastocks.server.jms.receiver.SimulationUpdateCountMessageReceiver
-import com.gastocks.server.jms.sender.SimulationUpdateQueueSender
+import com.gastocks.server.jms.services.simulation.technical.TechnicalIndicatorService
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
-import com.gastocks.server.models.domain.jms.QueueableSimulationCountUpdate
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
-import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.SymbolSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
@@ -34,10 +31,10 @@ class SimulationService {
     TechnicalQuoteService technicalQuoteService
 
     @Autowired
-    SimulationUpdateQueueSender simulationUpdateQueueSender
+    SymbolPersistenceService symbolPersistenceService
 
     @Autowired
-    SymbolPersistenceService symbolPersistenceService
+    TechnicalIndicatorService technicalIndicatorService
 
     /**
      * Receives the incoming symbol payload, finds the original simulation wrapper, and runs a simulation
@@ -49,6 +46,11 @@ class SimulationService {
         def startStopwatch = System.currentTimeMillis()
 
         PersistableSimulation persistableSimulation = simulationPersistenceService.findById(simulationSymbol.simulationId)
+        if (! persistableSimulation) {
+            log.warn("In doSimulationWithRequest and could not find simulation with ID [${simulationSymbol.simulationId}]")
+            return
+        }
+
         PersistableSymbol persistableSymbol = symbolPersistenceService.findByIdentifier(simulationSymbol.symbol)
 
         // Reconstitute request from simulation attributes.
@@ -68,9 +70,6 @@ class SimulationService {
                         transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
             }
         }
-
-        // Send message to update count receiver to notify this symbol has been processed, and increase the count of processed symbols by 1.
-        simulationUpdateQueueSender.queueSimulationCountUpdate(persistableSimulation.id, 1)
     }
 
     SymbolSimulation doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
@@ -104,7 +103,7 @@ class SimulationService {
                     return
                 }
 
-                boolean buyIndicator = getMACDBuyIndicator(quote, request.macdParameters, ix)
+                boolean buyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
                 // Add future indicators here, inspect all indicators before buying
 
                 if (buyIndicator) {
@@ -115,7 +114,7 @@ class SimulationService {
                 }
             }
 
-            boolean sellIndicator = getMACDSellIndicator(quote)
+            boolean sellIndicator = technicalIndicatorService.getMACDSellIndicator(quote)
             // Add future indicators here, inspect all indicators before selling
 
             if (sellIndicator && stockTransaction.started) {
@@ -135,31 +134,6 @@ class SimulationService {
         }
 
         simulation
-    }
-
-    /**
-     * Update the number of symbols processed by simulationCountUpdate.count
-     * Generally executed from JMS receiver
-     * @param simulationCountUpdate
-     */
-    void doSimulationUpdateCount(QueueableSimulationCountUpdate simulationCountUpdate) {
-        simulationPersistenceService.persistSimulationCountUpdate(simulationCountUpdate.simulationId, simulationCountUpdate.count)
-    }
-
-    boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
-
-        if (index > 0 && quote.signalCrossoverPositive) {
-            // If aboveCenter parameter, only initiate BUY if signal line is > 0
-            if (!requestParameters.macdPositiveTrigger || (requestParameters.macdPositiveTrigger && (quote.macdSignalLine >= 0.0))) {
-                return true
-            }
-        }
-
-        false
-    }
-
-    boolean getMACDSellIndicator(TechnicalQuote quote) {
-        quote.signalCrossoverNegative
     }
 
 }

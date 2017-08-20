@@ -32,6 +32,7 @@ class SimulationQueueSender {
         )
 
         log.info "Queueing a simulation request for processing: [${symbol}]"
+
         jmsTemplate.convertAndSend(QUEUE_SIMULATION_REQUEST, queuableSimulationSymbol)
     }
 
