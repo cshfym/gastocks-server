@@ -26,15 +26,26 @@ class SimulationPersistenceService {
     }
 
     @Transactional
-    PersistableSimulation persistNewSimulation(String description, String attributes) {
+    PersistableSimulation persistNewSimulation(String description, int queuedSymbolsSize, String attributes) {
 
         def persistableSimulation = new PersistableSimulation(
             description: description,
+            queuedSymbols: queuedSymbolsSize,
             attributes: attributes,
             runDate: new Date()
         )
 
         log.debug("Saving simulation: ${persistableSimulation.toString()}")
+
+        simulationRepository.save(persistableSimulation)
+    }
+
+    @Transactional
+    void persistSimulationCountUpdate(String simulationId, int count) {
+
+        PersistableSimulation persistableSimulation = simulationRepository.findOne(simulationId)
+
+        persistableSimulation.processedSymbols += count
 
         simulationRepository.save(persistableSimulation)
     }

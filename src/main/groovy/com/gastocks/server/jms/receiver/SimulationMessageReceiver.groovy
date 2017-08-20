@@ -19,7 +19,7 @@ class SimulationMessageReceiver {
     @JmsListener(destination = SimulationQueueSender.QUEUE_SIMULATION_REQUEST, containerFactory = "simulationFactory")
     void receiveSimulationRequest(QueueableSimulationSymbol simulationSymbol) {
 
-        log.info "Received [${simulationSymbol.simulationId}-${simulationSymbol.symbol}] from queue ${SimulationQueueSender.QUEUE_SIMULATION_REQUEST}"
+        log.debug "Received [${simulationSymbol.simulationId}-${simulationSymbol.symbol}] from queue ${SimulationQueueSender.QUEUE_SIMULATION_REQUEST}"
 
         simulationService.doSimulationWithRequest(simulationSymbol)
     }

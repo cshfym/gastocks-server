@@ -1,17 +1,17 @@
 package com.gastocks.server.jms.services.simulation
 
+import com.gastocks.server.jms.receiver.SimulationUpdateCountMessageReceiver
+import com.gastocks.server.jms.sender.SimulationUpdateQueueSender
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
+import com.gastocks.server.models.domain.jms.QueueableSimulationCountUpdate
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
 import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.models.simulation.BasicSimulation
+import com.gastocks.server.models.simulation.SymbolSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
-import com.gastocks.server.models.simulation.SimulationSummary
-import com.gastocks.server.models.simulation.StockTransaction
-import com.gastocks.server.models.symbol.Symbol
+import com.gastocks.server.models.simulation.SimulationTransaction
 import com.gastocks.server.services.TechnicalQuoteService
-import com.gastocks.server.services.SymbolService
 import com.gastocks.server.services.domain.SimulationPersistenceService
 import com.gastocks.server.services.domain.SimulationTransactionPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
@@ -34,11 +34,16 @@ class SimulationService {
     TechnicalQuoteService technicalQuoteService
 
     @Autowired
-    SymbolService symbolService
+    SimulationUpdateQueueSender simulationUpdateQueueSender
 
     @Autowired
     SymbolPersistenceService symbolPersistenceService
 
+    /**
+     * Receives the incoming symbol payload, finds the original simulation wrapper, and runs a simulation
+     * on all all technical quote data.
+     * @param simulationSymbol
+     */
     void doSimulationWithRequest(QueueableSimulationSymbol simulationSymbol) {
 
         def startStopwatch = System.currentTimeMillis()
@@ -48,24 +53,27 @@ class SimulationService {
 
         // Reconstitute request from simulation attributes.
         def jsonSlurper = new JsonSlurper()
-        SimulationRequest simulationRequest = jsonSlurper.parseText(persistableSimulation.attributes)
+        SimulationRequest simulationRequest = jsonSlurper.parseText(persistableSimulation.attributes) as SimulationRequest
 
         List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, simulationRequest)
-        BasicSimulation simulation = doSimulationForSymbol(quotes, simulationSymbol.symbol, simulationRequest)
+        SymbolSimulation simulation = doSimulationForSymbol(quotes, simulationSymbol.symbol, simulationRequest)
 
         if (simulation) {
             log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
             log.info("*** Simulation: [${persistableSimulation.attributes}]")
 
-            simulation.stockTransactions?.each { StockTransaction transaction ->
+            simulation.stockTransactions?.each { SimulationTransaction transaction ->
                 transactionPersistenceService.persistNewSimulationTransaction(
                         persistableSimulation, persistableSymbol, transaction.shares, transaction.commission, transaction.purchasePrice,
                         transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
             }
         }
+
+        // Send message to update count receiver to notify this symbol has been processed, and increase the count of processed symbols by 1.
+        simulationUpdateQueueSender.queueSimulationCountUpdate(persistableSimulation.id, 1)
     }
 
-    BasicSimulation doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
+    SymbolSimulation doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
 
         log.info ("Starting simulation for symbol [${symbol}]")
 
@@ -76,7 +84,7 @@ class SimulationService {
 
         quotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
 
-        BasicSimulation simulation = new BasicSimulation(symbol: symbol, stockTransactions: [])
+        SymbolSimulation simulation = new SymbolSimulation(symbol: symbol, stockTransactions: [])
 
         /**
          * Establish the "session" max purchase price - once the first purchase transaction occurs, we essentially
@@ -85,7 +93,7 @@ class SimulationService {
         double sessionMaxPurchasePrice = request.maxPurchasePrice
 
         // Establish starting transaction
-        StockTransaction stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
+        SimulationTransaction stockTransaction = new SimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
 
         // Iterate each quote ascending, examining and acting on buy/sell signals
         quotes.eachWithIndex { quote, ix ->
@@ -115,7 +123,7 @@ class SimulationService {
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction
-                stockTransaction = new StockTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
+                stockTransaction = new SimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
             }
         }
 
@@ -127,6 +135,15 @@ class SimulationService {
         }
 
         simulation
+    }
+
+    /**
+     * Update the number of symbols processed by simulationCountUpdate.count
+     * Generally executed from JMS receiver
+     * @param simulationCountUpdate
+     */
+    void doSimulationUpdateCount(QueueableSimulationCountUpdate simulationCountUpdate) {
+        simulationPersistenceService.persistSimulationCountUpdate(simulationCountUpdate.simulationId, simulationCountUpdate.count)
     }
 
     boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {

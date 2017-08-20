@@ -5,6 +5,7 @@ import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSimulationTransaction
 import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
+import com.gastocks.server.models.simulation.SimulationSummary
 import com.gastocks.server.services.simulation.SimulationApiService
 import com.gastocks.server.services.simulation.SimulationTransactionApiService
 import groovy.util.logging.Slf4j
@@ -43,7 +44,7 @@ class SimulationResource {
 
     @ResponseBody
     @RequestMapping(value="/{simulationId}/{symbol}/transactions", method=RequestMethod.GET)
-    List<PersistableSimulationTransaction> findAllTransactionsBySimulationId(@PathVariable("simulationId")String simulationId,
+    List<PersistableSimulationTransaction> findAllTransactionsBySimulationId(@PathVariable("simulationId") String simulationId,
         @PathVariable("symbol")String symbol) {
 
         def transactions
@@ -57,4 +58,29 @@ class SimulationResource {
 
         transactions
     }
+
+    @ResponseBody
+    @RequestMapping(value="/{id}", method=RequestMethod.GET)
+    PersistableSimulation getSimulationById(@PathVariable("id") String id) {
+
+        try {
+            simulationApiService.getSimulationById(id)
+        } catch (SimulationNotFoundException ex) {
+            log.info("Simulation not found by id [${simulationId}]")
+            throw ex
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/{id}/summary", method=RequestMethod.GET)
+    SimulationSummary getSimulationSummaryBySimulationId(@PathVariable("id") String id) {
+
+        try {
+            simulationApiService.getSimulationSummaryById(id)
+        } catch (SimulationNotFoundException ex) {
+            log.info("Simulation not found by id [${simulationId}]")
+            throw ex
+        }
+    }
+
 }

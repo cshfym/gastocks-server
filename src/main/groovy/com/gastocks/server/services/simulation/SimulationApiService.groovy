@@ -50,7 +50,7 @@ class SimulationApiService {
         PersistableSimulation simulation
 
         try {
-            simulation = simulationPersistenceService.persistNewSimulation(request.description, JsonOutput.toJson(request))
+            simulation = simulationPersistenceService.persistNewSimulation(request.description, filteredSymbols.size(), JsonOutput.toJson(request))
         } catch (Exception ex) {
             log.error(ex.message)
             return new BasicResponse(success: false, message: "Could not persist simulation, exception: ${ex.message}")
@@ -62,6 +62,10 @@ class SimulationApiService {
         }
 
         new BasicResponse(success: true, message: "Queued simulation [${simulation.id}]")
+    }
+
+    PersistableSimulation getSimulationById(String id) {
+        simulationPersistenceService.findById(id)
     }
 
     List<PersistableSimulation> findAll() {

@@ -2,11 +2,11 @@ package com.gastocks.server.models.simulation
 
 import java.beans.Transient
 
-class BasicSimulation {
+class SymbolSimulation {
 
     String symbol
 
-    List<StockTransaction> stockTransactions
+    List<SimulationTransaction> stockTransactions
 
     @Transient
     double getNetProceeds() {

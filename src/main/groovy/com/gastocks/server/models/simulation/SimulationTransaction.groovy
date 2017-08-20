@@ -3,9 +3,9 @@ package com.gastocks.server.models.simulation
 /**
  *
  */
-class StockTransaction {
+class SimulationTransaction {
 
-    StockTransaction() {
+    SimulationTransaction() {
         shares = 0
         purchasePrice = 0.0d
         sellPrice = 0.0d

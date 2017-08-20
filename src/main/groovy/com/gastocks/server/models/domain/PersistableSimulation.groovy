@@ -21,6 +21,16 @@ class PersistableSimulation {
     @Type(type="text")
     String attributes
 
+    /**
+     * The number of symbols queued as part of this simulation.
+     */
+    int queuedSymbols
+
+    /**
+     * The number of symbols which have completed simulation.
+     */
+    int processedSymbols
+
     @Override
     String toString() {
         "PersistableSimulation [${description}]"
