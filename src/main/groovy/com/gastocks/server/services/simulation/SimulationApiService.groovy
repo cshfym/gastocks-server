@@ -11,6 +11,7 @@ import com.gastocks.server.models.simulation.SimulationTransaction
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.SymbolService
 import com.gastocks.server.services.domain.SimulationPersistenceService
+import com.gastocks.server.services.domain.SimulationTransactionPersistenceService
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -28,6 +29,9 @@ class SimulationApiService {
 
     @Autowired
     SimulationPersistenceService simulationPersistenceService
+
+    @Autowired
+    SimulationTransactionPersistenceService simulationTransactionPersistenceService
 
     @Autowired
     SymbolService symbolService
@@ -77,7 +81,10 @@ class SimulationApiService {
 
         // Group all simulation transactions by symbol
         def symbolTransactionMap = new HashMap<String,List<SimulationTransaction>>()
-        simulation.transactions?.each { transaction ->
+
+        def simulationTransactions = simulationTransactionPersistenceService.findAllBySimulation(simulation)
+
+        simulationTransactions?.each { transaction ->
             List<SimulationTransaction> mappedTransactions = []
             if (symbolTransactionMap.containsKey(transaction.symbol.identifier)) {
                 mappedTransactions = symbolTransactionMap.get(transaction.symbol.identifier)
@@ -109,6 +116,7 @@ class SimulationApiService {
     }
 
     List<PersistableSimulation> findAll() {
-        simulationPersistenceService.findAll()
+        def simulations = simulationPersistenceService.findAll()
+        simulations.sort { s1, s2 -> s2.runDate <=> s1.runDate }
     }
 }

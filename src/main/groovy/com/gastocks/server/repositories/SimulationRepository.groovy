@@ -5,5 +5,4 @@ import org.springframework.data.repository.CrudRepository
 
 interface SimulationRepository extends CrudRepository<PersistableSimulation, String> {
 
-    List<PersistableSimulation> findAll()
 }

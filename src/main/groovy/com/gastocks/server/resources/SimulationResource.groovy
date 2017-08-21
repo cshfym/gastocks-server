@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 @Slf4j
 @Controller
 @CrossOrigin
-@RequestMapping("/simulation")
+@RequestMapping("/simulations")
 class SimulationResource {
 
     @Autowired

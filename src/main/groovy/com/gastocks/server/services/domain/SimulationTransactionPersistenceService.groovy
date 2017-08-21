@@ -24,6 +24,10 @@ class SimulationTransactionPersistenceService {
         transactionRepository.findAllBySimulationAndSymbol(persistableSimulation, symbol)
     }
 
+    List<PersistableSimulationTransaction> findAllBySimulation(PersistableSimulation persistableSimulation) {
+        transactionRepository.findAllBySimulation(persistableSimulation)
+    }
+
     @Transactional
     PersistableSimulationTransaction persistNewSimulationTransaction(PersistableSimulation simulation,
          PersistableSymbol symbol, int shares, double commission, double purchasePrice, double sellPrice, Date purchaseDate, Date sellDate) {

@@ -7,5 +7,7 @@ import org.springframework.data.repository.CrudRepository
 
 interface SimulationTransactionRepository extends CrudRepository<PersistableSimulationTransaction, String> {
 
+    List<PersistableSimulationTransaction> findAllBySimulation(PersistableSimulation simulation)
+
     List<PersistableSimulationTransaction> findAllBySimulationAndSymbol(PersistableSimulation simulation, PersistableSymbol symbol)
 }
