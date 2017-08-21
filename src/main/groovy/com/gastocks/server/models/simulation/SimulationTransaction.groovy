@@ -1,66 +1,54 @@
 package com.gastocks.server.models.simulation
 
 /**
- *
+ * Represents a single transaction for a single symbol in the simulation
  */
 class SimulationTransaction {
 
-    SimulationTransaction() {
-        shares = 0
-        purchasePrice = 0.0d
-        sellPrice = 0.0d
-    }
-
-    String symbol
-
+    // Base attributes
+    double commission
     Date purchaseDate
     double purchasePrice
-
     Date sellDate
     double sellPrice
-
+    String symbol
     int shares
 
-    double commission
+    // Calculated properties
 
-    boolean isStarted() {
-        purchaseDate && !sellDate
-    }
+    /**
+     * Gross proceeds and percentage are the earning/loss * shares purchased
+     */
+    double grossProceeds
+    double grossProceedsPercentage
 
-    boolean isFinalized() {
-        purchaseDate && sellDate
-    }
+    /**
+     * Net proceeds and percentage are gross proceeds minus commission
+     */
+    double netProceeds
+    double netProceedsPercentage
 
-    double getGrossProceeds() {
-        (netProceeds - commission).round(2)
-    }
+    /**
+     * Total investment is the total proceeds required to purchase the shares
+     */
+    double totalInvestment
 
-    double getNetProceeds() {
 
-        if (!finalized) {
-            return 0.0d
-        }
+    SimulationTransaction(double commission, Date purchaseDate, double purchasePrice, Date sellDate, double sellPrice, String symbol, int shares) {
 
-        (((sellPrice - purchasePrice) * shares) - commission).round(2)
-    }
+        this.commission = commission
+        this.purchaseDate = purchaseDate
+        this.purchasePrice = purchasePrice
+        this.sellDate = sellDate
+        this.sellPrice = sellPrice
+        this.symbol = symbol
+        this.shares = shares
 
-    double getTotalInvestment() {
-        (purchasePrice * shares).round(2)
-    }
-
-    double getGrossPercentage() {
-        double grossPercentage = (double)(grossProceeds / totalInvestment)
-        (grossPercentage * 100.0d).round(2)
-    }
-
-    double getNetPercentage() {
-        double netPercentage = (double)(netProceeds / totalInvestment)
-        (netPercentage * 100.0d).round(2)
-    }
-
-    @Override
-    String toString() {
-        "Transaction purchase of [${symbol}] on date [${purchaseDate}] for [${purchasePrice}], sell date [${sellDate}] for [${sellPrice}], " +
-            "gross proceeds of [${grossProceeds}] (${grossPercentage}%), net proceeds of [${netProceeds}] (${netPercentage})%."
+        // Calculate derived attributes
+        this.netProceeds = (((sellPrice - purchasePrice) * shares) - commission).round(2)
+        this.totalInvestment = (purchasePrice * shares).round(2)
+        this.grossProceeds = (netProceeds - commission).round(2)
+        this.grossProceedsPercentage = ((double)(grossProceeds / totalInvestment) * 100.0d).round(2)
+        this.netProceedsPercentage = ((double)(netProceeds / totalInvestment) * 100.0d).round(2)
     }
 }

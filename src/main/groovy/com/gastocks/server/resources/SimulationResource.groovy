@@ -6,6 +6,7 @@ import com.gastocks.server.models.domain.PersistableSimulationTransaction
 import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.SimulationSummary
+import com.gastocks.server.models.simulation.SymbolSimulationSummary
 import com.gastocks.server.services.simulation.SimulationApiService
 import com.gastocks.server.services.simulation.SimulationTransactionApiService
 import groovy.util.logging.Slf4j
@@ -79,6 +80,9 @@ class SimulationResource {
             simulationApiService.getSimulationSummaryById(id)
         } catch (SimulationNotFoundException ex) {
             log.info("Simulation not found by id [${id}]")
+            throw ex
+        } catch (Exception ex) {
+            log.error ("Error getting simulation summary by id: ${ex.message}")
             throw ex
         }
     }

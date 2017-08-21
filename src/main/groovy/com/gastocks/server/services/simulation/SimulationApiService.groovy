@@ -3,10 +3,11 @@ package com.gastocks.server.services.simulation
 import com.gastocks.server.jms.sender.SimulationQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableSimulation
-import com.gastocks.server.models.domain.PersistableSimulationTransaction
 import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.SimulationSummary
+import com.gastocks.server.models.simulation.SymbolSimulationSummary
+import com.gastocks.server.models.simulation.SimulationTransaction
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.SymbolService
 import com.gastocks.server.services.domain.SimulationPersistenceService
@@ -15,8 +16,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-
-import javax.transaction.Transactional
 
 @Slf4j
 @Service
@@ -72,17 +71,25 @@ class SimulationApiService {
 
         PersistableSimulation simulation = getSimulationById(id)
 
-        def symbolTransactionMap = new HashMap<String,List<PersistableSimulationTransaction>>()
+        // Group all simulation transactions by symbol
+        def symbolTransactionMap = new HashMap<String,List<SimulationTransaction>>()
         simulation.transactions?.each { transaction ->
-            List<PersistableSimulationTransaction> mappedTransactions = []
+            List<SimulationTransaction> mappedTransactions = []
             if (symbolTransactionMap.containsKey(transaction.symbol.identifier)) {
                 mappedTransactions = symbolTransactionMap.get(transaction.symbol.identifier)
             }
-            mappedTransactions << transaction
+            mappedTransactions << new SimulationTransaction(transaction.commission, transaction.purchaseDate, transaction.purchasePrice,
+                    transaction.sellDate, transaction.sellPrice, transaction.symbol.identifier, transaction.shares)
+
             symbolTransactionMap.put(transaction.symbol.identifier, mappedTransactions)
         }
 
-        null
+        def symbolSimulationSummaryList = []
+        symbolTransactionMap.each { k, v ->
+            symbolSimulationSummaryList << new SymbolSimulationSummary(k, v)
+        }
+
+        new SimulationSummary(symbolSimulationSummaryList)
     }
 
     PersistableSimulation getSimulationById(String id) {

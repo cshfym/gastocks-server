@@ -7,7 +7,7 @@ import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
 import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.SymbolSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
-import com.gastocks.server.models.simulation.SimulationTransaction
+import com.gastocks.server.models.simulation.TemporarySimulationTransaction
 import com.gastocks.server.services.TechnicalQuoteService
 import com.gastocks.server.services.domain.SimulationPersistenceService
 import com.gastocks.server.services.domain.SimulationTransactionPersistenceService
@@ -64,7 +64,7 @@ class SimulationService {
             log.info("*** Symbol Simulation Complete in [${System.currentTimeMillis() - startStopwatch} ms]")
             log.info("*** Simulation: [${persistableSimulation.attributes}]")
 
-            simulation.stockTransactions?.each { SimulationTransaction transaction ->
+            simulation.stockTransactions?.each { TemporarySimulationTransaction transaction ->
                 transactionPersistenceService.persistNewSimulationTransaction(
                         persistableSimulation, persistableSymbol, transaction.shares, transaction.commission, transaction.purchasePrice,
                         transaction.sellPrice, transaction.purchaseDate, transaction.sellDate)
@@ -92,7 +92,7 @@ class SimulationService {
         double sessionMaxPurchasePrice = request.maxPurchasePrice
 
         // Establish starting transaction
-        SimulationTransaction stockTransaction = new SimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
+        TemporarySimulationTransaction stockTransaction = new TemporarySimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
 
         // Iterate each quote ascending, examining and acting on buy/sell signals
         quotes.eachWithIndex { quote, ix ->
@@ -122,7 +122,7 @@ class SimulationService {
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction
-                stockTransaction = new SimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
+                stockTransaction = new TemporarySimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
             }
         }
 
