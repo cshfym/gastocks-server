@@ -18,7 +18,8 @@ class CacheConfiguration {
                 "allSymbols",
                 "getQuotesForSymbol",
                 "getTechnicalQuotesForSymbol",
-                "QuotePersistenceService.findAllQuotesForSymbol"
+                "QuotePersistenceService.findAllQuotesForSymbol",
+                "getSimulationSummaryById"
         )
     }
 }

@@ -15,6 +15,7 @@ import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Slf4j
@@ -67,7 +68,10 @@ class SimulationApiService {
         new BasicResponse(success: true, message: "Queued simulation [${simulation.id}]")
     }
 
+    @Cacheable(value="getSimulationSummaryById")
     SimulationSummary getSimulationSummaryById(String id) {
+
+        def startStopwatch = System.currentTimeMillis()
 
         PersistableSimulation simulation = getSimulationById(id)
 
@@ -88,6 +92,8 @@ class SimulationApiService {
         symbolTransactionMap.each { k, v ->
             symbolSimulationSummaryList << new SymbolSimulationSummary(k, v)
         }
+
+        log.debug ("Returning simulation summary for ID [${id}] in [${System.currentTimeMillis() - startStopwatch} ms]")
 
         new SimulationSummary(symbolSimulationSummaryList)
     }
