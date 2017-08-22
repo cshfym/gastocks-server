@@ -6,6 +6,9 @@ package com.gastocks.server.models.simulation
 class SimulationSummary {
 
     // Base attributes
+    String description
+    Date runDate
+
     List<SymbolSimulationSummary> symbolSimulationSummaries
 
     // Calculated properties
@@ -17,8 +20,10 @@ class SimulationSummary {
     double totalCommissionCost
     int transactionCount
 
-    SimulationSummary(List<SymbolSimulationSummary> transactions = []) {
+    SimulationSummary(String description, Date runDate, List<SymbolSimulationSummary> transactions = []) {
 
+        this.description = description
+        this.runDate = runDate
         this.symbolSimulationSummaries = transactions
 
         this.transactionCount = transactions.size()
