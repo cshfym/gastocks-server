@@ -6,7 +6,6 @@ import com.gastocks.server.models.domain.PersistableSimulationTransaction
 import com.gastocks.server.models.exception.SimulationNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.SimulationSummary
-import com.gastocks.server.models.simulation.SymbolSimulationSummary
 import com.gastocks.server.services.simulation.SimulationApiService
 import com.gastocks.server.services.simulation.SimulationTransactionApiService
 import groovy.util.logging.Slf4j
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
 @Slf4j
@@ -74,10 +74,11 @@ class SimulationResource {
 
     @ResponseBody
     @RequestMapping(value="/{id}/summary", method=RequestMethod.GET)
-    SimulationSummary getSimulationSummaryBySimulationId(@PathVariable("id") String id) {
+    SimulationSummary getSimulationSummaryBySimulationId(@PathVariable("id") String id,
+        @RequestParam("compact") boolean compact) {
 
         try {
-            simulationApiService.getSimulationSummaryById(id)
+            simulationApiService.getSimulationSummaryById(id, compact)
         } catch (SimulationNotFoundException ex) {
             log.info("Simulation not found by id [${id}]")
             throw ex

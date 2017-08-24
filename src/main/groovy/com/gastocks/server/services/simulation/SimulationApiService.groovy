@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service
 
 @Slf4j
 @Service
-@CompileStatic
 class SimulationApiService {
 
     @Autowired
@@ -73,7 +72,7 @@ class SimulationApiService {
     }
 
     @Cacheable(value="getSimulationSummaryById")
-    SimulationSummary getSimulationSummaryById(String id) {
+    SimulationSummary getSimulationSummaryById(String id, boolean compact) {
 
         def startStopwatch = System.currentTimeMillis()
 
@@ -100,7 +99,13 @@ class SimulationApiService {
             symbolSimulationSummaryList << new SymbolSimulationSummary(k, v)
         }
 
-        log.debug ("Returning simulation summary for ID [${id}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        if (compact) {
+            symbolSimulationSummaryList.each { SymbolSimulationSummary symbolSummary ->
+                symbolSummary.transactions = []
+            }
+        }
+
+        log.debug ("Returning simulation summary for ID [${id}] in [${System.currentTimeMillis() - startStopwatch} ms], compact [${compact}]")
 
         new SimulationSummary(simulation.description, simulation.runDate, symbolSimulationSummaryList)
     }
