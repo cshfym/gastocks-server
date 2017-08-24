@@ -8,6 +8,7 @@ class SimulationSummary {
     // Base attributes
     String description
     Date runDate
+    String attributes
 
     List<SymbolSimulationSummary> symbolSimulationSummaries
 
@@ -20,10 +21,11 @@ class SimulationSummary {
     double totalCommissionCost
     int transactionCount
 
-    SimulationSummary(String description, Date runDate, List<SymbolSimulationSummary> transactions = []) {
+    SimulationSummary(String description, Date runDate, String attributes, List<SymbolSimulationSummary> transactions = []) {
 
         this.description = description
         this.runDate = runDate
+        this.attributes = attributes
         this.symbolSimulationSummaries = transactions
 
         this.transactionCount = transactions.size()
@@ -32,7 +34,7 @@ class SimulationSummary {
         this.grossProceeds = transactions.grossProceeds ? ((double)transactions.grossProceeds.sum()).round(2) : 0
         this.netProceedsPercentage = totalInvestment ? ((double)(netProceeds / totalInvestment) * 100.0d).round(2) : 0
         this.grossProceedsPercentage = totalInvestment ? ((double)(grossProceeds / totalInvestment) * 100.0d).round(2) : 0
-        this.totalCommissionCost = transactions.totalCommissionCost ? transactions.totalCommissionCost.sum() as double : 0
+        this.totalCommissionCost = transactions.totalCommissionCost ? ((double)transactions.totalCommissionCost.sum()).round(2) as double : 0
     }
 
 }

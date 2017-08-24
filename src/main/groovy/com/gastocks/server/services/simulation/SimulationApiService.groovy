@@ -107,7 +107,7 @@ class SimulationApiService {
 
         log.debug ("Returning simulation summary for ID [${id}] in [${System.currentTimeMillis() - startStopwatch} ms], compact [${compact}]")
 
-        new SimulationSummary(simulation.description, simulation.runDate, symbolSimulationSummaryList)
+        new SimulationSummary(simulation.description, simulation.runDate, simulation.attributes, symbolSimulationSummaryList)
     }
 
     PersistableSimulation getSimulationById(String id) {
