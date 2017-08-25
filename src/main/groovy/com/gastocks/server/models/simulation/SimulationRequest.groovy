@@ -15,6 +15,7 @@ class SimulationRequest {
     int shares
     List<String> symbols
 
+    double minPurchasePrice
     double maxPurchasePrice
 
     MACDRequestParameters macdParameters

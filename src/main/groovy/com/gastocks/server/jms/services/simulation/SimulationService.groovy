@@ -86,10 +86,11 @@ class SimulationService {
         SymbolSimulation simulation = new SymbolSimulation(symbol: symbol, stockTransactions: [])
 
         /**
-         * Establish the "session" max purchase price - once the first purchase transaction occurs, we essentially
+         * Establish the "session" min/max purchase price - once the first purchase transaction occurs, we essentially
          * establish a much higher limit so as not to prevent subsequent transactions from being capped at the initial max price.
          */
         double sessionMaxPurchasePrice = request.maxPurchasePrice
+        double sessionMinPurchasePrice = request.minPurchasePrice
 
         // Establish starting transaction
         TemporarySimulationTransaction stockTransaction = new TemporarySimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
@@ -99,9 +100,8 @@ class SimulationService {
 
             if (!stockTransaction.started) {
 
-                if ((sessionMaxPurchasePrice > 0.0d) && (quote.price > sessionMaxPurchasePrice)) {
-                    return
-                }
+                if ((sessionMaxPurchasePrice > 0.0d) && (quote.price > sessionMaxPurchasePrice)) { return }
+                if ((sessionMinPurchasePrice > 0.0d) && (quote.price < sessionMinPurchasePrice)) { return }
 
                 boolean buyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
                 // Add future indicators here, inspect all indicators before buying
