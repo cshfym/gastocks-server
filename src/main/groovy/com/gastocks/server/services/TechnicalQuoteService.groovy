@@ -5,10 +5,8 @@ import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
-import com.gastocks.server.models.technical.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -53,7 +51,8 @@ class TechnicalQuoteService {
         persistableQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate } // Ascending
 
         // Calculate technical data points for all quotes available.
-        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request.macdParameters.macdShortPeriod, request.macdParameters.macdLongPeriod)
+        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request.macdParameters.macdShortPeriod,
+            request.macdParameters.macdLongPeriod)
 
         // Return sorted collection of TechnicalQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
@@ -68,28 +67,44 @@ class TechnicalQuoteService {
 
         List<TechnicalDataWrapper> technicalDataList = []
 
-        // TODO Split this out into the MACD processing.
-
-        quoteData.eachWithIndex { quote, ix ->
-            if (ix == 0) {
-                def macdTechnicalData = new MACDTechnicalData(emaShort: quote.price, emaLong: quote.price)
-                technicalDataList << new TechnicalDataWrapper(quoteDate: quote.quoteDate, macdTechnicalData: macdTechnicalData)
-            } else {
-                double emaShort = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaShort, emaShortDays)
-                double emaLong = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaLong, emaLongDays)
-                double macd = (emaShort - emaLong).round(4)
-                technicalDataList << new TechnicalDataWrapper(
-                        macdTechnicalData: new MACDTechnicalData(
-                            emaShort: emaShort,
-                            emaLong: emaLong,
-                            macd: macd),
-                        quoteDate: quote.quoteDate)
-            }
+        // Fill technicalDataList 1:1 for each quote
+        quoteData.each { quote ->
+            def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate)
+            calculateAverages(quote, quoteData, wrapper)
+            technicalDataList << wrapper
         }
 
+        macdService.buildMACDTechnicalData(technicalDataList, quoteData, emaShortDays, emaLongDays)
         macdService.buildMACDSignalData(technicalDataList)
 
         technicalDataList
+    }
+
+    /**
+     * Calculates weekly averages for varying periods starting with the quote, working backward.
+     * @param quote
+     * @param quoteData
+     */
+    protected void calculateAverages(PersistableQuote quote, List<PersistableQuote> quoteData, TechnicalDataWrapper wrapper) {
+
+        // Capture quote date from input quote, iterate backward
+        List<PersistableQuote> relevantQuotes = quoteData.findAll { it.quoteDate <= quote.quoteDate }
+
+        relevantQuotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
+
+        def m52WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 364) }
+        def m26WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 182) }
+        def m12WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 84) }
+        def m6WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 42) }
+        def m3WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 21) }
+        def m1WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 7) }
+
+        wrapper._52WeekAverage = (m52WeekQuotes.size() > 0) ? (m52WeekQuotes*.price.sum() / m52WeekQuotes.size()).round(2) : 0
+        wrapper._26WeekAverage = (m26WeekQuotes.size() > 0) ? (m26WeekQuotes*.price.sum() / m26WeekQuotes.size()).round(2) : 0
+        wrapper._12WeekAverage = (m12WeekQuotes.size() > 0) ? (m12WeekQuotes*.price.sum() / m12WeekQuotes.size()).round(2) : 0
+        wrapper._6WeekAverage = (m6WeekQuotes.size() > 0) ? (m6WeekQuotes*.price.sum() / m6WeekQuotes.size()).round(2) : 0
+        wrapper._3WeekAverage = (m3WeekQuotes.size() > 0) ? (m3WeekQuotes*.price.sum() / m3WeekQuotes.size()).round(2) : 0
+        wrapper._1WeekAverage = (m1WeekQuotes.size() > 0) ? (m1WeekQuotes*.price.sum() / m1WeekQuotes.size()).round(2) : 0
     }
 
 }

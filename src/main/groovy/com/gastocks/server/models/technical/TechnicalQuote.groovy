@@ -10,14 +10,21 @@ class TechnicalQuote extends Quote {
 
     int shortParameter
     int longParameter
-    Double emaShort
-    Double emaLong
-    Double macd
-    Double macdSignalLine
-    Double macdHist
+    double emaShort
+    double emaLong
+    double macd
+    double macdSignalLine
+    double macdHist
     boolean centerCrossoverPositive
     boolean centerCrossoverNegative
     boolean signalCrossoverPositive
     boolean signalCrossoverNegative
+
+    double _52WeekAverage
+    double _26WeekAverage
+    double _12WeekAverage
+    double _6WeekAverage
+    double _3WeekAverage
+    double _1WeekAverage
 
 }

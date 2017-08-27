@@ -32,7 +32,15 @@ class TechnicalQuoteConverter {
             centerCrossoverNegative: technicalData.macdTechnicalData.centerCrossoverNegative,
             centerCrossoverPositive: technicalData.macdTechnicalData.centerCrossoverPositive,
             signalCrossoverNegative: technicalData.macdTechnicalData.signalCrossoverNegative,
-            signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive
+            signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive,
+
+            // Averages
+            _52WeekAverage: technicalData._52WeekAverage,
+            _26WeekAverage: technicalData._26WeekAverage,
+            _12WeekAverage: technicalData._12WeekAverage,
+            _6WeekAverage: technicalData._6WeekAverage,
+            _3WeekAverage: technicalData._3WeekAverage,
+            _1WeekAverage: technicalData._1WeekAverage
         )
     }
 }

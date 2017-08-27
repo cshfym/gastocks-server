@@ -1,5 +1,6 @@
 package com.gastocks.server.services
 
+import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.technical.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import groovy.util.logging.Slf4j
@@ -14,6 +15,35 @@ class MACDService {
     TechnicalToolsService technicalToolsService
 
     private static final MACD_SIGNAL_DAYS = 9
+
+    /**
+     * Builds out the base data required for calculating the MACD signal data.
+     * @param technicalDataList
+     * @param quoteData
+     * @param emaShortDays
+     * @param emaLongDays
+     */
+    void buildMACDTechnicalData(List<TechnicalDataWrapper> technicalDataList, List<PersistableQuote> quoteData, int emaShortDays, int emaLongDays) {
+
+        // TODO !! technicalDataList is now initialized. Fix.
+
+        quoteData.eachWithIndex { quote, ix ->
+
+            def technicalWrapper = technicalDataList.find { it.quoteDate == quote.quoteDate }
+
+            if (ix == 0) {
+                technicalWrapper.macdTechnicalData = new MACDTechnicalData(emaShort: quote.price, emaLong: quote.price)
+            } else {
+                double emaShort = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaShort, emaShortDays)
+                double emaLong = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaLong, emaLongDays)
+                double macd = (emaShort - emaLong).round(4)
+                technicalWrapper.macdTechnicalData = new MACDTechnicalData(
+                    emaShort: emaShort,
+                    emaLong: emaLong,
+                    macd: macd)
+            }
+        }
+    }
 
     /**
      * The MACD signal line is the 9-day EMA of the MACD.

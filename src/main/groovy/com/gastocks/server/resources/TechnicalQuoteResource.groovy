@@ -29,7 +29,7 @@ class TechnicalQuoteResource {
             quotes = quoteService.getTechnicalQuotesForSymbol(symbol,
                 new SimulationRequest(macdParameters: new MACDRequestParameters(macdShortPeriod: emashort, macdLongPeriod: emalong)))
         } catch (QuoteNotFoundException ex) {
-            log.info "Quote not found for symbol ${symbol}"
+            log.info "Quote not found for symbol [${symbol}]"
             throw ex
         }
 
