@@ -40,7 +40,22 @@ class TechnicalQuoteConverter {
             _12WeekAverage: technicalData._12WeekAverage,
             _6WeekAverage: technicalData._6WeekAverage,
             _3WeekAverage: technicalData._3WeekAverage,
-            _1WeekAverage: technicalData._1WeekAverage
+            _1WeekAverage: technicalData._1WeekAverage,
+
+            // High/Low
+            _52WeekHigh: technicalData._52WeekHigh,
+            _52WeekLow: technicalData._52WeekLow,
+            _26WeekHigh: technicalData._26WeekHigh,
+            _26WeekLow: technicalData._26WeekLow,
+            _12WeekHigh: technicalData._12WeekHigh,
+            _12WeekLow: technicalData._12WeekLow,
+            _6WeekHigh: technicalData._6WeekHigh,
+            _6WeekLow: technicalData._6WeekLow,
+            _3WeekHigh: technicalData._3WeekHigh,
+            _3WeekLow: technicalData._3WeekLow,
+            _1WeekHigh: technicalData._1WeekHigh,
+            _1WeekLow: technicalData._1WeekLow
+
         )
     }
 }

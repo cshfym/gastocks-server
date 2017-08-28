@@ -70,7 +70,7 @@ class TechnicalQuoteService {
         // Fill technicalDataList 1:1 for each quote
         quoteData.each { quote ->
             def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate)
-            calculateAverages(quote, quoteData, wrapper)
+            calculateAveragesAndHighLows(quote, quoteData, wrapper)
             technicalDataList << wrapper
         }
 
@@ -85,7 +85,7 @@ class TechnicalQuoteService {
      * @param quote
      * @param quoteData
      */
-    protected void calculateAverages(PersistableQuote quote, List<PersistableQuote> quoteData, TechnicalDataWrapper wrapper) {
+    protected void calculateAveragesAndHighLows(PersistableQuote quote, List<PersistableQuote> quoteData, TechnicalDataWrapper wrapper) {
 
         // Capture quote date from input quote, iterate backward
         List<PersistableQuote> relevantQuotes = quoteData.findAll { it.quoteDate <= quote.quoteDate }
@@ -105,6 +105,20 @@ class TechnicalQuoteService {
         wrapper._6WeekAverage = (m6WeekQuotes.size() > 0) ? (m6WeekQuotes*.price.sum() / m6WeekQuotes.size()).round(2) : 0
         wrapper._3WeekAverage = (m3WeekQuotes.size() > 0) ? (m3WeekQuotes*.price.sum() / m3WeekQuotes.size()).round(2) : 0
         wrapper._1WeekAverage = (m1WeekQuotes.size() > 0) ? (m1WeekQuotes*.price.sum() / m1WeekQuotes.size()).round(2) : 0
+
+        wrapper._52WeekHigh = m52WeekQuotes.max { it.price }.price
+        wrapper._52WeekLow = m52WeekQuotes.min { it.price }.price
+        wrapper._26WeekHigh = m26WeekQuotes.max { it.price }.price
+        wrapper._26WeekLow = m26WeekQuotes.min { it.price }.price
+        wrapper._12WeekHigh = m12WeekQuotes.max { it.price }.price
+        wrapper._12WeekLow = m12WeekQuotes.min { it.price }.price
+        wrapper._6WeekHigh = m6WeekQuotes.max { it.price }.price
+        wrapper._6WeekLow = m6WeekQuotes.min { it.price }.price
+        wrapper._3WeekHigh = m3WeekQuotes.max { it.price }.price
+        wrapper._3WeekLow = m3WeekQuotes.min { it.price }.price
+        wrapper._1WeekHigh = m1WeekQuotes.max { it.price }.price
+        wrapper._1WeekLow = m1WeekQuotes.min { it.price }.price
+
     }
 
 }
