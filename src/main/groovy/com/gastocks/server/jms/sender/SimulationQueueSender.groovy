@@ -19,8 +19,7 @@ class SimulationQueueSender {
 
     /**
      * Queues a simulation request for processing
-     * @param @SimulationRequest
-     * @return
+     * @param simulationId, symbol
      */
     void queueRequest(String simulationId, String symbol) {
 

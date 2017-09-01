@@ -87,12 +87,4 @@ class QuotePersistenceService {
         quotes
     }
 
-    List<Double> get52WeekMinMaxForSymbolAndDate(PersistableSymbol symbol, Date date) {
-        [
-            quoteRepository.find52WeekMaximumForSymbolAndDate(symbol, date)
-            //quoteRepository.find52WeekMinimumForSymbolAndDate(symbol, date),
-            //quoteRepository.find52WeekAverageForSymbolAndDate(symbol, date)
-        ]
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.symbol.EnhancedSymbol
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.SymbolService
@@ -27,5 +28,11 @@ class SymbolResource {
     @RequestMapping(value="/enhanced", method=RequestMethod.GET)
     List<EnhancedSymbol> getEnhancedSymbols(@RequestParam("high52Week") double high52Week, @RequestParam("low52Week") double low52Week) {
         symbolService.findAllEnhancedSymbols(high52Week, low52Week)
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/backfill", method=RequestMethod.POST)
+    BasicResponse backfill() {
+        symbolService.backfillAllSymbols()
     }
 }

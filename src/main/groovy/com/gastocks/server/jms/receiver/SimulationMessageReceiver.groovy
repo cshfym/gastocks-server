@@ -21,7 +21,6 @@ class SimulationMessageReceiver {
 
         log.debug "Received [${simulationSymbol.simulationId}-${simulationSymbol.symbol}] from queue ${SimulationQueueSender.QUEUE_SIMULATION_REQUEST}"
 
-
         simulationService.doSimulationWithRequest(simulationSymbol)
     }
 }

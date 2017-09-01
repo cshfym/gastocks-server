@@ -61,13 +61,6 @@ class QuoteService {
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
     }
 
-    List<Double> get52WeekMinMaxForSymbolAndDate(PersistableSymbol symbol, Date date52Weeks) {
-        def startStopwatch = System.currentTimeMillis()
-        def minMaxForSymbol = quotePersistenceService.get52WeekMinMaxForSymbolAndDate(symbol, date52Weeks)
-        log.info("Found min/max for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms] ")
-        minMaxForSymbol
-    }
-
     boolean missingQuotesForSymbol(PersistableSymbol symbol) {
 
         def startStopwatch = System.currentTimeMillis()
