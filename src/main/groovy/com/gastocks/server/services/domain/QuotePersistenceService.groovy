@@ -5,9 +5,7 @@ import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.QuoteRepository
-import com.gastocks.server.util.DateUtility
 import groovy.util.logging.Slf4j
-import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -82,10 +80,19 @@ class QuotePersistenceService {
 
     @Cacheable(value = "QuotePersistenceService.findAllQuotesForSymbol")
     List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
+
         def startStopwatch = System.currentTimeMillis()
         def quotes = quoteRepository.findAllBySymbol(symbol)
         log.info("Loaded [${quotes?.size()}] quotes for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
         quotes
+    }
+
+    List<Double> get52WeekMinMaxForSymbolAndDate(PersistableSymbol symbol, Date date) {
+        [
+            quoteRepository.find52WeekMaximumForSymbolAndDate(symbol, date)
+            //quoteRepository.find52WeekMinimumForSymbolAndDate(symbol, date),
+            //quoteRepository.find52WeekAverageForSymbolAndDate(symbol, date)
+        ]
     }
 
 }
