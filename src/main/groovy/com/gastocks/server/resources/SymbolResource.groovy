@@ -24,6 +24,12 @@ class SymbolResource {
         symbolService.findAllSymbols()
     }
 
+    /**
+     * Finds all enhanced symbols which fit the constraint parameters.
+     * @param high52Week
+     * @param low52Week
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value="/enhanced", method=RequestMethod.GET)
     List<EnhancedSymbol> getEnhancedSymbols(@RequestParam("high52Week") double high52Week, @RequestParam("low52Week") double low52Week) {

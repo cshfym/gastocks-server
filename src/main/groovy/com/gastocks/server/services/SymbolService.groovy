@@ -7,7 +7,6 @@ import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.PersistableSymbolExtended
-import com.gastocks.server.models.quote.Quote
 import com.gastocks.server.models.symbol.EnhancedSymbol
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.domain.SymbolExtendedPersistenceService
@@ -82,10 +81,7 @@ class SymbolService {
 
         def startStopwatch = System.currentTimeMillis()
 
-        /*
         List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
-
-        Date date52WeeksBack = new Date() - 364
 
         def enhancedSymbols = allSymbols.collect { symbol ->
 
@@ -97,8 +93,6 @@ class SymbolService {
         log.info "Method findAllEnhancedSymbols with [${enhancedSymbols.size()}] count executed in [${System.currentTimeMillis() - startStopwatch}] ms]"
 
         enhancedSymbols
-
-        */
 
         null
     }
@@ -126,39 +120,39 @@ class SymbolService {
 
         def startStopwatch = System.currentTimeMillis()
 
-        PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
+        PersistableSymbol persistableSymbol = symbolPersistenceService.findByIdentifier(identifier)
 
-        List<PersistableQuote> symbolQuotes = quoteService.quotePersistenceService.findAllQuotesForSymbol(symbol)
+        List<PersistableQuote> symbolQuotes = quoteService.quotePersistenceService.findAllQuotesForSymbol(persistableSymbol)
         symbolQuotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
 
         symbolQuotes.each { quote ->
 
-            // Ignore duplicates.
-            if (symbolExtendedPersistenceService.findSymbolExtendedBySymbolAndQuoteDate(symbol, quote.quoteDate)) {
-                log.debug "Bypassing creation of symbol extended for identifier [${identifier}] and quote date [${quote.quoteDate}] as it already exists."
-                return
-            }
-
             def back52Weeks = quote.quoteDate - 364
             def quotesForDate = symbolQuotes.findAll { (it.quoteDate <= quote.quoteDate) && (it.quoteDate >= back52Weeks) }
             def pricesForDates = quotesForDate.collect { it.price }
-            def maximum52Weeks = quotesForDate.max { it.price }
-            def minimum52Weeks = quotesForDate.min { it.price }
-            def average52Weeks = pricesForDates ? ((double)(pricesForDates.sum { it } / pricesForDates.size())).round(2) : 0.0d
+            def max52Weeks = quotesForDate.max { it.price }
+            def min52Weeks = quotesForDate.min { it.price }
+            def avg52Weeks = pricesForDates ? ((double)(pricesForDates.sum { it } / pricesForDates.size())).round(2) : 0.0d
 
-            PersistableSymbolExtended extended = new PersistableSymbolExtended(
-                symbol: symbol,
-                quoteDate: quote.quoteDate,
-                price: quote.price,
-                maximum52Weeks: maximum52Weeks.price,
-                minimum52Weeks: minimum52Weeks.price,
-                average52Weeks: average52Weeks
-            )
+            PersistableSymbolExtended persistableSymbolExtended = symbolExtendedPersistenceService.findBySymbolAndQuoteDate(persistableSymbol, quote.quoteDate)
 
-            persistExtendedSymbol(extended)
+            if (!persistableSymbolExtended) {
+                persistableSymbolExtended = new PersistableSymbolExtended()
+            }
+
+            persistableSymbolExtended.with {
+                symbol = persistableSymbol
+                quoteDate = quote.quoteDate
+                price = quote.price
+                maximum52Weeks = max52Weeks.price
+                minimum52Weeks = min52Weeks.price
+                average52Weeks = avg52Weeks
+            }
+
+            persistExtendedSymbol(persistableSymbolExtended)
         }
 
-        log.info("Done backfilling extended symbol data for [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
     @Transactional

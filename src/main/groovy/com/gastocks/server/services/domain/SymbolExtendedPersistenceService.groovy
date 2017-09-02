@@ -21,8 +21,12 @@ class SymbolExtendedPersistenceService {
         symbolExtendedRepository.save(persistableSymbolExtended)
     }
 
-    PersistableSymbolExtended findSymbolExtendedBySymbolAndQuoteDate(PersistableSymbol symbol, Date quoteDate) {
+    PersistableSymbolExtended findBySymbolAndQuoteDate(PersistableSymbol symbol, Date quoteDate) {
         symbolExtendedRepository.findBySymbolAndQuoteDate(symbol, quoteDate)
+    }
+
+    List<PersistableSymbolExtended> findAllByMax52WeeksAndMin52Weeks(double max52Weeks, double min52Weeks) {
+
     }
 
 }
