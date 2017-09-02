@@ -18,6 +18,7 @@ CREATE TABLE `symbol_extended` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `quote_date` DATE COLLATE utf8mb4_bin NOT NULL,
+  `price` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
   `average_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
   `maximum_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
   `minimum_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
@@ -25,6 +26,7 @@ CREATE TABLE `symbol_extended` (
   INDEX `IDX_Symbol` (`symbol_id`),
   INDEX `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 CREATE TABLE `simulation` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,

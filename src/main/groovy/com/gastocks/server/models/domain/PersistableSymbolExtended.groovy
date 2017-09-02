@@ -19,6 +19,9 @@ class PersistableSymbolExtended {
     @JoinColumn(name = "symbol_id")
     PersistableSymbol symbol
 
+    @Column(name="price")
+    double price
+
     @Column(name="average_52_weeks")
     double average52Weeks
 
