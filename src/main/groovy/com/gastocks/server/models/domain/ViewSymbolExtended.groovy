@@ -12,6 +12,10 @@ class ViewSymbolExtended {
 
     String identifier
 
+    String description
+
+    String exchangeMarketShortName
+
     @Column(name="max_price")
     double maxPrice
 

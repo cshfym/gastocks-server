@@ -23,7 +23,11 @@ class ViewSymbolExtendedPersistenceService {
         def allEntries = viewSymbolExtendedCacheService.findAllViewSymbolExtendedFromCache()
 
         allEntries.each { viewSymbolExtended ->
-            if ((viewSymbolExtended.maxPrice <= maxQuotePrice) && (viewSymbolExtended.minPrice >= minQuotePrice)) {
+            if (maxQuotePrice && minQuotePrice) {
+                if ((viewSymbolExtended.maxPrice <= maxQuotePrice) && (viewSymbolExtended.minPrice >= minQuotePrice)) {
+                    filteredEntries << viewSymbolExtended
+                }
+            } else {
                 filteredEntries << viewSymbolExtended
             }
         }
