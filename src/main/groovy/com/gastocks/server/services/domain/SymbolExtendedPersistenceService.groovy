@@ -25,7 +25,16 @@ class SymbolExtendedPersistenceService {
         symbolExtendedRepository.findBySymbolAndQuoteDate(symbol, quoteDate)
     }
 
-    List<PersistableSymbolExtended> findAllByMax52WeeksAndMin52Weeks(double max52Weeks, double min52Weeks) {
+    List<PersistableSymbolExtended> findAllBySymbolWithParameters(PersistableSymbol symbol, Double maxQuotePrice = null, Double minQuotePrice = null) {
+
+        if (!maxQuotePrice && !minQuotePrice) {
+            symbolExtendedRepository.findAllBySymbolOrderByQuoteDateDesc(symbol)
+        } else {
+            def symbolExtendedList = symbolExtendedRepository.findAllBySymbolOrderByQuoteDateDesc(symbol)
+            if (symbolExtendedList.any { it.price > maxQuotePrice || it.price < minQuotePrice }) {
+                return []
+            }
+        }
 
     }
 

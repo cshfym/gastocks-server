@@ -8,6 +8,9 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.PathVariableMapMethodArgumentResolver
+
+import javax.websocket.server.PathParam
 
 @Slf4j
 @Controller
@@ -25,15 +28,28 @@ class SymbolResource {
     }
 
     /**
-     * Finds all enhanced symbols which fit the constraint parameters.
+     * Finds all enhanced symbols with parameters.
      * @param high52Week
      * @param low52Week
-     * @return
+     * @return List<EnhancedSymbol>
      */
     @ResponseBody
     @RequestMapping(value="/enhanced", method=RequestMethod.GET)
-    List<EnhancedSymbol> getEnhancedSymbols(@RequestParam("high52Week") double high52Week, @RequestParam("low52Week") double low52Week) {
-        symbolService.findAllEnhancedSymbols(high52Week, low52Week)
+    List<EnhancedSymbol> getEnhancedSymbols(@RequestParam(value="count", required=true) int count,
+            @RequestParam(value="maxQuotePrice", required=false) Double maxQuotePrice,
+            @RequestParam(value="minQuotePrice", required=false) Double minQuotePrice) {
+        symbolService.findAllEnhancedSymbols(count, maxQuotePrice, minQuotePrice)
+    }
+
+    /**
+     * Find single enhanced symbol with identifier path parameter.
+     * @param identifier
+     * @return EnhancedSymbol
+     */
+    @ResponseBody
+    @RequestMapping(value="/enhanced/{symbol_id}", method=RequestMethod.GET)
+    EnhancedSymbol getEnhancedSymbolByIdentifier(@PathVariable("symbol_id") String identifier) {
+        symbolService.findEnhancedSymbolByIdentifier(identifier)
     }
 
     @ResponseBody

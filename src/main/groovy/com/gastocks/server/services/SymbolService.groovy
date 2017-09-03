@@ -7,6 +7,7 @@ import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.PersistableSymbolExtended
+import com.gastocks.server.models.exception.SymbolNotFoundException
 import com.gastocks.server.models.symbol.EnhancedSymbol
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.domain.SymbolExtendedPersistenceService
@@ -77,24 +78,40 @@ class SymbolService {
         symbols
     }
 
-    List<EnhancedSymbol> findAllEnhancedSymbols(double high52Week, double low52Week) {
+    List<EnhancedSymbol> findAllEnhancedSymbols(int maxCount, Double maxQuotePrice = null, Double minQuotePrice = null) {
 
         def startStopwatch = System.currentTimeMillis()
 
         List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
 
-        def enhancedSymbols = allSymbols.collect { symbol ->
+        def enhancedSymbols = []
 
-            // Find min, max, avg with date constraint.
-
-            enhancedSymbolConverter.fromPersistableSymbol(symbol, minMaxAvgForSymbol)
+        int count = 0
+        allSymbols.each { symbol ->
+            if (count >= maxCount) { return }
+            List<PersistableSymbolExtended> extendedSymbols = symbolExtendedPersistenceService.findAllBySymbolWithParameters(symbol, maxQuotePrice, minQuotePrice)
+            if (!extendedSymbols) { return }
+            enhancedSymbols << enhancedSymbolConverter.fromPersistableSymbol(symbol, extendedSymbols)
+            count++
         }.sort { q1, q2 -> q1.identifier <=> q2.identifier } // Ascending by identifier, i.e. MYGN
 
         log.info "Method findAllEnhancedSymbols with [${enhancedSymbols.size()}] count executed in [${System.currentTimeMillis() - startStopwatch}] ms]"
 
         enhancedSymbols
+    }
 
-        null
+    EnhancedSymbol findEnhancedSymbolByIdentifier(String identifier) {
+
+        def startStopwatch = System.currentTimeMillis()
+
+        PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
+        if (!symbol) { throw new SymbolNotFoundException(identifier: identifier) }
+
+        def enhancedSymbol = enhancedSymbolConverter.fromPersistableSymbol(symbol, symbolExtendedPersistenceService.findAllBySymbol(symbol))
+
+        log.info "Method findEnhancedSymbolByIdentifier with identifier [${identifier}] executed in [${System.currentTimeMillis() - startStopwatch}] ms]"
+
+        enhancedSymbol
     }
 
     /**
