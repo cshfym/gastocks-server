@@ -1,7 +1,6 @@
 package com.gastocks.server.services.domain
 
 import com.gastocks.server.models.domain.ViewSymbolExtended
-import com.gastocks.server.repositories.ViewSymbolExtendedRepository
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -14,23 +13,23 @@ import org.springframework.stereotype.Service
 class ViewSymbolExtendedPersistenceService {
 
     @Autowired
-    ViewSymbolExtendedRepository viewSymbolExtendedRepository
+    ViewSymbolExtendedCacheService viewSymbolExtendedCacheService
 
     List<ViewSymbolExtended> findAllWithParameters(Double maxQuotePrice = null, Double minQuotePrice = null) {
 
         def startStopwatch = System.currentTimeMillis()
-        def response = viewSymbolExtendedRepository.findAllWithParameters(maxQuotePrice, minQuotePrice)
-        log.info("Found [${response.size()}] ViewSymbolExtended with min/max [${minQuotePrice}, ${maxQuotePrice}] in [${System.currentTimeMillis() - startStopwatch} ms] ")
 
-        response
+        def filteredEntries = []
+        def allEntries = viewSymbolExtendedCacheService.findAllViewSymbolExtendedFromCache()
+
+        allEntries.each { viewSymbolExtended ->
+            if ((viewSymbolExtended.maxPrice <= maxQuotePrice) && (viewSymbolExtended.minPrice >= minQuotePrice)) {
+                filteredEntries << viewSymbolExtended
+            }
+        }
+
+        log.info("Found [${filteredEntries.size()}] ViewSymbolExtended with min/max [${minQuotePrice}, ${maxQuotePrice}] in [${System.currentTimeMillis() - startStopwatch} ms] ")
+
+        filteredEntries
     }
-
-    ViewSymbolExtended findBySymbolId(String symbolId) {
-        viewSymbolExtendedRepository.findBySymbolId(symbolId)
-    }
-
-    ViewSymbolExtended findByIdentifier(String identifier) {
-        viewSymbolExtendedRepository.findByIdentifier(identifier)
-    }
-
 }
