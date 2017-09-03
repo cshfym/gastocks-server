@@ -3,6 +3,7 @@ start transaction;
 use `ga_stocks`;
 
 -- cleanup --
+DROP VIEW `v_symbol_extended`;
 DELETE FROM `symbol_extended`;
 DROP TABLE `symbol_extended`;
 DELETE FROM `simulation_transaction`;
@@ -17,16 +18,28 @@ DROP TABLE `exchange_market`;
 CREATE TABLE `symbol_extended` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `quote_date` DATE COLLATE utf8mb4_bin NOT NULL,
-  `price` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
-  `average_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
-  `maximum_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
-  `minimum_52_weeks` double(9,3) COLLATE utf8mb4_bin DEFAULT 0.0,
+  `quote_date` date NOT NULL,
+  `price` double(9,3) DEFAULT '0.000',
+  `average_52_weeks` double(9,3) DEFAULT '0.000',
+  `maximum_52_weeks` double(9,3) DEFAULT '0.000',
+  `minimum_52_weeks` double(9,3) DEFAULT '0.000',
   PRIMARY KEY (`id`),
-  INDEX `IDX_Symbol` (`symbol_id`),
-  INDEX `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`)
+  KEY `IDX_Symbol` (`symbol_id`),
+  KEY `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`),
+  KEY `IDX_Symbol_Max52` (`symbol_id`,`maximum_52_weeks`),
+  KEY `IDX_Symbol_Min52` (`symbol_id`,`minimum_52_weeks`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
+CREATE VIEW v_symbol_extended AS
+SELECT
+	se.symbol_id as symbol_id,
+    s.identifier,
+    max(se.price) as max_price,
+    min(se.price) as min_price,
+    avg(se.price) as avg_price
+FROM symbol_extended se
+INNER JOIN symbol s on se.symbol_id = s.id
+GROUP BY se.symbol_id;
 
 CREATE TABLE `simulation` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,

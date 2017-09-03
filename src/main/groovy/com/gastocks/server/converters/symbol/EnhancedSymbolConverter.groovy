@@ -8,19 +8,16 @@ import org.springframework.stereotype.Component
 @Component
 class EnhancedSymbolConverter {
 
-    EnhancedSymbol fromPersistableSymbol(PersistableSymbol persistableSymbol, List<PersistableSymbolExtended> symbolExtendedList) {
+    EnhancedSymbol fromPersistableSymbol(PersistableSymbol persistableSymbol, PersistableSymbolExtended symbolExtended) {
 
         new EnhancedSymbol(
             identifier: persistableSymbol.identifier,
             description: persistableSymbol.description,
             active: persistableSymbol.active,
             exchangeMarket: persistableSymbol.exchangeMarket.shortName,
-            maximumQuotePrice: (symbolExtendedList) ? symbolExtendedList.max { it.price }.price : 0.0d,
-            minimumQuotePrice: (symbolExtendedList) ? symbolExtendedList.min { it.price }.price : 0.0d,
-            averageQuotePrice: (symbolExtendedList) ? (double)(symbolExtendedList.sum { it.price } / symbolExtendedList.size()).round(2) : 0.0d,
-            quotePeriods: (symbolExtendedList) ? symbolExtendedList.size() : 0,
-            newestQuoteDate: (symbolExtendedList) ? symbolExtendedList[0].quoteDate : null,
-            oldestQuoteDate: (symbolExtendedList) ? symbolExtendedList[symbolExtendedList.size() - 1].quoteDate : null
+            maximumQuotePrice: (symbolExtended) ? symbolExtended.maximum52Weeks : 0.0d,
+            minimumQuotePrice: (symbolExtended) ? symbolExtended.minimum52Weeks : 0.0d,
+            averageQuotePrice: (symbolExtended) ? symbolExtended.average52Weeks : 0.0d
         )
     }
 }
