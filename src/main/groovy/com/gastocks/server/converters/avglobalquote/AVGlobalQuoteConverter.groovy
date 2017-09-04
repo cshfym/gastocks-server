@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component
 @Component
 class AVGlobalQuoteConverter extends BaseConverter {
 
-    final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d, k:mma zzz") // i.e. Jul 6, 4:04PM EDT
+    final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("MMM d k:mma zzz") // i.e. Jul 6, 4:04PM EDT
+    final static DateTimeFormatter DATE_FORMAT_WITH_COMMA = DateTimeFormat.forPattern("MMM d, k:mma zzz") // i.e. Jul 6, 4:04PM EDT
 
     @Override
     boolean hasData(Object obj) {
@@ -35,8 +36,11 @@ class AVGlobalQuoteConverter extends BaseConverter {
 
         def parsedDateTime
         try {
-            parsedDateTime = DATE_FORMAT.parseDateTime(objRoot."${AVGlobalQuoteConstants.LAST_UPDATED_DATE}" as String)
-                    .withYear(new DateTime().year)
+            parsedDateTime = DATE_FORMAT_WITH_COMMA.parseDateTime(
+                    objRoot."${AVGlobalQuoteConstants.LAST_UPDATED_DATE}" as String).withYear(new DateTime().year)
+        } catch (IllegalArgumentException iax) {
+            parsedDateTime = DATE_FORMAT.parseDateTime(
+                    objRoot."${AVGlobalQuoteConstants.LAST_UPDATED_DATE}" as String).withYear(new DateTime().year)
         } catch (Exception ex) {
             log.warn ("Could not parse date time [${AVGlobalQuoteConstants.LAST_UPDATED_DATE}] during quote conversion.")
             return null

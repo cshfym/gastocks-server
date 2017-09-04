@@ -1,6 +1,5 @@
 package com.gastocks.server.services
 
-import com.gastocks.server.converters.symbol.EnhancedSymbolConverter
 import com.gastocks.server.converters.symbol.SymbolConverter
 import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.BasicResponse
@@ -8,8 +7,6 @@ import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.PersistableSymbolExtended
 import com.gastocks.server.models.domain.ViewSymbolExtended
-import com.gastocks.server.models.exception.SymbolNotFoundException
-import com.gastocks.server.models.symbol.EnhancedSymbol
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.domain.SymbolExtendedPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
@@ -123,7 +120,11 @@ class SymbolService {
 
             PersistableSymbolExtended persistableSymbolExtended = symbolExtendedPersistenceService.findBySymbolAndQuoteDate(persistableSymbol, quote.quoteDate)
 
-            if (!persistableSymbolExtended) {
+            if (persistableSymbolExtended) {
+                // Ignore updating this symbol extended record.
+                log.debug "Bypassing update for symbol extended update [${identifier}] for quote [${quote.quoteDate}] as it exists."
+                return
+            } else {
                 persistableSymbolExtended = new PersistableSymbolExtended()
             }
 

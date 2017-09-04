@@ -23,4 +23,9 @@ class PersistableSymbol {
     @ManyToOne
     @JoinColumn(name = "exchange_market_id")
     PersistableExchangeMarket exchangeMarket
+
+    @Override
+    String toString() {
+        "PersistableSymbol [${identifier}] - [${description}]"
+    }
 }
