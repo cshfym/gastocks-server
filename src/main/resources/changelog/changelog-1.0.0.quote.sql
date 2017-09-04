@@ -13,7 +13,8 @@ CREATE TABLE `quote` (
   `dividend` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
   `split_coefficient` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `IDX_SymbolId_QuoteDate` (`symbol_id`,`quote_date`),
   KEY `FK_Quote_Symbol` (`symbol_id`),
-  INDEX `IDX_SymbolId_QuoteDate` (`symbol_id`, `quote_date`),
+  KEY `IDX_SymbolID_QuoteDate_Price` (`symbol_id`,`quote_date`,`price`),
   CONSTRAINT `FK_Quote_Symbol` FOREIGN KEY (`symbol_id`) REFERENCES `symbol` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
