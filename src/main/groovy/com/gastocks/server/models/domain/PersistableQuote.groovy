@@ -45,4 +45,8 @@ class PersistableQuote {
     @Temporal(TemporalType.DATE)
     Date quoteDate
 
+    @Override
+    String toString() {
+        "PersistableQuote [${symbol.identifier}] quoteDate: ${quoteDate}, price: ${price}, volume: ${volume}"
+    }
 }

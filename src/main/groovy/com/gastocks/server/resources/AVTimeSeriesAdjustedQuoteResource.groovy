@@ -30,8 +30,7 @@ class AVTimeSeriesAdjustedQuoteResource {
      */
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
-    BasicQuoteResponse getQuote(
-            @RequestParam(value="symbol", required=true) String symbol) {
+    BasicQuoteResponse getQuote(@RequestParam(value="symbol", required=true) String symbol) {
 
         def quote = quoteService.getQuote(symbol)
 
