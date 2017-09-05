@@ -23,11 +23,11 @@ class StatisticsUtility {
             temp += (it - mean) * (it - mean)
         }
 
-        (data) ? temp / (data.size() - 1) : 0.0d
+        (data) ? (double)(temp / (data.size() - 1)).round(2) : 0.0d
     }
 
     Double getStandardDeviation(List<Double> data) {
-        Math.sqrt(getVariance(data))
+        Math.sqrt(getVariance(data)) ?: 0.0d
     }
 
 }

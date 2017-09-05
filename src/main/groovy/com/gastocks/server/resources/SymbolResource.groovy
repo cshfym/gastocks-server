@@ -1,5 +1,6 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.ViewSymbolExtended
 import com.gastocks.server.models.symbol.Symbol
@@ -17,6 +18,9 @@ class SymbolResource {
 
     @Autowired
     SymbolService symbolService
+
+    @Autowired
+    SymbolExtendedQueueSender symbolExtendedQueueSender
 
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
@@ -41,4 +45,16 @@ class SymbolResource {
     BasicResponse backfill() {
         symbolService.backfillAllSymbols()
     }
+
+    /**
+     * Convenience API to trigger backfill of a single symbol_extended record.
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/backfill/{identifier}", method=RequestMethod.GET)
+    BasicResponse backfillSingle(@PathVariable("identifier") String identifier) {
+        //symbolService.doBackfillForSymbol(identifier)
+        symbolExtendedQueueSender.queueRequest(identifier)
+    }
+
 }

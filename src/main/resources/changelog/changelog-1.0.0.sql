@@ -23,6 +23,7 @@ CREATE TABLE `symbol_extended` (
   `average_52_weeks` double(9,3) DEFAULT '0.000',
   `maximum_52_weeks` double(9,3) DEFAULT '0.000',
   `minimum_52_weeks` double(9,3) DEFAULT '0.000',
+  `price_standard_deviation` double(9,3) DEFAULT '0.000'
   PRIMARY KEY (`id`),
   KEY `IDX_Symbol` (`symbol_id`),
   KEY `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`),
@@ -36,7 +37,8 @@ SELECT
     s.identifier,
     max(se.price) as max_price,
     min(se.price) as min_price,
-    avg(se.price) as avg_price
+    avg(se.price) as avg_price,
+    avg(se.price_standard_deviation) as avg_price_stdev,
 FROM symbol_extended se
 INNER JOIN symbol s on se.symbol_id = s.id
 GROUP BY se.symbol_id;

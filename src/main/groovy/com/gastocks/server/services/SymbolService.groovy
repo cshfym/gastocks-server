@@ -11,6 +11,7 @@ import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.domain.SymbolExtendedPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.services.domain.ViewSymbolExtendedPersistenceService
+import com.gastocks.server.util.StatisticsUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -39,24 +40,8 @@ class SymbolService {
     @Autowired
     ViewSymbolExtendedPersistenceService viewSymbolExtendedPersistenceService
 
-    /**
-     * Finds symbols that are missing quotes.
-     * @return
-     */
-    List<PersistableSymbol> findSymbolsWithMissingQuotes() {
-
-        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols()
-
-        List<PersistableSymbol> symbolsWithMissingQuotes = []
-
-        activeSymbols.each { symbol ->
-            if (quoteService.missingQuotesForSymbol(symbol)) {
-                symbolsWithMissingQuotes << symbol
-            }
-        }
-
-        symbolsWithMissingQuotes
-    }
+    @Autowired
+    StatisticsUtility statisticsUtility
 
     /**
      * Finds all symbols available
@@ -117,14 +102,10 @@ class SymbolService {
             def max52Weeks = quotesForDate.max { it.price }
             def min52Weeks = quotesForDate.min { it.price }
             def avg52Weeks = pricesForDates ? ((double)(pricesForDates.sum { it } / pricesForDates.size())).round(2) : 0.0d
+            def standardDev = statisticsUtility.getStandardDeviation(pricesForDates)
 
             PersistableSymbolExtended persistableSymbolExtended = symbolExtendedPersistenceService.findBySymbolAndQuoteDate(persistableSymbol, quote.quoteDate)
-
-            if (persistableSymbolExtended) {
-                // Ignore updating this symbol extended record.
-                log.debug "Bypassing update for symbol extended update [${identifier}] for quote [${quote.quoteDate}] as it exists."
-                return
-            } else {
+            if (!persistableSymbolExtended) {
                 persistableSymbolExtended = new PersistableSymbolExtended()
             }
 
@@ -135,6 +116,7 @@ class SymbolService {
                 maximum52Weeks = max52Weeks.price
                 minimum52Weeks = min52Weeks.price
                 average52Weeks = avg52Weeks
+                priceStandardDeviation = standardDev
             }
 
             persistExtendedSymbol(persistableSymbolExtended)
@@ -147,4 +129,13 @@ class SymbolService {
     void persistExtendedSymbol(PersistableSymbolExtended extended) {
         symbolExtendedPersistenceService.persistSymbolExtended(extended)
     }
+
+    /**
+     * Finds symbols that are missing quotes.
+     * @return
+     */
+    List<PersistableSymbol> findSymbolsWithMissingQuotes() {
+        // TBD
+    }
+
 }

@@ -31,4 +31,7 @@ class PersistableSymbolExtended {
     @Column(name="minimum_52_weeks")
     double minimum52Weeks
 
+    @Column(name="price_standard_deviation")
+    double priceStandardDeviation
+
 }
