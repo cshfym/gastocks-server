@@ -119,7 +119,13 @@ class SymbolService {
                 priceStandardDeviation = standardDev
             }
 
-            persistExtendedSymbol(persistableSymbolExtended)
+            try {
+                persistExtendedSymbol(persistableSymbolExtended)
+            } catch (Exception ex) {
+                // Check for "NaN" double
+                log.error "Could not save persistable symbol extended [${persistableSymbolExtended}], ex: ${ex.message}"
+            }
+
         }
 
         log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
