@@ -23,10 +23,10 @@ CREATE TABLE `symbol_extended` (
   `average_52_weeks` double(9,3) DEFAULT '0.000',
   `maximum_52_weeks` double(9,3) DEFAULT '0.000',
   `minimum_52_weeks` double(9,3) DEFAULT '0.000',
-  `price_standard_deviation` double(9,3) DEFAULT '0.000'
+  `price_standard_deviation` double(9,3) DEFAULT '0.000',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`),
   KEY `IDX_Symbol` (`symbol_id`),
-  KEY `IDX_Symbol_QuoteDate` (`symbol_id`,`quote_date`),
   KEY `IDX_Symbol_Max52` (`symbol_id`,`maximum_52_weeks`),
   KEY `IDX_Symbol_Min52` (`symbol_id`,`minimum_52_weeks`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

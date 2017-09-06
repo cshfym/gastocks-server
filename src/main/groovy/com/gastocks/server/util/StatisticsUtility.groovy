@@ -27,7 +27,11 @@ class StatisticsUtility {
     }
 
     Double getStandardDeviation(List<Double> data) {
-        Math.sqrt(getVariance(data)) ?: 0.0d
+        def standardDeviation = Math.sqrt(getVariance(data))
+        if (!standardDeviation || Double.isNaN(standardDeviation)) {
+            return 0.0d
+        }
+        standardDeviation
     }
 
 }

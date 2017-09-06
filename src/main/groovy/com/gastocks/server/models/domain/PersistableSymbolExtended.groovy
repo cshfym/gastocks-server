@@ -34,4 +34,8 @@ class PersistableSymbolExtended {
     @Column(name="price_standard_deviation")
     double priceStandardDeviation
 
+    @Override
+    String toString() {
+        "PersistableSymbolEtended id: [${id}], quoteDate: [${quoteDate}], symbol: [${symbol.identifier}], price: [${price}]"
+    }
 }

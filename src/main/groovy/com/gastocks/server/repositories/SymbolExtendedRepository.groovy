@@ -8,4 +8,5 @@ interface SymbolExtendedRepository extends CrudRepository<PersistableSymbolExten
 
     PersistableSymbolExtended findBySymbolAndQuoteDate(PersistableSymbol symbol, Date quoteDate)
 
+    List<PersistableSymbolExtended> findAllBySymbol(PersistableSymbol symbol)
 }

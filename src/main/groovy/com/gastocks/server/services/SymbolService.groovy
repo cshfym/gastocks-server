@@ -1,6 +1,7 @@
 package com.gastocks.server.services
 
 import com.gastocks.server.converters.symbol.SymbolConverter
+
 import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
@@ -15,8 +16,6 @@ import com.gastocks.server.util.StatisticsUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-
-import javax.transaction.Transactional
 
 @Slf4j
 @Service
@@ -94,6 +93,8 @@ class SymbolService {
         List<PersistableQuote> symbolQuotes = quoteService.quotePersistenceService.findAllQuotesForSymbol(persistableSymbol)
         symbolQuotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
 
+        List<PersistableSymbolExtended> existingPersistableSymbolExtendedList = symbolExtendedPersistenceService.findAllBySymbol(persistableSymbol)
+
         symbolQuotes.each { quote ->
 
             def back52Weeks = quote.quoteDate - 364
@@ -104,7 +105,10 @@ class SymbolService {
             def avg52Weeks = pricesForDates ? ((double)(pricesForDates.sum { it } / pricesForDates.size())).round(2) : 0.0d
             def standardDev = statisticsUtility.getStandardDeviation(pricesForDates)
 
-            PersistableSymbolExtended persistableSymbolExtended = symbolExtendedPersistenceService.findBySymbolAndQuoteDate(persistableSymbol, quote.quoteDate)
+            def persistableSymbolExtended = existingPersistableSymbolExtendedList.find {
+                (it.symbol.identifier == persistableSymbol.identifier) && (it.quoteDate == quote.quoteDate)
+            }
+
             if (!persistableSymbolExtended) {
                 persistableSymbolExtended = new PersistableSymbolExtended()
             }
@@ -119,15 +123,10 @@ class SymbolService {
                 priceStandardDeviation = standardDev
             }
 
-            persistExtendedSymbol(persistableSymbolExtended)
+            symbolExtendedPersistenceService.persistSymbolExtended(persistableSymbolExtended)
         }
 
         log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
-    }
-
-    @Transactional
-    void persistExtendedSymbol(PersistableSymbolExtended extended) {
-        symbolExtendedPersistenceService.persistSymbolExtended(extended)
     }
 
     /**
