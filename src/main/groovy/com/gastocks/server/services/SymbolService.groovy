@@ -16,6 +16,7 @@ import com.gastocks.server.util.StatisticsUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Slf4j
 @Service
@@ -84,6 +85,7 @@ class SymbolService {
      * Backfill specific symbol with identifier argument.
      * @param identifier
      */
+    @Transactional
     void doBackfillForSymbol(String identifier) {
 
         def startStopwatch = System.currentTimeMillis()
