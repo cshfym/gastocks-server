@@ -14,8 +14,6 @@ class ViewSymbolExtended {
 
     String description
 
-    String exchangeMarketShortName
-
     @Column(name="max_price")
     double maxPrice
 
@@ -24,6 +22,12 @@ class ViewSymbolExtended {
 
     @Column(name="avg_price")
     double avgPrice
+
+    @Column(name="max_price_stdev")
+    double maxPriceStdev
+
+    @Column(name="avg_price_stdev")
+    double avgPriceStdev
 
 }
 

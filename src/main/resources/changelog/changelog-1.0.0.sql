@@ -35,10 +35,12 @@ CREATE VIEW v_symbol_extended AS
 SELECT
 	se.symbol_id as symbol_id,
     s.identifier,
+    s.description,
     max(se.price) as max_price,
     min(se.price) as min_price,
     avg(se.price) as avg_price,
-    avg(se.price_standard_deviation) as avg_price_stdev,
+    max(se.price_standard_deviation) as max_price_stdev,
+    avg(se.price_standard_deviation) as avg_price_stdev
 FROM symbol_extended se
 INNER JOIN symbol s on se.symbol_id = s.id
 GROUP BY se.symbol_id;
