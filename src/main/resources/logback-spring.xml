@@ -38,11 +38,12 @@
                 %d{yyyy-MM-dd HH:mm:ss} - %msg%n
             </Pattern>
         </encoder>
-
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${DEV_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log
-            </fileNamePattern>
+            <fileNamePattern>${DEV_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -51,18 +52,15 @@
 
     </appender>
 
-    <!-- Send logs to both console and file audit -->
-    <logger name="com.gastocks" level="debug" additivity="false">
-        <appender-ref ref="FILE-AUDIT" />
+
+    <logger name="com.gastocks" level="info" additivity="false">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE-AUDIT" />
     </logger>
 
-    <root level="error">
+    <root level="DEBUG" >
+        <appender-ref ref="FILE-AUDIT" />
         <appender-ref ref="FILE-ERROR" />
-    </root>
-
-    <root level="info">
-        <appender-ref ref="STDOUT" />
     </root>
 
 </configuration>
