@@ -12,7 +12,7 @@ class DefaultResource {
 
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
-    BasicResponse hello() {
+    BasicResponse applicationDefault() {
         new BasicResponse(success: true, message: "Default resource. This URI does nothing.")
     }
 

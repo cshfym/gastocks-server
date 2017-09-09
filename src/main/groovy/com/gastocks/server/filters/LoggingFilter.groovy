@@ -18,7 +18,7 @@ class LoggingFilter implements Filter {
 
         if (request && request instanceof HttpServletRequest) {
             def path = ((HttpServletRequest)request).requestURL.toString()
-            log.debug("Request at path: [${path}]")
+            log.info("Request at path: [${path}]")
         }
 
 
