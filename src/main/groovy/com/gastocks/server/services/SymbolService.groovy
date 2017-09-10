@@ -114,7 +114,7 @@ class SymbolService {
             if (!persistableSymbolExtended) {
                 persistableSymbolExtended = new PersistableSymbolExtended()
             } else {
-                if (!symbolExtendedHasUpdates(persistableSymbolExtended, max52Weeks.price, min52Weeks.price, avg52Weeks, standardDev)) {
+                if (symbolExtendedValuesAreIdentical(persistableSymbolExtended, max52Weeks.price, min52Weeks.price, avg52Weeks, standardDev)) {
                     return // No update needed.
                 }
             }
@@ -135,7 +135,7 @@ class SymbolService {
         log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
-    boolean symbolExtendedHasUpdates(PersistableSymbolExtended symbolExtended, Double max52Weeks, Double min52Weeks, Double avg52Weeks, Double standardDev) {
+    boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, Double max52Weeks, Double min52Weeks, Double avg52Weeks, Double standardDev) {
         (symbolExtended.maximum52Weeks == max52Weeks) &&
         (symbolExtended.minimum52Weeks == min52Weeks) &&
         (symbolExtended.average52Weeks == avg52Weeks) &&
