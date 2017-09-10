@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
+/**
+ * This resource handles all quote data available for a given symbol or batched symbols.
+ */
 @Slf4j
 @Controller
 @RequestMapping("/avtsa")
@@ -54,7 +57,7 @@ class AVTimeSeriesAdjustedQuoteResource {
     @RequestMapping(value="/single", method=RequestMethod.GET)
     BasicQuoteResponse doSingle(@RequestParam(value="symbol", required=true) String symbol) {
 
-        fetchAndPersistService.fetchAndPersistQuote(symbol)
+        fetchAndPersistService.fetchAndQueueSymbol(symbol)
 
         new BasicQuoteResponse(success: true, message: "")
     }

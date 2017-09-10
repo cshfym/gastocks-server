@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 
+/**
+ * This resource handles the most recent/current quote for a given symbol or all batched symbols.
+ */
 @Controller
 @RequestMapping("/avgq")
 class AVGlobalQuoteResource {

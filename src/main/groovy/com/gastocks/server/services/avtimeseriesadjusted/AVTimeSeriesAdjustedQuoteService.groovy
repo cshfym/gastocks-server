@@ -24,7 +24,7 @@ class AVTimeSeriesAdjustedQuoteService extends AbstractExternalQuoteService {
     @Override
     String getResourceUrlString() {
         // "${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_FULL_URI}${API_KEY_PARAM}${API_KEY}${OUTPUT_SIZE_PARAM}"
-        "${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_FULL_URI}${API_KEY_PARAM}${API_KEY}" // Compact
+        "${AVTimeSeriesAdjustedQuoteConstants.AV_TS_ADJ_QUOTE_FULL_URI}${API_KEY_PARAM}${API_KEY}"
     }
 
     @Override

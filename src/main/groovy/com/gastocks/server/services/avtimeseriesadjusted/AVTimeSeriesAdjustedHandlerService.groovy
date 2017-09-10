@@ -77,11 +77,11 @@ class AVTimeSeriesAdjustedHandlerService {
      * Fetch a single symbol and persist quote response, if available.
      * @param symbol
      */
-    void fetchAndPersistQuote(String sym) {
+    void fetchAndQueueSymbol(String identifier) {
 
-        PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(sym)
+        PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
         if (!symbol) {
-            log.error("Could not find symbol with identifier [${sym}]!")
+            log.error("Could not find symbol with identifier [${identifier}]!")
             return
         }
 
