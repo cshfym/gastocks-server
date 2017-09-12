@@ -22,6 +22,7 @@ class TechnicalQuoteConverter {
             volume: persistableQuote.volume,
             shortParameter: shortParameter,
             longParameter: longParameter,
+            priceChangeFromLastQuote: technicalData.priceChangeFromLastQuote,
 
             // MACD Data
             emaShort: technicalData.macdTechnicalData.emaShort,

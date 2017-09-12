@@ -68,9 +68,10 @@ class TechnicalQuoteService {
         List<TechnicalDataWrapper> technicalDataList = []
 
         // Fill technicalDataList 1:1 for each quote
-        quoteData.each { quote ->
-            def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate)
+        quoteData.eachWithIndex { quote, ix ->
+            def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate, priceChangeFromLastQuote: false)
             calculateAveragesAndHighLows(quote, quoteData, wrapper)
+            if ((ix > 0) && (quoteData[ix - 1].price != quote.price)) { wrapper.priceChangeFromLastQuote = true }
             technicalDataList << wrapper
         }
 

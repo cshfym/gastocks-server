@@ -11,6 +11,7 @@ Technical Indicators:
 1. MACD
     - Add another setting to delay buy/sell until after X days after crossover?
     - Add another setting to look at "velocity" of the crossover, i.e., how rapidly it's moving up or down?
+    - Prevent triggering if the price is not changing.
 
 2. Relative Strength Index (RSI)
 http://www.investopedia.com/articles/active-trading/042114/overbought-or-oversold-use-relative-strength-index-find-out.asp

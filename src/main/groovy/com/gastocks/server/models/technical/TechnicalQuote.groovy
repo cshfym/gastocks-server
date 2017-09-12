@@ -19,6 +19,7 @@ class TechnicalQuote extends Quote {
     boolean centerCrossoverNegative
     boolean signalCrossoverPositive
     boolean signalCrossoverNegative
+    boolean priceChangeFromLastQuote
 
     double _52WeekHigh
     double _52WeekLow

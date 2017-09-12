@@ -24,6 +24,8 @@ class TechnicalDataWrapper {
     double _1WeekHigh
     double _1WeekLow
 
+    boolean priceChangeFromLastQuote
+
     MACDTechnicalData macdTechnicalData
 
 }

@@ -72,6 +72,13 @@ class SimulationService {
         }
     }
 
+    /**
+     * Primary method for initiating the simulation for the specified symbol.
+     * @param quotes
+     * @param symbol
+     * @param request
+     * @return {@link SymbolSimulation}
+     */
     SymbolSimulation doSimulationForSymbol(List<TechnicalQuote> quotes, String symbol, SimulationRequest request) {
 
         log.info ("Starting simulation for symbol [${symbol}]")
@@ -89,8 +96,8 @@ class SimulationService {
          * Establish the "session" min/max purchase price - once the first purchase transaction occurs, we essentially
          * establish a much higher limit so as not to prevent subsequent transactions from being capped at the initial max price.
          */
-        double sessionMaxPurchasePrice = request.maxPurchasePrice
-        double sessionMinPurchasePrice = request.minPurchasePrice
+        double sessionMaxPurchasePrice = request.maxPurchasePrice ?: 99999.00d
+        double sessionMinPurchasePrice = request.minPurchasePrice ?: 0.0d
 
         // Establish starting transaction
         TemporarySimulationTransaction stockTransaction = new TemporarySimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
@@ -104,6 +111,9 @@ class SimulationService {
                 if ((sessionMinPurchasePrice > 0.0d) && (quote.price < sessionMinPurchasePrice)) { return }
 
                 boolean buyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
+
+                if ((request.onlyTransactOnPriceChange) && (!quote.priceChangeFromLastQuote)) { buyIndicator = false }
+
                 // Add future indicators here, inspect all indicators before buying
 
                 if (buyIndicator) {

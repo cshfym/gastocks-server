@@ -12,6 +12,11 @@ class SimulationRequest {
      */
     boolean sellOpenPositions
 
+    /**
+     *
+     */
+    boolean onlyTransactOnPriceChange
+
     int shares
     List<String> symbols
 
