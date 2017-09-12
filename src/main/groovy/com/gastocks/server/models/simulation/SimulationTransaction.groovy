@@ -45,9 +45,9 @@ class SimulationTransaction {
         this.shares = shares
 
         // Calculate derived attributes
-        this.netProceeds = (((sellPrice - purchasePrice) * shares) - commission).round(2)
+        this.grossProceeds = (((sellPrice - purchasePrice) * shares) - commission).round(2)
         this.totalInvestment = (purchasePrice * shares).round(2)
-        this.grossProceeds = (netProceeds - commission).round(2)
+        this.netProceeds = (grossProceeds - commission).round(2)
         this.grossProceedsPercentage = ((double)(grossProceeds / totalInvestment) * 100.0d).round(2)
         this.netProceedsPercentage = ((double)(netProceeds / totalInvestment) * 100.0d).round(2)
     }
