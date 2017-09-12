@@ -28,7 +28,9 @@ class SimulationSummary {
         this.attributes = attributes
         this.symbolSimulationSummaries = transactions
 
-        this.transactionCount = transactions.size()
+        def totalTransactions = 0
+        transactions.each { totalTransactions += it.transactionCount }
+        this.transactionCount = totalTransactions
         this.totalInvestment = transactions.totalInvestment ? ((double)transactions.totalInvestment.sum()).round(2) : 0
         this.netProceeds = transactions.netProceeds ? ((double)transactions.netProceeds.sum()).round(2) : 0
         this.grossProceeds = transactions.grossProceeds ? ((double)transactions.grossProceeds.sum()).round(2) : 0
