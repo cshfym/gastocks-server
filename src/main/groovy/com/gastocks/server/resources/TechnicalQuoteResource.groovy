@@ -1,8 +1,6 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.exception.QuoteNotFoundException
-import com.gastocks.server.models.technical.request.MACDRequestParameters
-import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
 import com.gastocks.server.models.technical.response.TechnicalQuote
 import com.gastocks.server.services.technical.TechnicalQuoteService
@@ -30,6 +28,9 @@ class TechnicalQuoteResource {
             quotes = quoteService.getTechnicalQuotesForSymbol(symbol, requestParameters)
         } catch (QuoteNotFoundException ex) {
             log.info "Quote not found for symbol [${symbol}]"
+            throw ex
+        } catch (Exception ex) {
+            log.error("Exception during call to get technical quote for [${symbol}]: ", ex)
             throw ex
         }
 

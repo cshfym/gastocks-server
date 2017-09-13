@@ -14,50 +14,79 @@ class RSIService {
 
     void buildRSITechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, RSIRequestParameters parameters) {
 
+        RSITechnicalData previousRSITechnicalData
+
         quoteData.eachWithIndex { quote, ix ->
 
             def technicalWrapper = technicalWrapperDataList.find { it.quoteDate == quote.quoteDate }
 
             technicalWrapper.rsiTechnicalData = new RSITechnicalData(interval: parameters.interval, averagePriceGain: 0.0d, averagePriceLoss: 0.0d)
 
-            if (ix == 0) { return }
+            RSITechnicalData rsiData = technicalWrapper.rsiTechnicalData
 
-            // Capture delta in price
-            double priceChange = quote.price - quoteData[ix - 1].price
-            if (priceChange >= 0) {
-                technicalWrapper.rsiTechnicalData.priceGain = priceChange.round(2)
-            } else {
-                technicalWrapper.rsiTechnicalData.priceLoss = Math.abs(priceChange).round(2)
+            if (ix == 0) {
+                previousRSITechnicalData = rsiData
+                return
             }
 
-            if (ix < parameters.interval) { return }
+            // Capture delta in price
+            double priceChange = (quote.price - quoteData[ix - 1].price).round(4)
+            if (priceChange >= 0) {
+                rsiData.priceGain = priceChange.round(4)
+            } else {
+                rsiData.priceLoss = Math.abs(priceChange).round(4)
+            }
 
-            // N quote intervals are available, begin calculating RSI values
+            if (ix < parameters.interval) {
+                // Not all data is available up to the requested interval at this point, but calculate averageGain/Loss anyway.
+                rsiData.averagePriceGain = calculateFirstIntervalAverageGain(0, ix, technicalWrapperDataList)
+                rsiData.averagePriceLoss = calculateFirstIntervalAverageLoss(0, ix, technicalWrapperDataList)
+            } else if (ix == parameters.interval) {
+                // First RSI average gain/loss calculations are simple average
+                rsiData.averagePriceGain = calculateFirstIntervalAverageGain((ix - parameters.interval), ix, technicalWrapperDataList)
+                rsiData.averagePriceLoss = calculateFirstIntervalAverageLoss((ix - parameters.interval), ix, technicalWrapperDataList)
+                rsiData.relativeStrength = calculateRelativeStrength(rsiData.averagePriceGain, rsiData.averagePriceLoss)
+                rsiData.relativeStrengthIndex = calculateRelativeStrengthIndex(rsiData.relativeStrength)
+            } else if (ix > parameters.interval) {
+                // Subsequent RSI average gain/loss calculations are a derivative: ((Previous Gain * (Interval - 1) + Current Gain) / Interval)
+                rsiData.averagePriceGain = calculateSubsequentIntervalAverage(parameters.interval, previousRSITechnicalData.averagePriceGain, rsiData.priceGain)
+                rsiData.averagePriceLoss = calculateSubsequentIntervalAverage(parameters.interval, previousRSITechnicalData.averagePriceLoss, rsiData.priceLoss)
+                rsiData.relativeStrength = calculateRelativeStrength(rsiData.averagePriceGain, rsiData.averagePriceLoss)
+                rsiData.relativeStrengthIndex = calculateRelativeStrengthIndex(rsiData.relativeStrength)
+            }
 
-            technicalWrapper.rsiTechnicalData.averagePriceGain = calculateIntervalAverageGain((ix - parameters.interval), ix, technicalWrapperDataList)
-            technicalWrapper.rsiTechnicalData.averagePriceLoss = calculateIntervalAverageLoss((ix - parameters.interval), ix, technicalWrapperDataList)
+            /*
+            log.info("Calculated RSI of [${rsiData.relativeStrengthIndex}] RS: [${rsiData.relativeStrength}] Gain: [${rsiData.priceGain}] Loss: [${rsiData.priceLoss}] " +
+                    "AvgGain: [${rsiData.averagePriceGain}] AvgLoss: [${rsiData.averagePriceLoss}]" +
+                    ", previous rsiData Gain: [${previousRSITechnicalData.averagePriceGain}], Loss: [${previousRSITechnicalData.averagePriceLoss}]" +
+                    " for [${quote.symbol}]-[${quote.price}]-[${quote.quoteDate}]")
+            */
 
-            technicalWrapper.rsiTechnicalData.relativeStrength =
-                    technicalWrapper.rsiTechnicalData.averagePriceLoss ?
-                    (technicalWrapper.rsiTechnicalData.averagePriceGain / technicalWrapper.rsiTechnicalData.averagePriceLoss).round(2) : 0.00d
-
-            technicalWrapper.rsiTechnicalData.relativeStrengthIndex = (100 - (100 / (1 + technicalWrapper.rsiTechnicalData.relativeStrength))).round(2)
-
+            previousRSITechnicalData = rsiData
         }
     }
 
-    double calculateIntervalAverageGain(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
-
+    double calculateFirstIntervalAverageGain(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
         double intervalGainTotal = 0.0d
-        for (int i = startIndex; i < endIndex; i++) { intervalGainTotal += technicalWrapperDataList[i].rsiTechnicalData.priceGain }
-        (intervalGainTotal / (endIndex - startIndex)).round(2)
+        for (int i = startIndex; i < (endIndex + 1); i++) { intervalGainTotal += technicalWrapperDataList[i].rsiTechnicalData.priceGain }
+        (intervalGainTotal / (endIndex - startIndex)).round(4)
     }
 
-    double calculateIntervalAverageLoss(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
-
+    double calculateFirstIntervalAverageLoss(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
         double intervalLossTotal = 0.0d
-        for (int i = startIndex; i < endIndex; i++) { intervalLossTotal += technicalWrapperDataList[i].rsiTechnicalData.priceLoss }
-        (intervalLossTotal / (endIndex - startIndex)).round(2)
+        for (int i = startIndex; i < (endIndex + 1); i++) { intervalLossTotal += technicalWrapperDataList[i].rsiTechnicalData.priceLoss }
+        (intervalLossTotal / (endIndex - startIndex)).round(4)
     }
 
+    double calculateSubsequentIntervalAverage(int interval, double previousAverage, double current) {
+        (double)(((previousAverage * (interval - 1)) + current) / interval).round(4)
+    }
+
+    double calculateRelativeStrength(double averageGain, double averageLoss) {
+        averageLoss ? ((double)(averageGain / averageLoss)).round(4) : 0.00d
+    }
+
+    double calculateRelativeStrengthIndex(double relativeStrength) {
+        (100 - (100 / (1 + relativeStrength))).round(4)
+    }
 }
