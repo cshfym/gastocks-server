@@ -25,7 +25,7 @@ class TechnicalQuoteConverter {
 
             // Parameters
             quoteParameters: new TechnicalQuoteParameters(
-                    priceChangeFromLastQuote: technicalData.priceChangeFromLastQuote
+                    priceChangeFromLastQuote: technicalData.quoteParameters.priceChangeFromLastQuote
             ),
 
             // MACD Data
@@ -38,32 +38,31 @@ class TechnicalQuoteConverter {
                 centerCrossoverNegative: technicalData.macdTechnicalData.centerCrossoverNegative,
                 centerCrossoverPositive: technicalData.macdTechnicalData.centerCrossoverPositive,
                 signalCrossoverNegative: technicalData.macdTechnicalData.signalCrossoverNegative,
-                signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive,
-
+                signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive
             ),
 
             // Averages
             quoteMetadata: new TechnicalQuoteMetadata(
-                _52WeekAverage: technicalData._52WeekAverage,
-                _26WeekAverage: technicalData._26WeekAverage,
-                _12WeekAverage: technicalData._12WeekAverage,
-                _6WeekAverage: technicalData._6WeekAverage,
-                _3WeekAverage: technicalData._3WeekAverage,
-                _1WeekAverage: technicalData._1WeekAverage,
+                _52WeekAverage: technicalData.quoteMetadata._52WeekAverage,
+                _26WeekAverage: technicalData.quoteMetadata._26WeekAverage,
+                _12WeekAverage: technicalData.quoteMetadata._12WeekAverage,
+                _6WeekAverage: technicalData.quoteMetadata._6WeekAverage,
+                _3WeekAverage: technicalData.quoteMetadata._3WeekAverage,
+                _1WeekAverage: technicalData.quoteMetadata._1WeekAverage,
 
                 // High/Low
-                _52WeekHigh: technicalData._52WeekHigh,
-                _52WeekLow: technicalData._52WeekLow,
-                _26WeekHigh: technicalData._26WeekHigh,
-                _26WeekLow: technicalData._26WeekLow,
-                _12WeekHigh: technicalData._12WeekHigh,
-                _12WeekLow: technicalData._12WeekLow,
-                _6WeekHigh: technicalData._6WeekHigh,
-                _6WeekLow: technicalData._6WeekLow,
-                _3WeekHigh: technicalData._3WeekHigh,
-                _3WeekLow: technicalData._3WeekLow,
-                _1WeekHigh: technicalData._1WeekHigh,
-                _1WeekLow: technicalData._1WeekLow
+                _52WeekHigh: technicalData.quoteMetadata._52WeekHigh,
+                _52WeekLow: technicalData.quoteMetadata._52WeekLow,
+                _26WeekHigh: technicalData.quoteMetadata._26WeekHigh,
+                _26WeekLow: technicalData.quoteMetadata._26WeekLow,
+                _12WeekHigh: technicalData.quoteMetadata._12WeekHigh,
+                _12WeekLow: technicalData.quoteMetadata._12WeekLow,
+                _6WeekHigh: technicalData.quoteMetadata._6WeekHigh,
+                _6WeekLow: technicalData.quoteMetadata._6WeekLow,
+                _3WeekHigh: technicalData.quoteMetadata._3WeekHigh,
+                _3WeekLow: technicalData.quoteMetadata._3WeekLow,
+                _1WeekHigh: technicalData.quoteMetadata._1WeekHigh,
+                _1WeekLow: technicalData.quoteMetadata._1WeekLow
             )
         )
     }

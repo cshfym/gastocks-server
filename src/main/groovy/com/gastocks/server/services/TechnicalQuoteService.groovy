@@ -7,6 +7,8 @@ import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.TechnicalQuote
+import com.gastocks.server.models.technical.TechnicalQuoteMetadata
+import com.gastocks.server.models.technical.TechnicalQuoteParameters
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -69,9 +71,9 @@ class TechnicalQuoteService {
 
         // Fill technicalDataList 1:1 for each quote
         quoteData.eachWithIndex { quote, ix ->
-            def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate, priceChangeFromLastQuote: false)
+            def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate, quoteParameters: new TechnicalQuoteParameters(priceChangeFromLastQuote: false))
             calculateAveragesAndHighLows(quote, quoteData, wrapper)
-            if ((ix > 0) && (quoteData[ix - 1].price != quote.price)) { wrapper.priceChangeFromLastQuote = true }
+            if ((ix > 0) && (quoteData[ix - 1].price != quote.price)) { wrapper.quoteParameters.priceChangeFromLastQuote = true }
             technicalDataList << wrapper
         }
 
@@ -100,26 +102,27 @@ class TechnicalQuoteService {
         def m3WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 21) }
         def m1WeekQuotes = relevantQuotes.findAll { it.quoteDate >= (quote.quoteDate - 7) }
 
-        wrapper._52WeekAverage = (m52WeekQuotes.size() > 0) ? (m52WeekQuotes*.price.sum() / m52WeekQuotes.size()).round(2) : 0
-        wrapper._26WeekAverage = (m26WeekQuotes.size() > 0) ? (m26WeekQuotes*.price.sum() / m26WeekQuotes.size()).round(2) : 0
-        wrapper._12WeekAverage = (m12WeekQuotes.size() > 0) ? (m12WeekQuotes*.price.sum() / m12WeekQuotes.size()).round(2) : 0
-        wrapper._6WeekAverage = (m6WeekQuotes.size() > 0) ? (m6WeekQuotes*.price.sum() / m6WeekQuotes.size()).round(2) : 0
-        wrapper._3WeekAverage = (m3WeekQuotes.size() > 0) ? (m3WeekQuotes*.price.sum() / m3WeekQuotes.size()).round(2) : 0
-        wrapper._1WeekAverage = (m1WeekQuotes.size() > 0) ? (m1WeekQuotes*.price.sum() / m1WeekQuotes.size()).round(2) : 0
-
-        wrapper._52WeekHigh = m52WeekQuotes.max { it.price }.price
-        wrapper._52WeekLow = m52WeekQuotes.min { it.price }.price
-        wrapper._26WeekHigh = m26WeekQuotes.max { it.price }.price
-        wrapper._26WeekLow = m26WeekQuotes.min { it.price }.price
-        wrapper._12WeekHigh = m12WeekQuotes.max { it.price }.price
-        wrapper._12WeekLow = m12WeekQuotes.min { it.price }.price
-        wrapper._6WeekHigh = m6WeekQuotes.max { it.price }.price
-        wrapper._6WeekLow = m6WeekQuotes.min { it.price }.price
-        wrapper._3WeekHigh = m3WeekQuotes.max { it.price }.price
-        wrapper._3WeekLow = m3WeekQuotes.min { it.price }.price
-        wrapper._1WeekHigh = m1WeekQuotes.max { it.price }.price
-        wrapper._1WeekLow = m1WeekQuotes.min { it.price }.price
-
+        wrapper.quoteMetadata = new TechnicalQuoteMetadata()
+        wrapper.quoteMetadata.with {
+            _52WeekAverage = (m52WeekQuotes.size() > 0) ? (m52WeekQuotes*.price.sum() / m52WeekQuotes.size()).round(2) : 0
+            _26WeekAverage = (m26WeekQuotes.size() > 0) ? (m26WeekQuotes*.price.sum() / m26WeekQuotes.size()).round(2) : 0
+            _12WeekAverage = (m12WeekQuotes.size() > 0) ? (m12WeekQuotes*.price.sum() / m12WeekQuotes.size()).round(2) : 0
+            _6WeekAverage = (m6WeekQuotes.size() > 0) ? (m6WeekQuotes*.price.sum() / m6WeekQuotes.size()).round(2) : 0
+            _3WeekAverage = (m3WeekQuotes.size() > 0) ? (m3WeekQuotes*.price.sum() / m3WeekQuotes.size()).round(2) : 0
+            _1WeekAverage = (m1WeekQuotes.size() > 0) ? (m1WeekQuotes*.price.sum() / m1WeekQuotes.size()).round(2) : 0
+            _52WeekHigh = m52WeekQuotes.max { it.price }.price
+            _52WeekLow = m52WeekQuotes.min { it.price }.price
+            _26WeekHigh = m26WeekQuotes.max { it.price }.price
+            _26WeekLow = m26WeekQuotes.min { it.price }.price
+            _12WeekHigh = m12WeekQuotes.max { it.price }.price
+            _12WeekLow = m12WeekQuotes.min { it.price }.price
+            _6WeekHigh = m6WeekQuotes.max { it.price }.price
+            _6WeekLow = m6WeekQuotes.min { it.price }.price
+            _3WeekHigh = m3WeekQuotes.max { it.price }.price
+            _3WeekLow = m3WeekQuotes.min { it.price }.price
+            _1WeekHigh = m1WeekQuotes.max { it.price }.price
+            _1WeekLow = m1WeekQuotes.min { it.price }.price
+        }
     }
 
 }
