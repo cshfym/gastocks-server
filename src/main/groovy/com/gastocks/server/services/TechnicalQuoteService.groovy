@@ -57,7 +57,7 @@ class TechnicalQuoteService {
         // Return sorted collection of TechnicalQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def technicalData = technicalDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, technicalData, request.macdParameters.macdShortPeriod, request.macdParameters.macdLongPeriod)
+            quoteConverter.fromPersistableQuote(persistableQuote, technicalData)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending

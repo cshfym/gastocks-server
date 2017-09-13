@@ -8,8 +8,6 @@ import com.gastocks.server.models.quote.Quote
  */
 class TechnicalQuote extends Quote {
 
-    int shortParameter
-    int longParameter
     double emaShort
     double emaLong
     double macd

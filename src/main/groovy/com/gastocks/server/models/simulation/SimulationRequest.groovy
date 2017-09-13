@@ -6,6 +6,8 @@ class SimulationRequest {
 
     String description
     double commissionPrice
+    int shares
+    List<String> symbols
 
     /**
      * If a stock was purchased but never sold at the end of the simulation, close out the position with the last quote price & date.
@@ -13,12 +15,10 @@ class SimulationRequest {
     boolean sellOpenPositions
 
     /**
-     *
+     * If the stock price remains the same, do not initiate a buy or sell action.
      */
     boolean onlyTransactOnPriceChange
 
-    int shares
-    List<String> symbols
 
     double minPurchasePrice
     double maxPurchasePrice

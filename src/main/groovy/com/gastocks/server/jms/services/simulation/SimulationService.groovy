@@ -36,6 +36,9 @@ class SimulationService {
     @Autowired
     TechnicalIndicatorService technicalIndicatorService
 
+    static final double SESSION_MAX_PURCHASE_PRICE = 9999999.00d
+    static final double SESSION_MIN_PURCHASE_PRICE = 0.0d
+
     /**
      * Receives the incoming symbol payload, finds the original simulation wrapper, and runs a simulation
      * on all all technical quote data.
@@ -96,8 +99,8 @@ class SimulationService {
          * Establish the "session" min/max purchase price - once the first purchase transaction occurs, we essentially
          * establish a much higher limit so as not to prevent subsequent transactions from being capped at the initial max price.
          */
-        double sessionMaxPurchasePrice = request.maxPurchasePrice ?: 99999.00d
-        double sessionMinPurchasePrice = request.minPurchasePrice ?: 0.0d
+        double sessionMaxPurchasePrice = request.maxPurchasePrice ?: SESSION_MAX_PURCHASE_PRICE
+        double sessionMinPurchasePrice = request.minPurchasePrice ?: SESSION_MIN_PURCHASE_PRICE
 
         // Establish starting transaction
         TemporarySimulationTransaction stockTransaction = new TemporarySimulationTransaction(shares: request.shares, symbol: symbol, commission: request.commissionPrice)
@@ -110,21 +113,24 @@ class SimulationService {
                 if ((sessionMaxPurchasePrice > 0.0d) && (quote.price > sessionMaxPurchasePrice)) { return }
                 if ((sessionMinPurchasePrice > 0.0d) && (quote.price < sessionMinPurchasePrice)) { return }
 
-                boolean buyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
+                boolean globalBuyIndicator = inspectAnyGlobalBuyIndicators(request, quote)
 
-                if ((request.onlyTransactOnPriceChange) && (!quote.priceChangeFromLastQuote)) { buyIndicator = false }
+                boolean macdBuyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
 
                 // Add future indicators here, inspect all indicators before buying
 
-                if (buyIndicator) {
+                if (!globalBuyIndicator) { return }
+
+                if (macdBuyIndicator) {
                     //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                     stockTransaction.purchaseDate = quote.quoteDate
                     stockTransaction.purchasePrice = quote.price
-                    sessionMaxPurchasePrice = 9999999.00d
+                    sessionMaxPurchasePrice = SESSION_MAX_PURCHASE_PRICE
                 }
             }
 
             boolean sellIndicator = technicalIndicatorService.getMACDSellIndicator(quote)
+
             // Add future indicators here, inspect all indicators before selling
 
             if (sellIndicator && stockTransaction.started) {
@@ -146,4 +152,13 @@ class SimulationService {
         simulation
     }
 
+    /**
+     * Global buy indicator = used to override all other technical buy indicators.
+     */
+    boolean inspectAnyGlobalBuyIndicators(SimulationRequest request, TechnicalQuote quote) {
+
+        // If the stock price remains the same, do not allow buy.
+        if ((request.onlyTransactOnPriceChange) && (!quote.priceChangeFromLastQuote)) { return false }
+
+    }
 }

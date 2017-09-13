@@ -3,13 +3,12 @@ package com.gastocks.server.converters.quote
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.services.TechnicalQuoteService
 import org.springframework.stereotype.Component
 
 @Component
 class TechnicalQuoteConverter {
 
-    TechnicalQuote fromPersistableQuote(PersistableQuote persistableQuote, TechnicalDataWrapper technicalData, int shortParameter, int longParameter) {
+    TechnicalQuote fromPersistableQuote(PersistableQuote persistableQuote, TechnicalDataWrapper technicalData) {
 
         new TechnicalQuote(
             quoteDate: persistableQuote.quoteDate,
@@ -20,8 +19,6 @@ class TechnicalQuoteConverter {
             high: persistableQuote.dayHigh,
             low: persistableQuote.dayLow,
             volume: persistableQuote.volume,
-            shortParameter: shortParameter,
-            longParameter: longParameter,
             priceChangeFromLastQuote: technicalData.priceChangeFromLastQuote,
 
             // MACD Data
