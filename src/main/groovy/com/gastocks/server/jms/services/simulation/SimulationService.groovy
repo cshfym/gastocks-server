@@ -1,6 +1,6 @@
 package com.gastocks.server.jms.services.simulation
 
-import com.gastocks.server.jms.services.simulation.technical.TechnicalIndicatorService
+import com.gastocks.server.jms.services.simulation.technical.MacdIndicatorService
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
@@ -8,7 +8,7 @@ import com.gastocks.server.models.technical.TechnicalQuote
 import com.gastocks.server.models.simulation.SymbolSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.TemporarySimulationTransaction
-import com.gastocks.server.services.TechnicalQuoteService
+import com.gastocks.server.services.technical.TechnicalQuoteService
 import com.gastocks.server.services.domain.SimulationPersistenceService
 import com.gastocks.server.services.domain.SimulationTransactionPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
@@ -34,13 +34,13 @@ class SimulationService {
     SymbolPersistenceService symbolPersistenceService
 
     @Autowired
-    TechnicalIndicatorService technicalIndicatorService
+    MacdIndicatorService macdIndicatorService
 
     static final double SESSION_MAX_PURCHASE_PRICE = 9999999.00d
     static final double SESSION_MIN_PURCHASE_PRICE = 0.0d
 
     /**
-     * Receives the incoming symbol payload, finds the original simulation wrapper, and runs a simulation
+     * Receives the incoming symbol payload, finds the original simulation parameters, and runs a simulation
      * on all all technical quote data.
      * @param simulationSymbol
      */
@@ -115,7 +115,7 @@ class SimulationService {
 
                 boolean globalBuyIndicator = inspectAnyGlobalBuyIndicators(request, quote)
 
-                boolean macdBuyIndicator = technicalIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
+                boolean macdBuyIndicator = macdIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
 
                 // Add future indicators here, inspect all indicators before buying
 
@@ -129,12 +129,11 @@ class SimulationService {
                 }
             }
 
-            boolean sellIndicator = technicalIndicatorService.getMACDSellIndicator(quote)
+            boolean sellIndicator = macdIndicatorService.getMACDSellIndicator(quote)
 
             // Add future indicators here, inspect all indicators before selling
 
             if (sellIndicator && stockTransaction.started) {
-                // log.info("Initiating SELL action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction

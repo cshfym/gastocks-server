@@ -4,7 +4,7 @@ import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.services.TechnicalQuoteService
+import com.gastocks.server.services.technical.TechnicalQuoteService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller

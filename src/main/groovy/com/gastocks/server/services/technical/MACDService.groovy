@@ -1,6 +1,7 @@
-package com.gastocks.server.services
+package com.gastocks.server.services.technical
 
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.simulation.MACDRequestParameters
 import com.gastocks.server.models.technical.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import groovy.util.logging.Slf4j
@@ -23,9 +24,7 @@ class MACDService {
      * @param emaShortDays
      * @param emaLongDays
      */
-    void buildMACDTechnicalData(List<TechnicalDataWrapper> technicalDataList, List<PersistableQuote> quoteData, int emaShortDays, int emaLongDays) {
-
-        // TODO !! technicalDataList is now initialized. Fix.
+    void buildMACDTechnicalData(List<TechnicalDataWrapper> technicalDataList, List<PersistableQuote> quoteData, MACDRequestParameters parameters) {
 
         quoteData.eachWithIndex { quote, ix ->
 
@@ -34,8 +33,8 @@ class MACDService {
             if (ix == 0) {
                 technicalWrapper.macdTechnicalData = new MACDTechnicalData(emaShort: quote.price, emaLong: quote.price)
             } else {
-                double emaShort = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaShort, emaShortDays)
-                double emaLong = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaLong, emaLongDays)
+                double emaShort = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaShort, parameters.macdShortPeriod)
+                double emaLong = technicalToolsService.calculateEMA(quote.price, technicalDataList.get(ix - 1).macdTechnicalData.emaLong, parameters.macdLongPeriod)
                 double macd = (emaShort - emaLong).round(4)
                 technicalWrapper.macdTechnicalData = new MACDTechnicalData(
                     emaShort: emaShort,
@@ -54,7 +53,7 @@ class MACDService {
         technicalDataList.eachWithIndex { technicalData, ix ->
 
             MACDTechnicalData macdTechnicalData = technicalDataList[ix].macdTechnicalData
-            MACDTechnicalData macdTechnicalDataYesterday = technicalDataList[ix-1].macdTechnicalData
+            MACDTechnicalData macdTechnicalDataYesterday = technicalDataList[ix - 1].macdTechnicalData
 
             if (ix == 0) {
                 macdTechnicalData.macdSignalLine = macdTechnicalData.macd

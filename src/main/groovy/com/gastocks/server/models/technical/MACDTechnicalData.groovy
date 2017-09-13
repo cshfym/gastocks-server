@@ -11,4 +11,5 @@ class MACDTechnicalData {
     boolean centerCrossoverNegative
     boolean signalCrossoverPositive
     boolean signalCrossoverNegative
+
 }

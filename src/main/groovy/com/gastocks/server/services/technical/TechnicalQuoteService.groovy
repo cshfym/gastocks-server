@@ -1,4 +1,4 @@
-package com.gastocks.server.services
+package com.gastocks.server.services.technical
 
 import com.gastocks.server.converters.quote.TechnicalQuoteConverter
 import com.gastocks.server.models.domain.PersistableQuote
@@ -33,7 +33,7 @@ class TechnicalQuoteService {
     MACDService macdService
 
     @Autowired
-    TechnicalToolsService technicalToolsService
+    RSIService rsiService
 
     /**
      * Retrieve all technical quotes for a given symbol identifier
@@ -53,8 +53,7 @@ class TechnicalQuoteService {
         persistableQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate } // Ascending
 
         // Calculate technical data points for all quotes available.
-        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request.macdParameters.macdShortPeriod,
-            request.macdParameters.macdLongPeriod)
+        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request)
 
         // Return sorted collection of TechnicalQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
@@ -65,22 +64,26 @@ class TechnicalQuoteService {
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending
     }
 
-    protected List<TechnicalDataWrapper> buildTechnicalData(List<PersistableQuote> quoteData, int emaShortDays, int emaLongDays) {
+    protected List<TechnicalDataWrapper> buildTechnicalData(List<PersistableQuote> quoteData, SimulationRequest request) {
 
-        List<TechnicalDataWrapper> technicalDataList = []
+        List<TechnicalDataWrapper> technicalDataWrapperList = []
 
-        // Fill technicalDataList 1:1 for each quote
+        // Fill technicalDataWrapperList 1:1 for each quote
         quoteData.eachWithIndex { quote, ix ->
             def wrapper = new TechnicalDataWrapper(quoteDate: quote.quoteDate, quoteParameters: new TechnicalQuoteParameters(priceChangeFromLastQuote: false))
             calculateAveragesAndHighLows(quote, quoteData, wrapper)
             if ((ix > 0) && (quoteData[ix - 1].price != quote.price)) { wrapper.quoteParameters.priceChangeFromLastQuote = true }
-            technicalDataList << wrapper
+            technicalDataWrapperList << wrapper
         }
 
-        macdService.buildMACDTechnicalData(technicalDataList, quoteData, emaShortDays, emaLongDays)
-        macdService.buildMACDSignalData(technicalDataList)
+        // MACD
+        macdService.buildMACDTechnicalData(technicalDataWrapperList, quoteData, request.macdParameters)
+        macdService.buildMACDSignalData(technicalDataWrapperList)
 
-        technicalDataList
+        // RSI
+        rsiService.buildRSITechnicalData(technicalDataWrapperList, quoteData, request.rsiRequestParameters)
+
+        technicalDataWrapperList
     }
 
     /**

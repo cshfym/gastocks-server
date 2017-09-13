@@ -10,4 +10,6 @@ class TechnicalDataWrapper {
 
     MACDTechnicalData macdTechnicalData
 
+    RSITechnicalData rsiTechnicalData
+
 }

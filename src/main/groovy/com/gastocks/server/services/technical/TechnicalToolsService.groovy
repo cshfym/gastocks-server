@@ -1,4 +1,4 @@
-package com.gastocks.server.services
+package com.gastocks.server.services.technical
 
 import org.springframework.stereotype.Service
 

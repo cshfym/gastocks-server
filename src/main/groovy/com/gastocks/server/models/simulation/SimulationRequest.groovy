@@ -25,6 +25,8 @@ class SimulationRequest {
 
     MACDRequestParameters macdParameters
 
+    RSIRequestParameters rsiRequestParameters
+
     @Transient
     @Override
     String toString() {
