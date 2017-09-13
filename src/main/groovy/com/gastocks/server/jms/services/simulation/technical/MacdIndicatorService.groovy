@@ -1,7 +1,7 @@
 package com.gastocks.server.jms.services.simulation.technical
 
-import com.gastocks.server.models.simulation.MACDRequestParameters
-import com.gastocks.server.models.technical.TechnicalQuote
+import com.gastocks.server.models.technical.request.MACDRequestParameters
+import com.gastocks.server.models.technical.response.TechnicalQuote
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Service
 

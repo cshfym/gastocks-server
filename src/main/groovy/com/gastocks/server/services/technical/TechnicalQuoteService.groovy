@@ -4,11 +4,11 @@ import com.gastocks.server.converters.quote.TechnicalQuoteConverter
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
-import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.technical.TechnicalDataWrapper
-import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.models.technical.TechnicalQuoteMetadata
-import com.gastocks.server.models.technical.TechnicalQuoteParameters
+import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
+import com.gastocks.server.models.technical.response.TechnicalQuote
+import com.gastocks.server.models.technical.response.TechnicalQuoteMetadata
+import com.gastocks.server.models.technical.response.TechnicalQuoteParameters
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -27,7 +27,7 @@ class TechnicalQuoteService {
     SymbolPersistenceService symbolPersistenceService
 
     @Autowired
-    TechnicalQuoteConverter quoteConverter
+    TechnicalQuoteConverter technicalQuoteConverter
 
     @Autowired
     MACDService macdService
@@ -42,7 +42,7 @@ class TechnicalQuoteService {
      * @return List<Quote>
      */
     @Cacheable(value = "getTechnicalQuotesForSymbol")
-    List<TechnicalQuote> getTechnicalQuotesForSymbol(String identifier, SimulationRequest request) {
+    List<TechnicalQuote> getTechnicalQuotesForSymbol(String identifier, TechnicalQuoteRequestParameters parameters) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
 
@@ -53,18 +53,18 @@ class TechnicalQuoteService {
         persistableQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate } // Ascending
 
         // Calculate technical data points for all quotes available.
-        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, request)
+        List<TechnicalDataWrapper> technicalDataList = buildTechnicalData(persistableQuotes, parameters)
 
         // Return sorted collection of TechnicalQuote objects
         def quotes = persistableQuotes.collect { persistableQuote ->
             def technicalData = technicalDataList.find { it.quoteDate == persistableQuote.quoteDate }
-            quoteConverter.fromPersistableQuote(persistableQuote, technicalData)
+            technicalQuoteConverter.fromPersistableQuote(persistableQuote, technicalData)
         }
 
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate } // Descending
     }
 
-    protected List<TechnicalDataWrapper> buildTechnicalData(List<PersistableQuote> quoteData, SimulationRequest request) {
+    protected List<TechnicalDataWrapper> buildTechnicalData(List<PersistableQuote> quoteData, TechnicalQuoteRequestParameters parameters) {
 
         List<TechnicalDataWrapper> technicalDataWrapperList = []
 
@@ -77,11 +77,11 @@ class TechnicalQuoteService {
         }
 
         // MACD
-        macdService.buildMACDTechnicalData(technicalDataWrapperList, quoteData, request.macdParameters)
+        macdService.buildMACDTechnicalData(technicalDataWrapperList, quoteData, parameters.macdRequestParameters)
         macdService.buildMACDSignalData(technicalDataWrapperList)
 
         // RSI
-        rsiService.buildRSITechnicalData(technicalDataWrapperList, quoteData, request.rsiRequestParameters)
+        rsiService.buildRSITechnicalData(technicalDataWrapperList, quoteData, parameters.rsiRequestParameters)
 
         technicalDataWrapperList
     }

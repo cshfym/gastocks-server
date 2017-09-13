@@ -1,8 +1,8 @@
 package com.gastocks.server.services.technical
 
 import com.gastocks.server.models.domain.PersistableQuote
-import com.gastocks.server.models.simulation.MACDRequestParameters
-import com.gastocks.server.models.technical.MACDTechnicalData
+import com.gastocks.server.models.technical.request.MACDRequestParameters
+import com.gastocks.server.models.technical.response.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,4 +1,4 @@
-package com.gastocks.server.models.simulation
+package com.gastocks.server.models.technical.request
 
 /**
  * Class to hold incoming request RSI request parameters for simulations.

@@ -1,7 +1,6 @@
-package com.gastocks.server.models.technical
+package com.gastocks.server.models.technical.response
 
 import com.gastocks.server.models.quote.Quote
-
 
 /**
  * Represents a non-persistent, externally-facing TechnicalQuote for a single symbol.

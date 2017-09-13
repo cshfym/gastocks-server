@@ -4,7 +4,8 @@ import com.gastocks.server.jms.services.simulation.technical.MacdIndicatorServic
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
-import com.gastocks.server.models.technical.TechnicalQuote
+import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
+import com.gastocks.server.models.technical.response.TechnicalQuote
 import com.gastocks.server.models.simulation.SymbolSimulation
 import com.gastocks.server.models.simulation.SimulationRequest
 import com.gastocks.server.models.simulation.TemporarySimulationTransaction
@@ -60,7 +61,15 @@ class SimulationService {
         def jsonSlurper = new JsonSlurper()
         SimulationRequest simulationRequest = jsonSlurper.parseText(persistableSimulation.attributes) as SimulationRequest
 
-        List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, simulationRequest)
+        // Get paramters from simulationRequest to build technical quotes
+        TechnicalQuoteRequestParameters technicalQuoteRequestParameters =
+            new TechnicalQuoteRequestParameters(
+                macdRequestParameters: simulationRequest.macdParameters,
+                rsiRequestParameters: simulationRequest.rsiRequestParameters
+            )
+
+        List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, technicalQuoteRequestParameters)
+
         SymbolSimulation simulation = doSimulationForSymbol(quotes, simulationSymbol.symbol, simulationRequest)
 
         if (simulation) {

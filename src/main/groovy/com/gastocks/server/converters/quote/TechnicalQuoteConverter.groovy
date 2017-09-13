@@ -1,11 +1,12 @@
 package com.gastocks.server.converters.quote
 
 import com.gastocks.server.models.domain.PersistableQuote
-import com.gastocks.server.models.technical.MACDTechnicalData
+import com.gastocks.server.models.technical.response.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
-import com.gastocks.server.models.technical.TechnicalQuote
-import com.gastocks.server.models.technical.TechnicalQuoteMetadata
-import com.gastocks.server.models.technical.TechnicalQuoteParameters
+import com.gastocks.server.models.technical.response.RSITechnicalData
+import com.gastocks.server.models.technical.response.TechnicalQuote
+import com.gastocks.server.models.technical.response.TechnicalQuoteMetadata
+import com.gastocks.server.models.technical.response.TechnicalQuoteParameters
 import org.springframework.stereotype.Component
 
 @Component
@@ -39,6 +40,17 @@ class TechnicalQuoteConverter {
                 centerCrossoverPositive: technicalData.macdTechnicalData.centerCrossoverPositive,
                 signalCrossoverNegative: technicalData.macdTechnicalData.signalCrossoverNegative,
                 signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive
+            ),
+
+            //RSI Data
+            rsiParameters: new RSITechnicalData(
+                interval: technicalData.rsiTechnicalData.interval,
+                priceGain: technicalData.rsiTechnicalData.priceGain,
+                priceLoss: technicalData.rsiTechnicalData.priceLoss,
+                averagePriceGain: technicalData.rsiTechnicalData.averagePriceGain,
+                averagePriceLoss: technicalData.rsiTechnicalData.averagePriceLoss,
+                relativeStrength: technicalData.rsiTechnicalData.relativeStrength,
+                relativeStrengthIndex: technicalData.rsiTechnicalData.relativeStrengthIndex
             ),
 
             // Averages

@@ -1,9 +1,10 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.exception.QuoteNotFoundException
-import com.gastocks.server.models.simulation.MACDRequestParameters
+import com.gastocks.server.models.technical.request.MACDRequestParameters
 import com.gastocks.server.models.simulation.SimulationRequest
-import com.gastocks.server.models.technical.TechnicalQuote
+import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
+import com.gastocks.server.models.technical.response.TechnicalQuote
 import com.gastocks.server.services.technical.TechnicalQuoteService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,14 +21,13 @@ class TechnicalQuoteResource {
     TechnicalQuoteService quoteService
 
     @ResponseBody
-    @RequestMapping(value="/{symbol}/{emashort}/{emalong}", method=RequestMethod.GET)
-    List<TechnicalQuote> getTechnicalQuote(@PathVariable("symbol") String symbol, @PathVariable("emashort") int emashort, @PathVariable("emalong") int emalong) {
+    @RequestMapping(value="/{symbol}", method=RequestMethod.POST)
+    List<TechnicalQuote> getTechnicalQuote(@PathVariable("symbol") String symbol, @RequestBody TechnicalQuoteRequestParameters requestParameters) {
 
-        def quotes = []
+        def quotes
 
         try {
-            quotes = quoteService.getTechnicalQuotesForSymbol(symbol,
-                new SimulationRequest(macdParameters: new MACDRequestParameters(macdShortPeriod: emashort, macdLongPeriod: emalong)))
+            quotes = quoteService.getTechnicalQuotesForSymbol(symbol, requestParameters)
         } catch (QuoteNotFoundException ex) {
             log.info "Quote not found for symbol [${symbol}]"
             throw ex
