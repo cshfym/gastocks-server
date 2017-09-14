@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 
 @Slf4j
 @Service
-class MacdIndicatorService {
+class MACDIndicatorService {
 
     boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
 

@@ -7,4 +7,6 @@ class RSIRequestParameters {
 
     int interval
 
+    int overBoughtLine
+    int overSoldLine
 }

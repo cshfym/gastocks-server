@@ -7,6 +7,9 @@ class RSITechnicalData {
      */
     int interval
 
+    int overBoughtLine
+    int overSoldLine
+
     double priceGain
     double priceLoss
 

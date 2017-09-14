@@ -1,6 +1,7 @@
 package com.gastocks.server.jms.services.simulation
 
-import com.gastocks.server.jms.services.simulation.technical.MacdIndicatorService
+import com.gastocks.server.jms.services.simulation.technical.MACDIndicatorService
+import com.gastocks.server.jms.services.simulation.technical.RSIIndicatorService
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
@@ -35,7 +36,10 @@ class SimulationService {
     SymbolPersistenceService symbolPersistenceService
 
     @Autowired
-    MacdIndicatorService macdIndicatorService
+    MACDIndicatorService macdIndicatorService
+
+    @Autowired
+    RSIIndicatorService rsiIndicatorService
 
     static final double SESSION_MAX_PURCHASE_PRICE = 9999999.00d
     static final double SESSION_MIN_PURCHASE_PRICE = 0.0d
@@ -125,6 +129,8 @@ class SimulationService {
                 boolean globalBuyIndicator = inspectAnyGlobalBuyIndicators(request, quote)
 
                 boolean macdBuyIndicator = macdIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
+
+                boolean rsiBuyIndicator = rsiIndicatorService.getRSIBuyIndicator(quote, request.rsiRequestParameters, ix)
 
                 // Add future indicators here, inspect all indicators before buying
 

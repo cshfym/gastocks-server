@@ -20,7 +20,8 @@ class RSIService {
 
             def technicalWrapper = technicalWrapperDataList.find { it.quoteDate == quote.quoteDate }
 
-            technicalWrapper.rsiTechnicalData = new RSITechnicalData(interval: parameters.interval, averagePriceGain: 0.0d, averagePriceLoss: 0.0d)
+            technicalWrapper.rsiTechnicalData = new RSITechnicalData(interval: parameters.interval, overBoughtLine: parameters.overBoughtLine,
+                    overSoldLine: parameters.overSoldLine, averagePriceGain: 0.0d, averagePriceLoss: 0.0d)
 
             RSITechnicalData rsiData = technicalWrapper.rsiTechnicalData
 
@@ -63,6 +64,18 @@ class RSIService {
             */
 
             previousRSITechnicalData = rsiData
+        }
+    }
+
+    void buildRSISignalData(List<TechnicalDataWrapper> technicalDataList) {
+
+        technicalDataList.eachWithIndex { technicalData, ix ->
+
+            RSITechnicalData rsiData = technicalDataList[ix].rsiTechnicalData
+            RSITechnicalData rsiDataYesterday = technicalDataList[ix-1].rsiTechnicalData
+
+
+
         }
     }
 

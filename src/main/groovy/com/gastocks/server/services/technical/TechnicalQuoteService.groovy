@@ -82,6 +82,7 @@ class TechnicalQuoteService {
 
         // RSI
         rsiService.buildRSITechnicalData(technicalDataWrapperList, quoteData, parameters.rsiRequestParameters)
+        rsiService.buildRSISignalData(technicalDataWrapperList, quoteData, parameters.rsiRequestParameters)
 
         technicalDataWrapperList
     }
