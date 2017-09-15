@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service
 @Service
 class RSIService {
 
-
     void buildRSITechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, RSIRequestParameters parameters) {
 
         RSITechnicalData previousRSITechnicalData
@@ -20,10 +19,17 @@ class RSIService {
 
             def technicalWrapper = technicalWrapperDataList.find { it.quoteDate == quote.quoteDate }
 
-            technicalWrapper.rsiTechnicalData = new RSITechnicalData(interval: parameters.interval, overBoughtLine: parameters.overBoughtLine,
-                    overSoldLine: parameters.overSoldLine, averagePriceGain: 0.0d, averagePriceLoss: 0.0d)
+            technicalWrapper.rsiTechnicalData = new RSITechnicalData()
 
             RSITechnicalData rsiData = technicalWrapper.rsiTechnicalData
+
+            rsiData.with {
+                interval = parameters.interval
+                overBoughtLine = parameters.overBoughtLine
+                overSoldLine = parameters.overSoldLine
+                averagePriceGain = 0.0d
+                averagePriceLoss = 0.0d
+            }
 
             if (ix == 0) {
                 previousRSITechnicalData = rsiData
@@ -69,13 +75,32 @@ class RSIService {
 
     void buildRSISignalData(List<TechnicalDataWrapper> technicalDataList) {
 
-        technicalDataList.eachWithIndex { technicalData, ix ->
+        technicalDataList.eachWithIndex { TechnicalDataWrapper technicalData, ix ->
 
             RSITechnicalData rsiData = technicalDataList[ix].rsiTechnicalData
             RSITechnicalData rsiDataYesterday = technicalDataList[ix-1].rsiTechnicalData
 
+            if (ix == 0) { return }
 
+            // Set overbought, oversold indicators
+            if (rsiData.relativeStrengthIndex < rsiData.overBoughtLine) { rsiData.overBought = true }
+            if (rsiData.relativeStrengthIndex > rsiData.overSoldLine) { rsiData.overSold = true }
 
+            // Overbought crossover negative, i.e. RSI crosses below the 70 line (70.5 to 69.5, for example)
+            if (rsiData.overBought && !rsiDataYesterday.overBought) { rsiData.overBoughtCrossoverPositive = true }
+
+            // Overbought crossover positive, i.e. RSI crosses above the 70 line (69.8 to 70.3, for example)
+            if (!rsiData.overBought && rsiDataYesterday.overBought) { rsiData.overBoughtCrossoverNegative = true }
+
+            // Oversold crossover negative, i.e. RSI crosses below the 30 line (30.5 to 29.5, for example)
+            if (rsiData.overSold && !rsiDataYesterday.overSold) { rsiData.overSoldCrossoverNegative = true }
+
+            // Oversold crossover positive, i.e. RSI crosses above the 30 line (29.5 to 30.5, for example)
+            if (!rsiData.overSold && rsiDataYesterday.overSold) { rsiData.overSoldCrossoverPositive = true }
+
+            // Middle crossovers
+            if (rsiData.relativeStrengthIndex >= 50.0d && rsiDataYesterday.relativeStrengthIndex < 50.0d) { rsiData.centerLineCrossoverPositive = true }
+            if (rsiData.relativeStrengthIndex <= 50.0d && rsiDataYesterday.relativeStrengthIndex > 50.0d) { rsiData.centerLineCrossoverNegative = true }
         }
     }
 

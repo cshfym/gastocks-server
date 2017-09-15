@@ -126,17 +126,18 @@ class SimulationService {
                 if ((sessionMaxPurchasePrice > 0.0d) && (quote.price > sessionMaxPurchasePrice)) { return }
                 if ((sessionMinPurchasePrice > 0.0d) && (quote.price < sessionMinPurchasePrice)) { return }
 
-                boolean globalBuyIndicator = inspectAnyGlobalBuyIndicators(request, quote)
+                // boolean globalBuyIndicator = inspectAnyGlobalBuyIndicators(request, quote)
 
                 boolean macdBuyIndicator = macdIndicatorService.getMACDBuyIndicator(quote, request.macdParameters, ix)
 
-                boolean rsiBuyIndicator = rsiIndicatorService.getRSIBuyIndicator(quote, request.rsiRequestParameters, ix)
+                boolean rsiBuyIndicator = rsiIndicatorService.getRSIBuyIndicator(quote)
 
                 // Add future indicators here, inspect all indicators before buying
 
-                if (!globalBuyIndicator) { return }
+                // if (!globalBuyIndicator) { return }
 
-                if (macdBuyIndicator) {
+                //if (macdBuyIndicator) {
+                if (rsiBuyIndicator) {
                     //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                     stockTransaction.purchaseDate = quote.quoteDate
                     stockTransaction.purchasePrice = quote.price
@@ -144,11 +145,13 @@ class SimulationService {
                 }
             }
 
-            boolean sellIndicator = macdIndicatorService.getMACDSellIndicator(quote)
+            boolean macdSellIndicator = macdIndicatorService.getMACDSellIndicator(quote)
+            boolean rsiSellIndicator = rsiIndicatorService.getRSISellIndicator(quote)
 
             // Add future indicators here, inspect all indicators before selling
 
-            if (sellIndicator && stockTransaction.started) {
+            //if (macdSellIndicator && stockTransaction.started) {
+            if (rsiSellIndicator && stockTransaction.started) {
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction
@@ -172,7 +175,7 @@ class SimulationService {
     boolean inspectAnyGlobalBuyIndicators(SimulationRequest request, TechnicalQuote quote) {
 
         // If the stock price remains the same, do not allow buy.
-        if ((request.onlyTransactOnPriceChange) && (!quote.priceChangeFromLastQuote)) { return false }
+        if ((request.onlyTransactOnPriceChange) && (!quote.quoteParameters.priceChangeFromLastQuote)) { return false }
 
     }
 }

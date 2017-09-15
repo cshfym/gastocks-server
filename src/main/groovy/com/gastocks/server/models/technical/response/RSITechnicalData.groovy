@@ -26,13 +26,15 @@ class RSITechnicalData {
      */
     double relativeStrengthIndex
 
-    boolean overBoughtCrossoverNegative
-    boolean overBoughtCrossoverPositive
+    boolean overBought
+    boolean overBoughtCrossoverNegative     // RSI value crosses below overbought line
+    boolean overBoughtCrossoverPositive     // RSI value crosses above overbought line
 
-    boolean overSoldCrossoverNegative
-    boolean overSoldCrossoverPositive
+    boolean overSold
+    boolean overSoldCrossoverNegative       // RSI value crosses below oversold line
+    boolean overSoldCrossoverPositive       // RSI value crosses above oversold line
 
-    boolean centerLineCrossoverNegative
-    boolean centerLineCrossoverPositive
+    boolean centerLineCrossoverNegative     // RSI value crosses below 50 line
+    boolean centerLineCrossoverPositive     // RSI value crosses above 50 line
 
 }

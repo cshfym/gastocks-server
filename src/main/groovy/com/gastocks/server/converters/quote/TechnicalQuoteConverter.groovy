@@ -45,12 +45,22 @@ class TechnicalQuoteConverter {
             //RSI Data
             rsiParameters: new RSITechnicalData(
                 interval: technicalData.rsiTechnicalData.interval,
+                overBoughtLine: technicalData.rsiTechnicalData.overBoughtLine,
+                overSoldLine: technicalData.rsiTechnicalData.overSoldLine,
                 priceGain: technicalData.rsiTechnicalData.priceGain,
                 priceLoss: technicalData.rsiTechnicalData.priceLoss,
                 averagePriceGain: technicalData.rsiTechnicalData.averagePriceGain,
                 averagePriceLoss: technicalData.rsiTechnicalData.averagePriceLoss,
                 relativeStrength: technicalData.rsiTechnicalData.relativeStrength,
-                relativeStrengthIndex: technicalData.rsiTechnicalData.relativeStrengthIndex
+                relativeStrengthIndex: technicalData.rsiTechnicalData.relativeStrengthIndex,
+                overBought: technicalData.rsiTechnicalData.overBought,
+                overSold: technicalData.rsiTechnicalData.overSold,
+                overBoughtCrossoverPositive: technicalData.rsiTechnicalData.overBoughtCrossoverPositive,
+                overBoughtCrossoverNegative: technicalData.rsiTechnicalData.overBoughtCrossoverNegative,
+                overSoldCrossoverPositive: technicalData.rsiTechnicalData.overSoldCrossoverPositive,
+                overSoldCrossoverNegative: technicalData.rsiTechnicalData.overSoldCrossoverNegative,
+                centerLineCrossoverNegative: technicalData.rsiTechnicalData.centerLineCrossoverNegative,
+                centerLineCrossoverPositive: technicalData.rsiTechnicalData.centerLineCrossoverPositive
             ),
 
             // Averages
