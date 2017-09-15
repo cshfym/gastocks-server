@@ -25,4 +25,14 @@ class RSITechnicalData {
      * Relative strength index is calculated as "100 - (100 / (1 + relativeStrength))"
      */
     double relativeStrengthIndex
+
+    boolean overBoughtCrossoverNegative
+    boolean overBoughtCrossoverPositive
+
+    boolean overSoldCrossoverNegative
+    boolean overSoldCrossoverPositive
+
+    boolean centerLineCrossoverNegative
+    boolean centerLineCrossoverPositive
+
 }
