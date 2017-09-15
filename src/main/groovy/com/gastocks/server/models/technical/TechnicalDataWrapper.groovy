@@ -10,6 +10,8 @@ class TechnicalDataWrapper {
 
     Date quoteDate
 
+    double price
+
     TechnicalQuoteParameters quoteParameters
 
     TechnicalQuoteMetadata quoteMetadata

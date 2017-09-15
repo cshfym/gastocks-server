@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service
 @Service
 class RSIService {
 
+    /* Ignore the first N quote periods to allow the RSI to smooth out */
+    final static int IGNORE_RSI_INITIAL_PERIODS = 15
+
     void buildRSITechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, RSIRequestParameters parameters) {
 
         RSITechnicalData previousRSITechnicalData
@@ -80,11 +83,15 @@ class RSIService {
             RSITechnicalData rsiData = technicalDataList[ix].rsiTechnicalData
             RSITechnicalData rsiDataYesterday = technicalDataList[ix-1].rsiTechnicalData
 
-            if (ix == 0) { return }
+            if ((ix < IGNORE_RSI_INITIAL_PERIODS) || (technicalData.price == 0)) { return }
 
             // Set overbought, oversold indicators
-            if (rsiData.relativeStrengthIndex < rsiData.overBoughtLine) { rsiData.overBought = true }
-            if (rsiData.relativeStrengthIndex > rsiData.overSoldLine) { rsiData.overSold = true }
+            if (rsiData.relativeStrengthIndex > rsiData.overBoughtLine) {
+                rsiData.overBought = true
+            }
+            if (rsiData.relativeStrengthIndex < rsiData.overSoldLine) {
+                rsiData.overSold = true
+            }
 
             // Overbought crossover negative, i.e. RSI crosses below the 70 line (70.5 to 69.5, for example)
             if (rsiData.overBought && !rsiDataYesterday.overBought) { rsiData.overBoughtCrossoverPositive = true }
