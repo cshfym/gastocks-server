@@ -9,7 +9,7 @@ class MACDTechnicalData {
     double macdHist
     boolean centerCrossoverPositive
     boolean centerCrossoverNegative
-    boolean signalCrossoverPositive
-    boolean signalCrossoverNegative
+    boolean signalCrossoverPositive // Crosses over the MACD signal line on a positive uptrend (BUY)
+    boolean signalCrossoverNegative // Crosses over the MACD signal line on a negative downtrend (SELL)
 
 }

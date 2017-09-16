@@ -8,6 +8,13 @@ import org.springframework.stereotype.Service
 @Service
 class RSIIndicatorService {
 
+    /*
+        Observations:
+        1. 80/20 outperforms 70/30 on stocks $8-$15
+        2. 80/20 RSI crossovers with corresponding MACD crossover (within a few days) seem to pair well
+        3.
+     */
+
     boolean getRSIBuyIndicator(TechnicalQuote quote) {
 
         // RSI is trending upward, out of overbought territory, signaling a potential BUY action

@@ -2,6 +2,7 @@ package com.gastocks.server.jms.services.simulation
 
 import com.gastocks.server.jms.services.simulation.technical.MACDIndicatorService
 import com.gastocks.server.jms.services.simulation.technical.RSIIndicatorService
+import com.gastocks.server.jms.services.simulation.technical.SynergyIndicatorService
 import com.gastocks.server.models.domain.PersistableSimulation
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.jms.QueueableSimulationSymbol
@@ -40,6 +41,10 @@ class SimulationService {
 
     @Autowired
     RSIIndicatorService rsiIndicatorService
+
+    @Autowired
+    SynergyIndicatorService synergyIndicatorService
+
 
     static final double SESSION_MAX_PURCHASE_PRICE = 9999999.00d
     static final double SESSION_MIN_PURCHASE_PRICE = 0.0d
@@ -132,12 +137,15 @@ class SimulationService {
 
                 boolean rsiBuyIndicator = rsiIndicatorService.getRSIBuyIndicator(quote)
 
+                boolean rsiSynergyBuyIndicator = rsiBuyIndicator ?
+                        synergyIndicatorService.rsiConfirmWithMacdCrossover(quotes, ix, 5, "BUY") : false
+
                 // Add future indicators here, inspect all indicators before buying
 
                 // if (!globalBuyIndicator) { return }
 
                 //if (macdBuyIndicator) {
-                if (rsiBuyIndicator) {
+                if (rsiBuyIndicator && rsiSynergyBuyIndicator) {
                     //log.info("Initiating BUY action with MACD at [${quote.macd}], signal [${quote.macdSignalLine}], MACDHist [${quote.macdHist}]")
                     stockTransaction.purchaseDate = quote.quoteDate
                     stockTransaction.purchasePrice = quote.price
@@ -150,8 +158,11 @@ class SimulationService {
 
             // Add future indicators here, inspect all indicators before selling
 
+            boolean rsiSynergySellIndicator = rsiSellIndicator ?
+                    synergyIndicatorService.rsiConfirmWithMacdCrossover(quotes, ix, 5, "SELL") : false
+
             //if (macdSellIndicator && stockTransaction.started) {
-            if (rsiSellIndicator && stockTransaction.started) {
+            if (rsiSellIndicator && rsiSynergySellIndicator && stockTransaction.started) {
                 stockTransaction.sellDate = quote.quoteDate
                 stockTransaction.sellPrice = quote.price
                 simulation.stockTransactions << stockTransaction
