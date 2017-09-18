@@ -33,6 +33,11 @@ class SimulationTransaction {
      */
     double totalInvestment
 
+    /**
+     * Investment periods - how long the investment was held before closing (selling)
+     */
+    int investmentPeriodDays
+
 
     SimulationTransaction(double commission, Date purchaseDate, double purchasePrice, Date sellDate, double sellPrice, String symbol, int shares) {
 
@@ -50,5 +55,7 @@ class SimulationTransaction {
         this.netProceeds = (grossProceeds - commission).round(2)
         this.grossProceedsPercentage = ((double)(grossProceeds / totalInvestment) * 100.0d).round(2)
         this.netProceedsPercentage = ((double)(netProceeds / totalInvestment) * 100.0d).round(2)
+
+        this.investmentPeriodDays = Math.abs(sellDate.time - purchaseDate.time) / (24 * 60 * 60 * 1000)
     }
 }

@@ -17,6 +17,7 @@ class SymbolSimulationSummary {
     double grossProceedsPercentage
     double totalCommissionCost
     int transactionCount
+    int investmentPeriodDays
 
     SymbolSimulationSummary(String symbol, List<SimulationTransaction> transactions = []) {
 
@@ -30,6 +31,7 @@ class SymbolSimulationSummary {
         this.netProceedsPercentage = ((double)(netProceeds / totalInvestment) * 100.0d).round(2)
         this.grossProceedsPercentage = ((double)(grossProceeds / totalInvestment) * 100.0d).round(2)
         this.totalCommissionCost = transactions.commission.sum() as double
+        this.investmentPeriodDays = transactions.investmentPeriodDays.sum() as int
     }
 
 }
