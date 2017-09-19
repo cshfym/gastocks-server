@@ -1,5 +1,8 @@
 package com.gastocks.server.models.simulation
 
+import org.joda.time.DateTime
+import org.joda.time.Days
+
 
 class TemporarySimulationTransaction {
 
@@ -54,6 +57,10 @@ class TemporarySimulationTransaction {
     double getNetPercentage() {
         double netPercentage = (double)(netProceeds / totalInvestment)
         (netPercentage * 100.0d).round(2)
+    }
+
+    int getTradingPeriods() {
+        Math.abs(sellDate.time - purchaseDate.time) / (24 * 60 * 60 * 1000)
     }
 
     @Override

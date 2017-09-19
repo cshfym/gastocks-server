@@ -22,6 +22,10 @@ class SimulationRequest {
      */
     boolean onlyTransactOnPriceChange
 
+    /**
+     * Limit transactions to maxTradingPeriods - helps filter out transactions that span excessive time periods (i.e. > 1 year)
+     */
+    int maxTradingPeriods
 
     double minPurchasePrice
     double maxPurchasePrice

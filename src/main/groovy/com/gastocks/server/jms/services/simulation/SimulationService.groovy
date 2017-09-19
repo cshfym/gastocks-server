@@ -177,6 +177,13 @@ class SimulationService {
             simulation.stockTransactions << stockTransaction
         }
 
+        // Limit transactions to maxTradingPeriods, if applicable.
+        if (request.maxTradingPeriods) {
+            simulation.stockTransactions = simulation.stockTransactions.findAll { transaction ->
+                transaction.tradingPeriods <= request.maxTradingPeriods
+            }
+        }
+
         simulation
     }
 
