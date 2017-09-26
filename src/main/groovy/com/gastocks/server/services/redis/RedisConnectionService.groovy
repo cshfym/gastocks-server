@@ -1,6 +1,7 @@
 package com.gastocks.server.services.redis
 
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import redis.clients.jedis.Jedis
 
@@ -8,12 +9,16 @@ import redis.clients.jedis.Jedis
 @Service
 class RedisConnectionService {
 
-    final static String REDIS_CONNECTION_URL = "104.236.144.134"
-    final static int REDIS_CONNECTION_PORT = 7480
-    final static String REDIS_CONNECTION_PW = "jediknight"
+    @Value('${redis.connection.url}')
+    String REDIS_CONNECTION_URL
 
+    @Value('${redis.connection.port}')
+    int REDIS_CONNECTION_PORT
 
-    Jedis jedis
+    @Value('${redis.connection.password}')
+    String REDIS_CONNECTION_PW
+
+    private Jedis jedis
 
     void setCache(String key, String value) {
 
@@ -34,6 +39,6 @@ class RedisConnectionService {
         jedis.connect()
         jedis.auth(REDIS_CONNECTION_PW)
 
-        log.info("Establish connecion with Redis at ${REDIS_CONNECTION_URL}:${REDIS_CONNECTION_PORT}: [${jedis.ping()}]")
+        log.info("Established connecion with Redis at ${REDIS_CONNECTION_URL}:${REDIS_CONNECTION_PORT}: [${jedis.ping()}]")
     }
 }

@@ -33,7 +33,7 @@ class DefaultResource {
             redisConnectionService.setCache(key, value)
         } catch (Exception ex) {
             ex.printStackTrace()
-            log.error("Exception trying to cache key [${key}]", ex)
+            log.error("Exception trying to set cache with key [${key}]", ex)
         }
 
         new BasicResponse(success: true)
