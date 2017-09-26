@@ -1,5 +1,6 @@
 package com.gastocks.server.services
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.QuoteConverter
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
@@ -44,7 +45,7 @@ class QuoteService {
      * @param identifier
      * @return List<Quote>
      */
-    @Cacheable(value = "getQuotesForSymbol", key="#identifier")
+    @Cacheable(value = CacheConfiguration.GET_QUOTES_FOR_SYMBOL, key="#identifier")
     List<Quote> getQuotesForSymbol(String identifier) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)

@@ -1,5 +1,6 @@
 package com.gastocks.server.services.domain
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.domain.PersistableQuote
@@ -78,7 +79,7 @@ class QuotePersistenceService {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
 
-    @Cacheable(value = "QuotePersistenceService.findAllQuotesForSymbol")
+    @Cacheable(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL)
     List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
 
         def startStopwatch = System.currentTimeMillis()

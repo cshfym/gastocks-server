@@ -1,5 +1,6 @@
 package com.gastocks.server.services.domain
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableHolidayCalendar
 import com.gastocks.server.repositories.HolidayCalendarRepository
@@ -59,7 +60,7 @@ class HolidayCalendarPersistenceService {
         false
     }
 
-    @Cacheable(value = "allHolidayCalendars")
+    @Cacheable(value = CacheConfiguration.ALL_HOLIDAY_CALENDARS)
     List<PersistableHolidayCalendar> findAll() {
         holidayCalendarRepository.findAll()
     }

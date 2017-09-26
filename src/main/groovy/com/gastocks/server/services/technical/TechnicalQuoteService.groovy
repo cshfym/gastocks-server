@@ -1,5 +1,6 @@
 package com.gastocks.server.services.technical
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.TechnicalQuoteConverter
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
@@ -41,7 +42,7 @@ class TechnicalQuoteService {
      * @param identifier
      * @return List<Quote>
      */
-    @Cacheable(value = "getTechnicalQuotesForSymbol")
+    @Cacheable(value = CacheConfiguration.GET_TECHNICAL_QUOTES_FOR_SYMBOL)
     List<TechnicalQuote> getTechnicalQuotesForSymbol(String identifier, TechnicalQuoteRequestParameters parameters) {
 
         PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)

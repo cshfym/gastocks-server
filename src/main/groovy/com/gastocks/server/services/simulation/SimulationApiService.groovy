@@ -1,5 +1,6 @@
 package com.gastocks.server.services.simulation
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.jms.sender.SimulationQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableSimulation
@@ -71,7 +72,7 @@ class SimulationApiService {
         new BasicResponse(success: true, message: "Queued simulation [${simulation.id}]")
     }
 
-    @Cacheable(value="getSimulationSummaryById")
+    @Cacheable(value = CacheConfiguration.GET_SIMULATION_SUMMARY_BY_ID)
     SimulationSummary getSimulationSummaryById(String id, boolean compact) {
 
         def startStopwatch = System.currentTimeMillis()

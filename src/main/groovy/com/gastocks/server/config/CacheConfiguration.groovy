@@ -16,18 +16,25 @@ import org.springframework.scheduling.annotation.Scheduled
 @EnableScheduling
 class CacheConfiguration {
 
+    static final String ACTIVE_SYMBOLS = "activeSymbols"
+    static final String ALL_HOLIDAY_CALENDARS = "allHolidayCalendars"
+    static final String ALL_SYMBOLS = "allSymbols"
+    static final String GET_QUOTES_FOR_SYMBOL = "getQuotesForSymbol"
+    static final String GET_TECHNICAL_QUOTES_FOR_SYMBOL = "getTechnicalQuotesForSymbol"
+    static final String FIND_ALL_QUOTES_FOR_SYMBOL = "findAllQuotesForSymbol"
+    static final String GET_SIMULATION_SUMMARY_BY_ID = "getSimulationSummaryById"
     static final String VIEW_SYMBOL_EXTENDED = "viewSymbolExtended"
 
     @Bean
     CacheManager cacheManager() {
         return new ConcurrentMapCacheManager(
-                "activeSymbols",
-                "allHolidayCalendars",
-                "allSymbols",
-                "getQuotesForSymbol",
-                "getTechnicalQuotesForSymbol",
-                "QuotePersistenceService.findAllQuotesForSymbol",
-                "getSimulationSummaryById",
+                ACTIVE_SYMBOLS,
+                ALL_HOLIDAY_CALENDARS,
+                ALL_SYMBOLS,
+                GET_QUOTES_FOR_SYMBOL,
+                GET_TECHNICAL_QUOTES_FOR_SYMBOL,
+                FIND_ALL_QUOTES_FOR_SYMBOL,
+                GET_SIMULATION_SUMMARY_BY_ID,
                 VIEW_SYMBOL_EXTENDED
         )
     }
