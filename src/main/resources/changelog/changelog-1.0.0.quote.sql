@@ -1,3 +1,7 @@
+start transaction;
+
+use `ga_stocks`;
+
 CREATE TABLE `quote` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
@@ -18,3 +22,5 @@ CREATE TABLE `quote` (
   KEY `IDX_SymbolID_QuoteDate_Price` (`symbol_id`,`quote_date`,`price`),
   CONSTRAINT `FK_Quote_Symbol` FOREIGN KEY (`symbol_id`) REFERENCES `symbol` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+commit;
