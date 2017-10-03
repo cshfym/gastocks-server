@@ -90,12 +90,15 @@ CREATE TABLE `symbol` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `identifier` varchar(10) COLLATE utf8mb4_bin NOT NULL,
   `description` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
-  `active` Boolean COLLATE utf8mb4_bin DEFAULT TRUE,
+  `active` tinyint(1) DEFAULT '1',
   `exchange_market_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_symbol_identifier_exchange_market_id` (`identifier`,`exchange_market_id`),
+  UNIQUE KEY `identifier_UNIQUE` (`identifier`),
   KEY `FK_Symbol_ExchangeMarket` (`exchange_market_id`),
   CONSTRAINT `FK_Symbol_ExchangeMarket` FOREIGN KEY (`exchange_market_id`) REFERENCES `exchange_market` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 CREATE UNIQUE INDEX `idx_symbol_identifier_exchange_market_id`  ON `ga_stocks`.`symbol` (identifier, exchange_market_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 

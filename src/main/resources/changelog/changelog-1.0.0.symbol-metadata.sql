@@ -8,13 +8,17 @@ DROP TABLE sector;
 
 CREATE TABLE `sector` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `description` varchar(100) COLLATE utf8mb4_bin NOT NULL
+  `description` varchar(100) COLLATE utf8mb4_bin NOT NULL,
+  UNIQUE KEY `description_UNIQUE` (`description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 CREATE TABLE `industry` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `description` varchar(100) COLLATE utf8mb4_bin NOT NULL
+  `description` varchar(100) COLLATE utf8mb4_bin NOT NULL,
+  UNIQUE KEY `description_UNIQUE` (`description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 CREATE TABLE `symbol_metadata` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
@@ -6439,7 +6443,7 @@ INSERT INTO `symbol_metadata` (`id`,`symbol_id`,`sector_id`,`industry_id`,`ipo_y
 ((select UUID()),(select id from symbol where identifier = 'WTR'),(select id from sector where description = 'Public Utilities'),(select id from industry where description = 'Water Supply'),'n/a',5896254712.17),
 ((select UUID()),(select id from symbol where identifier = 'YORW'),(select id from sector where description = 'Public Utilities'),(select id from industry where description = 'Water Supply'),'n/a',435541776),
 ((select UUID()),(select id from symbol where identifier = 'BXC'),(select id from sector where description = 'Capital Goods'),(select id from industry where description = 'Wholesale Distributors'),'2004',93984622.93),
-((select UUID()),(select id from symbol where identifier = 'WAIR'),(select id from sector where description = 'Capital Goods'),(select id from industry where description = 'Wholesale Distributors'),'2011',936046012.2);
+((select UUID()),(select id from symbol where identifier = 'WAIR'),(select id from sector where description = 'Capital Goods'),(select id from industry where description = 'Wholesale Distributors'),'2011',936046012.2),
 ((select UUID()),(select id from symbol where identifier = 'PRIM'),(select id from sector where description = 'Basic Industries'),(select id from industry where description = 'Water Supply'),'n/a',1513285513.1),
 ((select UUID()),(select id from symbol where identifier = 'SBS'),(select id from sector where description = 'Public Utilities'),(select id from industry where description = 'Water Supply'),'2002',7149513229.74),
 ((select UUID()),(select id from symbol where identifier = 'SJW'),(select id from sector where description = 'Public Utilities'),(select id from industry where description = 'Water Supply'),'n/a',1160667560.4),
