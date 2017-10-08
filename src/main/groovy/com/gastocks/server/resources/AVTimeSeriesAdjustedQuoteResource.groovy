@@ -54,7 +54,7 @@ class AVTimeSeriesAdjustedQuoteResource {
      * @return {@BasicQuoteResponse}
      */
     @ResponseBody
-    @RequestMapping(value="/single", method=RequestMethod.GET)
+    @RequestMapping(value="/single", method=RequestMethod.POST)
     BasicQuoteResponse doSingle(@RequestParam(value="symbol", required=true) String symbol) {
 
         fetchAndPersistService.fetchAndQueueSymbol(symbol)
@@ -68,7 +68,7 @@ class AVTimeSeriesAdjustedQuoteResource {
      * @return {@BasicQuoteResponse}
      */
     @ResponseBody
-    @RequestMapping(value="/partial", method=RequestMethod.GET)
+    @RequestMapping(value="/partial", method=RequestMethod.POST)
     BasicQuoteResponse doPartial(
             @RequestParam(value="symbol", required=true) String symbol,
             @RequestParam(value="exchange", required=true) String exchange) {
@@ -83,7 +83,7 @@ class AVTimeSeriesAdjustedQuoteResource {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value="batchAll", method=RequestMethod.GET)
+    @RequestMapping(value="batchAll", method=RequestMethod.POST)
     BasicResponse doBatchAll() {
 
         fetchAndPersistService.fetchAndPersistAllQuotes()

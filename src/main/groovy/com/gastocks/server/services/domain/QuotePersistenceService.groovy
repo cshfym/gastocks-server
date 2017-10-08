@@ -75,6 +75,23 @@ class QuotePersistenceService {
         quoteRepository.save(existingQuote)
     }
 
+    void updateQuote(PersistableQuote existingQuote, AVTimeSeriesAdjustedDay quote) {
+
+        existingQuote.with {
+            price = quote.close
+            dayOpen = quote.dayOpen
+            dayHigh = quote.dayHigh
+            dayLow = quote.dayLow
+            volume = quote.volume
+            dividend = quote.dividend
+            splitCoefficient = quote.splitCoefficient
+        }
+
+        log.debug("Updating existing quote: ${existingQuote.toString()}")
+
+        quoteRepository.save(existingQuote)
+    }
+
     PersistableQuote findQuote(PersistableSymbol symbol, Date lastUpdated) {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
