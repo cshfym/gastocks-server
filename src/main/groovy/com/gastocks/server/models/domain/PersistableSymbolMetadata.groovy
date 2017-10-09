@@ -12,10 +12,13 @@ class PersistableSymbolMetadata {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     String id
 
+    @OneToOne(cascade = CascadeType.ALL)
     PersistableSymbol symbol
 
+    @OneToOne(cascade = CascadeType.ALL)
     PersistableSector sector
 
+    @OneToOne(cascade = CascadeType.ALL)
     PersistableIndustry industry
 
     Long ipoYear
@@ -26,4 +29,5 @@ class PersistableSymbolMetadata {
     String toString() {
         "PersistableSymbolMetadata [${symbol.identifier}] - [${sector.description}] - [${industry.description}] - [${ipoYear}] - [${marketCap}]"
     }
+
 }
