@@ -1,7 +1,7 @@
 package com.gastocks.server.services
 
 import com.gastocks.server.converters.symbol.SymbolConverter
-
+import com.gastocks.server.jms.sender.QuotePriceChangeQueueSender
 import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
@@ -39,6 +39,9 @@ class SymbolService {
 
     @Autowired
     ViewSymbolExtendedPersistenceService viewSymbolExtendedPersistenceService
+
+    @Autowired
+    QuotePriceChangeQueueSender quotePriceChangeQueueSender
 
     @Autowired
     StatisticsUtility statisticsUtility
@@ -143,11 +146,64 @@ class SymbolService {
     }
 
     /**
-     * Finds symbols that are missing quotes.
-     * @return
+     * Queues backfill of all price change data
+     * @return BasicResponse
      */
-    List<PersistableSymbol> findSymbolsWithMissingQuotes() {
-        // TBD
+    BasicResponse backfillAllSymbolsPriceChangeData() {
+
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+
+        allSymbols.each { symbol ->
+            quotePriceChangeQueueSender.queueRequest(symbol.identifier)
+        }
+
+        new BasicResponse(success: true)
+    }
+
+    /**
+     * Backfill price change data (previousDayClose, priceChange, priceChangePercentage) for a given symbol.
+     * @param identifier
+     */
+    @Transactional
+    void doBackfillPriceChangeData(String identifier) {
+
+        def startStopwatch = System.currentTimeMillis()
+
+        PersistableSymbol persistableSymbol = symbolPersistenceService.findByIdentifier(identifier)
+
+        List<PersistableQuote> symbolQuotes = quoteService.quotePersistenceService.findAllQuotesForSymbol(persistableSymbol)
+        symbolQuotes.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
+
+        PersistableQuote previousQuote
+
+        symbolQuotes.eachWithIndex { quote, index ->
+
+            if (allPriceDataAvailable(quote)) {
+                previousQuote = quote
+                return
+            }
+
+            if (index == 0) {
+                quote.previousDayClose = quote.price
+                quote.priceChange = 0
+                quote.priceChangePercentage = 0
+            } else {
+                quote.previousDayClose = previousQuote.price
+                quote.priceChange = (quote.price - previousQuote.price).round(3)
+                quote.priceChangePercentage = (quote.previousDayClose > 0) ? (quote.priceChange / quote.previousDayClose).round(4) : 0.0000
+            }
+
+            quoteService.quotePersistenceService.updateQuote(quote)
+
+            previousQuote = quote
+        }
+
+        log.info("Done backfilling price change data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+
+    }
+
+    boolean allPriceDataAvailable(PersistableQuote quote) {
+        quote.previousDayClose && quote.priceChange && quote.priceChangePercentage
     }
 
 }

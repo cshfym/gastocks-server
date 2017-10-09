@@ -24,6 +24,9 @@ class JmsConfiguration {
     @Value('${symbol.extended.fill.consumer.queue.concurrency}')
     String SYMBOL_EXTENDED_FILL_CONSUMER_QUEUE_CONCURRENCY
 
+    @Value('${quote.price.change.backfill.consumer.queue.concurrency}')
+    String QUOTE_PRICE_CHANGE_BACKFILL_CONSUMER_QUEUE_CONCURRENCY
+
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -55,7 +58,7 @@ class JmsConfiguration {
     }
 
     /**
-     * Bean corresponds to the "extendedSymbolFillFactory" JMS listener for consuming simulation requests.
+     * Bean corresponds to the "extendedSymbolFillFactory" JMS listener for consuming extended symbol backfill requests.
      * @param connectionFactory
      * @param configurer
      * @return {@JmsListenerContainerFactory}
@@ -65,6 +68,21 @@ class JmsConfiguration {
 
         def factory = new DefaultJmsListenerContainerFactory()
         factory.setConcurrency(SYMBOL_EXTENDED_FILL_CONSUMER_QUEUE_CONCURRENCY)
+        configurer.configure(factory, connectionFactory)
+        factory
+    }
+
+    /**
+     * Bean corresponds to the "quotePriceChangeFillFactory" JMS listener for consuming quote price change backfill requests.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
+    @Bean
+    JmsListenerContainerFactory<?> quotePriceChangeFillFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
+        def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency(QUOTE_PRICE_CHANGE_BACKFILL_CONSUMER_QUEUE_CONCURRENCY)
         configurer.configure(factory, connectionFactory)
         factory
     }

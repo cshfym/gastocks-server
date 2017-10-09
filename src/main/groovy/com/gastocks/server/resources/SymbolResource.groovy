@@ -42,7 +42,7 @@ class SymbolResource {
      */
     @ResponseBody
     @RequestMapping(value="/backfill", method=RequestMethod.POST)
-    BasicResponse backfill() {
+    BasicResponse backfillAll() {
         symbolService.backfillAllSymbols()
     }
 
@@ -51,10 +51,29 @@ class SymbolResource {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value="/backfill/{identifier}", method=RequestMethod.GET)
+    @RequestMapping(value="/backfill/{identifier}", method=RequestMethod.POST)
     BasicResponse backfillSingle(@PathVariable("identifier") String identifier) {
         //symbolService.doBackfillForSymbol(identifier)
         symbolExtendedQueueSender.queueRequest(identifier)
     }
 
+    /**
+     * Convenience API to trigger backfill of previous day close, price change, price change %
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/pricechange", method=RequestMethod.POST)
+    BasicResponse priceChangeAll() {
+        symbolService.backfillAllSymbolsPriceChangeData()
+    }
+
+    /**
+     * Convenience API to trigger backfill of previous day close, price change, price change % for a single symbol
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/pricechange/{identifier}", method=RequestMethod.POST)
+    BasicResponse priceChangeWithIdentifier(@PathVariable("identifier") String identifier) {
+        symbolService.doBackfillPriceChangeData(identifier)
+    }
 }
