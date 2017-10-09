@@ -20,7 +20,7 @@ class AVGlobalQuoteResource {
     AVGlobalQuoteHandlerService quoteHandlerService
 
     @ResponseBody
-    @RequestMapping(value="/batchAll", method=RequestMethod.GET)
+    @RequestMapping(value="/batchAll", method=RequestMethod.POST)
     BasicQuoteResponse batchAll() {
 
         quoteHandlerService.fetchAndQueueAllQuotesForAllSymbols()
@@ -29,7 +29,7 @@ class AVGlobalQuoteResource {
     }
 
     @ResponseBody
-    @RequestMapping(value="/single", method=RequestMethod.GET)
+    @RequestMapping(value="/single", method=RequestMethod.POST)
     BasicQuoteResponse doSingle(@RequestParam(value="symbol", required=true) String symbol) {
 
         quoteHandlerService.fetchAndQueueQuoteForSymbol(symbol)

@@ -59,6 +59,11 @@ class QuotePersistenceService {
 
     void updateQuote(PersistableQuote existingQuote, AVGlobalQuote quote) {
 
+        if (quotesEqual(existingQuote, quote)) {
+            log.debug("Updating quote bypassed, quotes are identical: ${existingQuote.toString()}")
+            return
+        }
+
         existingQuote.with {
             price = quote.latestPrice
             dayOpen = quote.currentTradingDayOpen
@@ -73,6 +78,24 @@ class QuotePersistenceService {
         log.debug("Updating existing quote: ${existingQuote.toString()}")
 
         quoteRepository.save(existingQuote)
+    }
+
+    /**
+     * Compares a {@link PersistableQuote with a @link AVGlobalQuote}
+     * @param existingQuote
+     * @param quote
+     * @return boolean
+     */
+    boolean quotesEqual(PersistableQuote existingQuote, AVGlobalQuote quote) {
+
+        existingQuote.price == quote.latestPrice &&
+        existingQuote.dayOpen == quote.currentTradingDayOpen &&
+        existingQuote.dayHigh == quote.currentTradingDayHigh &&
+        existingQuote.dayLow == quote.currentTradingDayLow &&
+        existingQuote.previousDayClose == quote.previousTradingDayClose &&
+        existingQuote.priceChange == quote.priceChange &&
+        existingQuote.priceChangePercentage == quote.priceChangePercentage &&
+        existingQuote.volume == quote.volume
     }
 
     void updateQuote(PersistableQuote existingQuote, AVTimeSeriesAdjustedDay quote) {
