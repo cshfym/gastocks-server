@@ -161,6 +161,17 @@ class SymbolService {
     }
 
     /**
+     * Queues backfill of identifier price change data
+     * @return BasicResponse
+     */
+    BasicResponse backfillSymbolPriceChangeData(String identifier) {
+
+        quotePriceChangeQueueSender.queueRequest(identifier)
+
+        new BasicResponse(success: true)
+    }
+
+    /**
      * Backfill price change data (previousDayClose, priceChange, priceChangePercentage) for a given symbol.
      * @param identifier
      */

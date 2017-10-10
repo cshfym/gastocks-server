@@ -31,19 +31,30 @@ CREATE TABLE `symbol_extended` (
   KEY `IDX_Symbol_Min52` (`symbol_id`,`minimum_52_weeks`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-CREATE VIEW v_symbol_extended AS
-SELECT
-	se.symbol_id as symbol_id,
-    s.identifier,
-    s.description,
-    max(se.price) as max_price,
-    min(se.price) as min_price,
-    avg(se.price) as avg_price,
-    max(se.price_standard_deviation) as max_price_stdev,
-    avg(se.price_standard_deviation) as avg_price_stdev
-FROM symbol_extended se
-INNER JOIN symbol s on se.symbol_id = s.id
-GROUP BY se.symbol_id;
+CREATE
+    ALGORITHM = UNDEFINED
+    DEFINER = `root`@`%`
+    SQL SECURITY DEFINER
+VIEW `v_symbol_extended` AS
+    SELECT
+        `se`.`symbol_id` AS `symbol_id`,
+        `s`.`identifier` AS `identifier`,
+        `s`.`description` AS `description`,
+        `ind`.`description` AS `industry`,
+        `sec`.`description` AS `sector`,
+        MAX(`se`.`price`) AS `max_price`,
+        MIN(`se`.`price`) AS `min_price`,
+        AVG(`se`.`price`) AS `avg_price`,
+        MAX(`se`.`price_standard_deviation`) AS `max_price_stdev`,
+        AVG(`se`.`price_standard_deviation`) AS `avg_price_stdev`
+    FROM
+        (`symbol_extended` `se`
+         JOIN `symbol` `s` ON ((`se`.`symbol_id` = `s`.`id`))
+         JOIN `symbol_metadata` `sm` ON ((`se`.`symbol_id` = `sm`.`symbol_id`))
+         JOIN `industry` `ind` ON ((`ind`.`id` = `sm`.`industry_id`))
+         JOIN `sector` `sec` ON ((`sec`.`id` = `sm`.`sector_id`))
+        )
+    GROUP BY `se`.`symbol_id`, `ind`.`description`, `sec`.`description`;
 
 CREATE TABLE `simulation` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,

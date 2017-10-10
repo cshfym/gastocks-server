@@ -14,6 +14,10 @@ class ViewSymbolExtended {
 
     String description
 
+    String industry
+
+    String sector
+
     @Column(name="max_price")
     double maxPrice
 

@@ -53,7 +53,6 @@ class SymbolResource {
     @ResponseBody
     @RequestMapping(value="/backfill/{identifier}", method=RequestMethod.POST)
     BasicResponse backfillSingle(@PathVariable("identifier") String identifier) {
-        //symbolService.doBackfillForSymbol(identifier)
         symbolExtendedQueueSender.queueRequest(identifier)
     }
 
@@ -74,6 +73,6 @@ class SymbolResource {
     @ResponseBody
     @RequestMapping(value="/pricechange/{identifier}", method=RequestMethod.POST)
     BasicResponse priceChangeWithIdentifier(@PathVariable("identifier") String identifier) {
-        symbolService.doBackfillPriceChangeData(identifier)
+        symbolService.backfillSymbolPriceChangeData(identifier)
     }
 }
