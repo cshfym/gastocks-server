@@ -41,9 +41,10 @@ class SymbolResource {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value="/backfill", method=RequestMethod.POST)
+    @RequestMapping(value="/vse/backfill", method=RequestMethod.POST)
     BasicResponse backfillAll() {
         symbolService.backfillAllSymbols()
+        new BasicResponse(success: true)
     }
 
     /**
@@ -51,9 +52,10 @@ class SymbolResource {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value="/backfill/{identifier}", method=RequestMethod.POST)
+    @RequestMapping(value="/vse/backfill/{identifier}", method=RequestMethod.POST)
     BasicResponse backfillSingle(@PathVariable("identifier") String identifier) {
         symbolExtendedQueueSender.queueRequest(identifier)
+        new BasicResponse(success: true)
     }
 
     /**
@@ -64,6 +66,7 @@ class SymbolResource {
     @RequestMapping(value="/pricechange", method=RequestMethod.POST)
     BasicResponse priceChangeAll() {
         symbolService.backfillAllSymbolsPriceChangeData()
+        new BasicResponse(success: true)
     }
 
     /**
@@ -74,5 +77,6 @@ class SymbolResource {
     @RequestMapping(value="/pricechange/{identifier}", method=RequestMethod.POST)
     BasicResponse priceChangeWithIdentifier(@PathVariable("identifier") String identifier) {
         symbolService.backfillSymbolPriceChangeData(identifier)
+        new BasicResponse(success: true)
     }
 }
