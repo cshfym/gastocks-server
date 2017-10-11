@@ -1,10 +1,8 @@
 package com.gastocks.server.jms.services.avglobalquote
 
-import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol
 import com.gastocks.server.services.IExternalQuoteService
-import com.gastocks.server.services.SymbolService
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import groovy.util.logging.Slf4j
@@ -22,9 +20,6 @@ class AVGlobalQuoteProcessingService {
 
     @Autowired
     SymbolPersistenceService symbolPersistenceService
-
-    @Autowired
-    SymbolExtendedQueueSender symbolExtendedQueueSender
 
     /**
      * Primary method for processing a symbol into a quote and persisting it. (Move from JMS package later?)
@@ -53,8 +48,6 @@ class AVGlobalQuoteProcessingService {
                  quotePersistenceService.persistNewQuote(avQuote, persistableSymbol)
                  log.info("Persisting new quote for [${persistableSymbol.identifier} - ${persistableSymbol.exchangeMarket.shortName}] on [${avQuote.lastUpdated.toString()}]")
             }
-
-            symbolExtendedQueueSender.queueRequest(persistableSymbol.identifier)
         }
 
     }
