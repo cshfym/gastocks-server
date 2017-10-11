@@ -24,9 +24,6 @@ class AVTimeSeriesAdjustedProcessingService {
     @Autowired
     SymbolPersistenceService symbolPersistenceService
 
-    @Autowired
-    SymbolExtendedQueueSender symbolExtendedQueueSender
-
     @Value('${avtsa.max.quote.periods}')
     Integer AVTSA_MAX_QUOTE_PERIODS
 
@@ -68,8 +65,6 @@ class AVTimeSeriesAdjustedProcessingService {
 
                 }
             }
-
-            symbolExtendedQueueSender.queueRequest(persistableSymbol.identifier)
         }
 
         log.info "${daysPersisted} quotes for symbol [${symbol.identifier}] stored in [${System.currentTimeMillis() - startStopwatch} ms], " +
