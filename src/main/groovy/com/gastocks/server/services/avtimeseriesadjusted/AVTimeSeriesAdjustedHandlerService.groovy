@@ -41,7 +41,7 @@ class AVTimeSeriesAdjustedHandlerService {
 
         symbols.eachWithIndex { symbol, index ->
             // if (index > 0) { return }
-            queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
+            queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
     }
 
@@ -69,7 +69,7 @@ class AVTimeSeriesAdjustedHandlerService {
 
         activeSymbols.eachWithIndex { symbol, index ->
             // if (index > 0) { return }
-            queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
+            queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
     }
 
@@ -85,7 +85,7 @@ class AVTimeSeriesAdjustedHandlerService {
             return
         }
 
-        queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
+        queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
     }
 
 }

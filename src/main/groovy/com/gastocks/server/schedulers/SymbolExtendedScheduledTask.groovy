@@ -25,7 +25,7 @@ class SymbolExtendedScheduledTask {
 
         log.info("Loaded [${String.valueOf(symbols.size())}] active symbols, queueing symbols for extended data backfill processing.")
 
-        symbols.eachWithIndex { PersistableSymbol symbol ->
+        symbols.each { PersistableSymbol symbol ->
             symbolExtendedQueueSender.queueRequest(symbol.identifier)
         }
     }

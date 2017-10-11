@@ -35,7 +35,7 @@ class AVGlobalQuoteHandlerService {
         log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, queueing symbols for quote processing.")
 
         activeSymbols.eachWithIndex { symbol, index ->
-            queueService.queueSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ)
+            queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ)
         }
     }
 
@@ -45,7 +45,7 @@ class AVGlobalQuoteHandlerService {
 
         log.info("Found symbol [${persistableSymbol.identifier}], queueing for quote fetch and persist.")
 
-        queueService.queueSymbol(persistableSymbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ)
+        queueService.queueWithPersistableSymbol(persistableSymbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ)
     }
 
 }

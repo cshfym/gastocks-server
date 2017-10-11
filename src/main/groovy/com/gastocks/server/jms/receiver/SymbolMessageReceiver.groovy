@@ -40,6 +40,6 @@ class SymbolMessageReceiver {
 
         log.info "Received <{ ${symbol} }> in ${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ}"
 
-        globalQuoteProcessingService.processSymbol(symbol, globalQuoteService)
+        globalQuoteProcessingService.processSymbol(symbol, globalQuoteService, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ)
     }
 }

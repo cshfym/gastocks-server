@@ -22,18 +22,22 @@ class SymbolQueueSender {
     final static String SYMBOL_QUEUE_DESTINATION_AVGQ = "com.gastocks.queue.symbol.avgq"
 
     /**
-     * Queues a symbol on the quote queue for processing.
+     * Pushes a symbol on the quote queue for processing.
      * @param symbol
      * @return
      */
-    void queueSymbol(PersistableSymbol symbol, String destination) {
+    void queueWithPersistableSymbol(PersistableSymbol symbol, String destination) {
+
+        def queueableSymbol = new QueueableSymbol(symbolId: symbol.id, identifier: symbol.identifier, retryCount: 0)
+
+        queueSymbol(queueableSymbol, destination)
+    }
+
+    void queueSymbol(QueueableSymbol queueableSymbol, String destination) {
 
         JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
-
-        def queueableSymbol = new QueueableSymbol(symbolId: symbol.id, identifier: symbol.identifier)
 
         log.info "Queueing a symbol for processing: <{ ${queueableSymbol} }>"
         jmsTemplate.convertAndSend(destination, queueableSymbol)
     }
-
 }
