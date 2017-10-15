@@ -133,7 +133,12 @@ class SymbolService {
             }
 
             symbolExtendedPersistenceService.persistSymbolExtended(persistableSymbolExtended)
+
+            quotesForDate.clear()
         }
+
+        symbolQuotes.clear()
+        existingPersistableSymbolExtendedList.clear()
 
         log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
