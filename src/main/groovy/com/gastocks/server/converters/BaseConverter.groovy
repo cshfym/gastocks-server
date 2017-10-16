@@ -11,27 +11,27 @@ abstract class BaseConverter implements IConverter {
 
     abstract <T extends IQuote> T fromObject(Object obj)
 
-    static Double parseToDouble(String val) {
+    static double parseToDouble(String val) {
         try {
             Double.parseDouble(val)
-        } catch (Exception ex) {
-            null
+        } catch (NumberFormatException ex) {
+            throw ex
         }
     }
 
-    static Double parseToFloat(String val) {
+    static double parseToFloat(String val) {
         try {
             Float.parseFloat(val)
-        } catch (Exception ex) {
-            null
+        } catch (NumberFormatException ex) {
+            throw ex
         }
     }
 
-    static Integer parseToInteger(String val) {
+    static int parseToInteger(String val) {
         try {
             Integer.parseInt(val)
-        } catch (Exception ex) {
-            null
+        } catch (NumberFormatException ex) {
+            throw ex
         }
     }
 

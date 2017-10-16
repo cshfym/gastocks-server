@@ -74,7 +74,7 @@ class SymbolService {
         symbols
     }
 
-    List<ViewSymbolExtended> findAllViewSymbolExtendedWithParameters(Double maxQuotePrice = null, Double minQuotePrice = null) {
+    List<ViewSymbolExtended> findAllViewSymbolExtendedWithParameters(double maxQuotePrice = null, double minQuotePrice = null) {
         viewSymbolExtendedPersistenceService.findAllWithParameters(maxQuotePrice, minQuotePrice)
     }
 
@@ -169,7 +169,7 @@ class SymbolService {
                 "in [${System.currentTimeMillis() - startStopwatch} ms] with terminateBackfill [${terminateBackfill}]")
     }
 
-    boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, Double max52Weeks, Double min52Weeks, Double avg52Weeks, Double standardDev) {
+    boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, double max52Weeks, double min52Weeks, double avg52Weeks, double standardDev) {
         (symbolExtended.maximum52Weeks == max52Weeks) &&
         (symbolExtended.minimum52Weeks == min52Weeks) &&
         (symbolExtended.average52Weeks == avg52Weeks) &&

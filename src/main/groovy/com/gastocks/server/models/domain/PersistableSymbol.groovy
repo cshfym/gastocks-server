@@ -18,7 +18,7 @@ class PersistableSymbol {
 
     String identifier
     String description
-    Boolean active
+    boolean active
 
     @ManyToOne
     @JoinColumn(name = "exchange_market_id")

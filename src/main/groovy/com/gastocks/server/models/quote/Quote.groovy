@@ -9,10 +9,10 @@ class Quote {
     Date quoteDate
     String symbol
     String exchangeName
-    Double price
-    Double open
-    Double high
-    Double low
+    double price
+    double open
+    double high
+    double low
     Integer volume
 
 }

@@ -27,16 +27,16 @@ class PersistableQuote {
     @JoinColumn(name = "symbol_id")
     PersistableSymbol symbol
 
-    Double price
-    Double dayOpen
-    Double dayHigh
-    Double dayLow
-    Double previousDayClose
-    Double priceChange
-    Float priceChangePercentage
-    Integer volume
-    Double dividend
-    Double splitCoefficient
+    double price
+    double dayOpen
+    double dayHigh
+    double dayLow
+    double previousDayClose
+    double priceChange
+    float priceChangePercentage
+    int volume
+    double dividend
+    double splitCoefficient
 
     /**
      * Last market date presented as YYYY-MM-dd

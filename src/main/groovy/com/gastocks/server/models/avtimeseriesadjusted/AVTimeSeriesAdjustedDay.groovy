@@ -4,13 +4,13 @@ import org.joda.time.DateTime
 
 class AVTimeSeriesAdjustedDay {
 
-    public Double dayOpen
-    public Double dayHigh
-    public Double dayLow
-    public Double close
-    public Double adjustedClose
-    public Integer volume
-    public Double dividend
-    public Double splitCoefficient
+    public double dayOpen
+    public double dayHigh
+    public double dayLow
+    public double close
+    public double adjustedClose
+    public int volume
+    public double dividend
+    public double splitCoefficient
     public DateTime date
 }

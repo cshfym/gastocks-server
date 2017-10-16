@@ -9,13 +9,13 @@ class AVGlobalQuote implements IQuote {
 
     String symbol
     String exchangeName
-    Double latestPrice
-    Double currentTradingDayOpen
-    Double currentTradingDayHigh
-    Double currentTradingDayLow
-    Double previousTradingDayClose
-    Double priceChange
-    Float priceChangePercentage
+    double latestPrice
+    double currentTradingDayOpen
+    double currentTradingDayHigh
+    double currentTradingDayLow
+    double previousTradingDayClose
+    double priceChange
+    float priceChangePercentage
     Integer volume
     DateTime lastUpdated
 

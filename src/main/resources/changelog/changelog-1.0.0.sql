@@ -62,7 +62,7 @@ CREATE TABLE `simulation` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `description` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
   `run_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
-  `queued_symbols` integer COLLATE utf8mb4_bin DEFAULT 0,
+  `queued_symbols` integer COLLATE utf8mb4_bin DEFAULT '0.000',
   `attributes` TEXT COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `IDX_Description` (`description`)
@@ -72,16 +72,16 @@ CREATE TABLE `simulation` (
 CREATE TABLE `simulation_transaction` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
   `simulation_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `create_date` DATE COLLATE utf8mb4_bin DEFAULT NULL,
-  `shares` integer COLLATE utf8mb4_bin DEFAULT 0,
+  `create_date` date DEFAULT NULL,
+  `shares` int(11) DEFAULT '0',
   `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `commission` double(9,3) COLLATE utf8mb4_bin DEFAULT NULL,
-  `purchase_price` double(9,3) COLLATE utf8mb4_bin NOT NULL,
-  `sell_price` double(9,3) COLLATE utf8mb4_bin NOT NULL,
-  `purchase_date` DATE COLLATE utf8mb4_bin NOT NULL,
-  `sell_date` DATE COLLATE utf8mb4_bin NOT NULL,
+  `commission` double(9,3) DEFAULT '0.000',
+  `purchase_price` double(9,3) NOT NULL DEFAULT '0.000',
+  `sell_price` double(9,3) NOT NULL DEFAULT '0.000',
+  `purchase_date` date NOT NULL,
+  `sell_date` date NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `IDX_Symbol` (`symbol_id`),
+  KEY `IDX_Symbol` (`symbol_id`),
   KEY `FK_SimulationTransaction_Simulation` (`simulation_id`),
   CONSTRAINT `FK_SimulationTransaction_Simulation` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

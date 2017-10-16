@@ -27,10 +27,10 @@ class AVGlobalQuoteProcessingService {
     SymbolQueueSender symbolQueueSender
 
     @Value('${av.quote.daily.retry.maximum}')
-    Integer QUOTE_RETRY_RETRY_MAXIMUM
+    int QUOTE_RETRY_RETRY_MAXIMUM
 
     @Value('${av.quote.daily.retry.delay}')
-    Integer QUOTE_RETRY_RETRY_DELAY
+    int QUOTE_RETRY_RETRY_DELAY
 
     /**
      * Primary method for processing a symbol into a quote and persisting it. (Move from JMS package later?)

@@ -31,8 +31,8 @@ class SymbolResource {
     @ResponseBody
     @RequestMapping(value="/vse", method=RequestMethod.GET)
     List<ViewSymbolExtended> getViewSymbolExtended(
-        @RequestParam(value="maxQuotePrice", required=false) Double maxQuotePrice,
-        @RequestParam(value="minQuotePrice", required=false) Double minQuotePrice) {
+        @RequestParam(value="maxQuotePrice", required=false) double maxQuotePrice,
+        @RequestParam(value="minQuotePrice", required=false) double minQuotePrice) {
         symbolService.findAllViewSymbolExtendedWithParameters(maxQuotePrice, minQuotePrice)
     }
 

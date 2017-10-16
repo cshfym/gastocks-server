@@ -15,7 +15,7 @@ class ViewSymbolExtendedPersistenceService {
     @Autowired
     ViewSymbolExtendedCacheService viewSymbolExtendedCacheService
 
-    List<ViewSymbolExtended> findAllWithParameters(Double maxQuotePrice = null, Double minQuotePrice = null) {
+    List<ViewSymbolExtended> findAllWithParameters(double maxQuotePrice = null, double minQuotePrice = null) {
 
         def startStopwatch = System.currentTimeMillis()
 
