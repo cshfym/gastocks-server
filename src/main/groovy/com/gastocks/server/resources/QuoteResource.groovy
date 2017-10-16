@@ -39,7 +39,7 @@ class QuoteResource {
     }
 
     @ResponseBody
-    @RequestMapping(value="/audit", method=RequestMethod.GET)
+    @RequestMapping(value="/audit", method=RequestMethod.POST)
     BasicResponse doQuoteAudit() {
         quoteService.queueAllSymbolsForQuoteAudit()
     }

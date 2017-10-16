@@ -136,6 +136,8 @@ class QuoteService {
             lastQuote = quote
         }
 
+        quotesForSymbol.clear()
+
         log.info("Finished quote audit for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startSymbolStopwatch} ms]")
     }
 
