@@ -2,6 +2,8 @@ package com.gastocks.server.services
 
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.QuoteConverter
+import com.gastocks.server.jms.sender.QuoteAuditMessageSender
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
@@ -42,6 +44,9 @@ class QuoteService {
     QuoteAuditPersistenceService quoteAuditPersistenceService
 
     @Autowired
+    QuoteAuditMessageSender quoteAuditMessageSender
+
+    @Autowired
     QuoteConverter quoteConverter
 
     /**
@@ -67,59 +72,73 @@ class QuoteService {
         quotes.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate }
     }
 
-    Map<String,String> doQuoteDataAudit() {
+    BasicResponse queueAllSymbolsForQuoteAudit() {
 
         def startStopwatch = System.currentTimeMillis()
 
-        Double allowablePriceChangePercentThreshold = 0.30  // 10% one-day jump
-
-        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
-
-        allSymbols.each { symbol ->
-
-            def startSymbolStopwatch = System.currentTimeMillis()
-
-            List<PersistableQuote> quotesForSymbol = quotePersistenceService.findAllQuotesForSymbol(symbol)
-
-            quotesForSymbol.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
-
-            PersistableQuote lastQuote
-            boolean breakSymbolSearch = false
-
-            quotesForSymbol.eachWithIndex { quote, ix ->
-
-                if (ix == 0 || breakSymbolSearch) {
-                    lastQuote = quote
-                    return
-                }
-
-                // Check for <= zero price
-                if (quote.price <= 0) {
-                    persistQuoteAudit(symbol, quote, "Quote value <= 0.0")
-                    breakSymbolSearch = true
-                    return
-                }
-
-                // Check for irregular price jumps
-                Double priceChange = Math.abs(quote.price - lastQuote.price).round(3)
-                Double priceChangePercentage = (quote.previousDayClose > 0) ? (quote.priceChange / quote.previousDayClose).round(4) : 0.0000
-                if (priceChangePercentage > allowablePriceChangePercentThreshold) {
-                    persistQuoteAudit(symbol, quote, "Quote price change of [${priceChange}] from [${lastQuote.price}] to [${quote.price}] " +
-                            "greater than allowable threshold of [${allowablePriceChangePercentThreshold}%] (changed [${priceChangePercentage}%])")
-                    breakSymbolSearch = true
-                    return
-                }
-
-                lastQuote = quote
-            }
-
-            log.info("Finished quote audit for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startSymbolStopwatch} ms]")
+        // Clean up all audit records prior to starting.
+        try {
+            quoteAuditPersistenceService.removeAllAudits()
+        } catch (Exception ex) {
+            log.error("Exception removing all audit records!", ex)
+            return new BasicResponse(success: false, message: ex.message)
         }
 
-        log.info("Finished quote audit for all symbols in [${System.currentTimeMillis() - startStopwatch} ms]")
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+        allSymbols.each { symbol ->
+            quoteAuditMessageSender.queueRequest(symbol.identifier)
+        }
+
+        log.info("Finished queueing quote audit for all symbols in [${System.currentTimeMillis() - startStopwatch} ms]")
+
+        new BasicResponse(success: true)
     }
 
     @Transactional
+    void runQuoteAuditForIdentifier(String identifier) {
+
+        double allowablePriceChangePercentThreshold = 0.30  // 10% one-day jump
+
+        def startSymbolStopwatch = System.currentTimeMillis()
+
+        PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(identifier)
+        List<PersistableQuote> quotesForSymbol = quotePersistenceService.findAllQuotesForSymbol(symbol)
+
+        quotesForSymbol.sort { q1, q2 -> q1.quoteDate <=> q2.quoteDate }
+
+        PersistableQuote lastQuote
+        boolean breakSymbolSearch = false
+
+        quotesForSymbol.eachWithIndex { quote, ix ->
+
+            if (ix == 0 || breakSymbolSearch) {
+                lastQuote = quote
+                return
+            }
+
+            // Check for <= zero price
+            if (quote.price <= 0.0) {
+                persistQuoteAudit(symbol, quote, "Quote value <= 0.0")
+                breakSymbolSearch = true
+                return
+            }
+
+            // Check for irregular price jumps
+            double priceChange = Math.abs(quote.price - lastQuote.price).round(3)
+            double priceChangePercentage = (quote.previousDayClose > 0) ? (quote.priceChange / quote.previousDayClose).round(4) : 0.0000
+            if (priceChangePercentage > allowablePriceChangePercentThreshold) {
+                persistQuoteAudit(symbol, quote, "Quote price change of [${priceChange}] from [${lastQuote.price}] to [${quote.price}] " +
+                        "greater than allowable threshold of [${allowablePriceChangePercentThreshold}%] (changed [${priceChangePercentage}%])")
+                breakSymbolSearch = true
+                return
+            }
+
+            lastQuote = quote
+        }
+
+        log.info("Finished quote audit for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startSymbolStopwatch} ms]")
+    }
+
     void persistQuoteAudit(PersistableSymbol symbol, PersistableQuote quote, String auditText) {
         quoteAuditPersistenceService.persistNewQuoteAudit(symbol, quote, auditText)
     }

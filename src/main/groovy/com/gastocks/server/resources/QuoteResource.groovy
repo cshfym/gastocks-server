@@ -1,5 +1,6 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.quote.Quote
 import com.gastocks.server.services.QuoteService
@@ -39,8 +40,8 @@ class QuoteResource {
 
     @ResponseBody
     @RequestMapping(value="/audit", method=RequestMethod.GET)
-    Map<String,String> doQuoteAudit() {
-        quoteService.doQuoteDataAudit()
+    BasicResponse doQuoteAudit() {
+        quoteService.queueAllSymbolsForQuoteAudit()
     }
 
 
