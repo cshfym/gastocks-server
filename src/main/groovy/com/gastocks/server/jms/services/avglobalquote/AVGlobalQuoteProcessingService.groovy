@@ -43,7 +43,8 @@ class AVGlobalQuoteProcessingService {
 
         def persistableSymbol = symbolPersistenceService.findById(symbol.symbolId)
 
-        def quote = null
+        def quote
+
         try {
             quote = quoteService.getQuote(persistableSymbol.identifier)
         } catch (Exception ex) {

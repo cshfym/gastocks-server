@@ -240,8 +240,9 @@ class SymbolService {
             previousQuote = quote
         }
 
-        log.info("Done backfilling price change data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        symbolQuotes.clear()
 
+        log.info("Done backfilling price change data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
     boolean allPriceDataAvailable(PersistableQuote quote) {
