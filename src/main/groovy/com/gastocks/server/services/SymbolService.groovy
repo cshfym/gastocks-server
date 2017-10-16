@@ -15,12 +15,18 @@ import com.gastocks.server.services.domain.ViewSymbolExtendedPersistenceService
 import com.gastocks.server.util.StatisticsUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+
+import javax.persistence.EntityManager
 
 @Slf4j
 @Service
 class SymbolService {
+
+    @Autowired
+    EntityManager entityManager
 
     @Autowired
     SymbolPersistenceService symbolPersistenceService
@@ -45,6 +51,9 @@ class SymbolService {
 
     @Autowired
     StatisticsUtility statisticsUtility
+
+    @Value('${symbol.extended.backfill.force}')
+    Boolean symbolExtendedBackfillForce
 
     /**
      * Finds all symbols available
@@ -89,7 +98,7 @@ class SymbolService {
      * @param identifier
      */
     @Transactional
-    void doBackfillForSymbol(String identifier) {
+    void doBackfillForSymbolExtended(String identifier) {
 
         def startStopwatch = System.currentTimeMillis()
 
@@ -100,7 +109,12 @@ class SymbolService {
 
         List<PersistableSymbolExtended> existingPersistableSymbolExtendedList = symbolExtendedPersistenceService.findAllBySymbol(persistableSymbol)
 
+        boolean terminateBackfill = false
+        int updateCount = 0
+
         symbolQuotes.each { quote ->
+
+            if (terminateBackfill) { return }
 
             def back52Weeks = quote.quoteDate - 364
             def quotesForDate = symbolQuotes.findAll { (it.quoteDate <= quote.quoteDate) && (it.quoteDate >= back52Weeks) }
@@ -108,7 +122,7 @@ class SymbolService {
             def max52Weeks = quotesForDate.max { it.price }
             def min52Weeks = quotesForDate.min { it.price }
             def avg52Weeks = pricesForDates ? ((double)(pricesForDates.sum { it } / pricesForDates.size())).round(2) : 0.0d
-            def standardDev = statisticsUtility.getStandardDeviation(pricesForDates)
+            def standardDev = statisticsUtility.getStandardDeviation(pricesForDates).round(3)
 
             def persistableSymbolExtended = existingPersistableSymbolExtendedList.find {
                 (it.symbol.identifier == persistableSymbol.identifier) && (it.quoteDate == quote.quoteDate)
@@ -118,7 +132,14 @@ class SymbolService {
                 persistableSymbolExtended = new PersistableSymbolExtended()
             } else {
                 if (symbolExtendedValuesAreIdentical(persistableSymbolExtended, max52Weeks.price, min52Weeks.price, avg52Weeks, standardDev)) {
-                    return // No update needed.
+
+                    // No update needed - terminate fill. It's possible older quotes haven't been filled.
+                    if (!symbolExtendedBackfillForce) {
+                        log.info("Found PersistableSymbolExtended [${identifier}] not requiring update on [${persistableSymbolExtended.quoteDate}], terminating backfill.")
+                        terminateBackfill = true
+                    }
+
+                    return
                 }
             }
 
@@ -134,13 +155,18 @@ class SymbolService {
 
             symbolExtendedPersistenceService.persistSymbolExtended(persistableSymbolExtended)
 
+            updateCount++
+
             quotesForDate.clear()
         }
 
         symbolQuotes.clear()
         existingPersistableSymbolExtendedList.clear()
 
-        log.info("Done backfilling extended symbol data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        entityManager.flush()
+
+        log.info("Done backfilling [${updateCount}] extended symbol data(s) for [${persistableSymbol.identifier}] " +
+                "in [${System.currentTimeMillis() - startStopwatch} ms] with terminateBackfill [${terminateBackfill}]")
     }
 
     boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, Double max52Weeks, Double min52Weeks, Double avg52Weeks, Double standardDev) {

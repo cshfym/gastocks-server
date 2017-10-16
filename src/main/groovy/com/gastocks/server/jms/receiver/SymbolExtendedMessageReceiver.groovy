@@ -19,6 +19,6 @@ class SymbolExtendedMessageReceiver {
 
         log.debug "Received [${identifier}] from queue ${SymbolExtendedQueueSender.QUEUE_SYMBOL_EXTENDED_BACKFILL}"
 
-        symbolService.doBackfillForSymbol(identifier)
+        symbolService.doBackfillForSymbolExtended(identifier)
     }
 }
