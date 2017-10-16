@@ -14,6 +14,8 @@ DELETE FROM `symbol`;
 DROP TABLE `symbol`;
 DELETE FROM `exchange_market`;
 DROP TABLE `exchange_market`;
+DELETE FROM `quote_audit`;
+DROP TABLE `quote_audit`;
 
 CREATE TABLE `symbol_extended` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
@@ -112,6 +114,21 @@ CREATE TABLE `symbol` (
 
 
 CREATE UNIQUE INDEX `idx_symbol_identifier_exchange_market_id`  ON `ga_stocks`.`symbol` (identifier, exchange_market_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+
+
+CREATE TABLE `quote_audit` (
+  `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `symbol_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `quote_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `audit_text` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `IDX_SymbolId` (`symbol_id`),
+  INDEX `IDX_QuoteId` (`quote_id`),
+  UNIQUE KEY `IDX_SymbolId_QuoteId` (`symbol_id`, `quote_id`),
+  CONSTRAINT `FK_QuoteAudit_Symbol` FOREIGN KEY (`symbol_id`) REFERENCES `symbol` (`id`),
+  CONSTRAINT `FK_QuoteAudit_Quote` FOREIGN KEY (`quote_id`) REFERENCES `quote` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 CREATE TABLE `holiday_calendar` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,

@@ -37,4 +37,11 @@ class QuoteResource {
         quotes
     }
 
+    @ResponseBody
+    @RequestMapping(value="/audit", method=RequestMethod.GET)
+    Map<String,String> doQuoteAudit() {
+        quoteService.doQuoteDataAudit()
+    }
+
+
 }
