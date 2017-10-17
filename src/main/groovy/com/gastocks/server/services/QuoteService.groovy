@@ -3,9 +3,12 @@ package com.gastocks.server.services
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.QuoteConverter
 import com.gastocks.server.jms.sender.QuoteAuditMessageSender
+import com.gastocks.server.jms.sender.SymbolQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.domain.PersistableQuoteAudit
 import com.gastocks.server.models.domain.PersistableSymbol
+import com.gastocks.server.models.domain.jms.QueueableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.quote.Quote
 import com.gastocks.server.services.domain.QuoteAuditPersistenceService
@@ -47,6 +50,9 @@ class QuoteService {
     QuoteAuditMessageSender quoteAuditMessageSender
 
     @Autowired
+    SymbolQueueSender symbolQueueSender
+
+    @Autowired
     QuoteConverter quoteConverter
 
     /**
@@ -78,7 +84,7 @@ class QuoteService {
 
         // Clean up all audit records prior to starting.
         try {
-            quoteAuditPersistenceService.removeAllAudits()
+            quoteAuditPersistenceService.deleteAllAudits()
         } catch (Exception ex) {
             log.error("Exception removing all audit records!", ex)
             return new BasicResponse(success: false, message: ex.message)
@@ -86,7 +92,7 @@ class QuoteService {
 
         List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
         allSymbols.each { symbol ->
-            quoteAuditMessageSender.queueRequest(symbol.identifier)
+            quoteAuditMessageSender.queueAuditRequest(symbol.identifier)
         }
 
         log.info("Finished queueing quote audit for all symbols in [${System.currentTimeMillis() - startStopwatch} ms]")
@@ -94,17 +100,70 @@ class QuoteService {
         new BasicResponse(success: true)
     }
 
+    /**
+     * Iterates all previously loaded quote_audit records, enqueue for processing.
+     * @return {@link BasicResponse}
+     */
+    BasicResponse doQueueSymbolsForAuditReload() {
+
+        List<PersistableQuoteAudit> quoteAuditList = quoteAuditPersistenceService.findAll()
+
+        quoteAuditList.each { quoteAudit ->
+            quoteAuditMessageSender.queueAuditReloadRequest(quoteAudit.id)
+        }
+
+        quoteAuditList.clear()
+
+        new BasicResponse(success: true, message: "[${quoteAuditList?.size()}] quote_audit records queued.")
+    }
+
+    /**
+     * Iterates all previously loaded quote_audit records, removes existing quote data, and fetches new quotes.
+     * @return {@link BasicResponse}
+     */
+    @Transactional
+    void doQuoteAuditReload(String auditId) {
+
+        PersistableQuoteAudit quoteAudit = quoteAuditPersistenceService.findById(auditId)
+
+        if (!quoteAudit) {
+            log.warn("Could not find PersistableQuoteAudit with id [${auditId}]")
+            return
+        }
+
+        PersistableSymbol symbol = symbolPersistenceService.findById(quoteAudit.symbol.id)
+
+        quoteAuditPersistenceService.deleteAudit(quoteAudit) // Delete audit record linked to quote
+
+        List<PersistableQuote> quotes = quotePersistenceService.findAllQuotesForSymbol(symbol)
+        log.info("Found [${quotes?.size()}] quotes for symbol [${symbol.identifier}], proceeding to delete quotes.")
+        def startStopwatch = System.currentTimeMillis()
+        quotes.each { quote ->
+            quotePersistenceService.deleteQuote(quote)
+        }
+        log.info("Deleted [${quotes?.size()}] quotes for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+
+        symbolQueueSender.queueSymbol(
+            new QueueableSymbol(symbolId: quoteAudit.symbol.id, identifier: quoteAudit.symbol.identifier),
+            SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA
+        )
+
+        quotes.clear()
+
+        log.info("Symbol [${symbol.identifier}] enqueued on [${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA}] for full symbol re-load.")
+    }
+
     @Transactional
     void runQuoteAuditForIdentifier(String identifier) {
 
         // Establish the set of allowable thresholds
         List<PriceChangeThreshold> thresholds = []
-        thresholds << new PriceChangeThreshold(priceRangeLow: 0.000, priceRangeHigh: 9.999, thresholdPercentage: 1000.00)     //1000%
-        thresholds << new PriceChangeThreshold(priceRangeLow: 10.000, priceRangeHigh: 19.999, thresholdPercentage: 2.00)      //200%
-        thresholds << new PriceChangeThreshold(priceRangeLow: 20.000, priceRangeHigh: 29.999, thresholdPercentage: 1.00)      //100%
-        thresholds << new PriceChangeThreshold(priceRangeLow: 30.000, priceRangeHigh: 39.999, thresholdPercentage: 0.50)      //50%
-        thresholds << new PriceChangeThreshold(priceRangeLow: 40.000, priceRangeHigh: 49.999, thresholdPercentage: 0.25)      //25%
-        thresholds << new PriceChangeThreshold(priceRangeLow: 50.000, priceRangeHigh: 99999999.999, thresholdPercentage: 0.1) //10%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 0.000, priceRangeHigh: 9.999, thresholdPercentage: 1000.00)      //1000%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 10.000, priceRangeHigh: 19.999, thresholdPercentage: 2.00)       //200%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 20.000, priceRangeHigh: 29.999, thresholdPercentage: 1.00)       //100%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 30.000, priceRangeHigh: 39.999, thresholdPercentage: 0.50)       //50%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 40.000, priceRangeHigh: 49.999, thresholdPercentage: 0.35)       //35%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 50.000, priceRangeHigh: 99999999.999, thresholdPercentage: 0.25) //25%
 
         def startSymbolStopwatch = System.currentTimeMillis()
 

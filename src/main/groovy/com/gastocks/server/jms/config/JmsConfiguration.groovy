@@ -30,6 +30,9 @@ class JmsConfiguration {
     @Value('${quote.audit.queue.consumer.queue.concurrency}')
     String QUOTE_AUDIT_CONSUMER_QUEUE_CONCURRENCY
 
+    @Value('${quote.audit.reload.consumer.queue.concurrency}')
+    String QUOTE_AUDIT_RELOAD_CONSUMER_QUEUE_CONCURRENCY
+
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -91,7 +94,7 @@ class JmsConfiguration {
     }
 
     /**
-     * Bean corresponds to the "quoteAuditFactory" JMS listener for consuming quote price change backfill requests.
+     * Bean corresponds to the "quoteAuditFactory" JMS listener for consuming quote audit requests.
      * @param connectionFactory
      * @param configurer
      * @return {@JmsListenerContainerFactory}
@@ -104,6 +107,23 @@ class JmsConfiguration {
         configurer.configure(factory, connectionFactory)
         factory
     }
+
+    /**
+     * Bean corresponds to the "quoteAuditReloadFactory" JMS listener for consuming quote audit correction requests.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
+    @Bean
+    JmsListenerContainerFactory<?> quoteAuditReloadFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
+        def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency(QUOTE_AUDIT_RELOAD_CONSUMER_QUEUE_CONCURRENCY)
+        configurer.configure(factory, connectionFactory)
+        factory
+    }
+
+
 
     @Bean // Serialize message content to json using TextMessage
     MessageConverter jacksonJmsMessageConverter() {

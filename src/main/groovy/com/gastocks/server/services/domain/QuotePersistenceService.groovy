@@ -145,4 +145,7 @@ class QuotePersistenceService {
         quotes
     }
 
+    void deleteQuote(PersistableQuote quote) {
+        quoteRepository.delete(quote)
+    }
 }

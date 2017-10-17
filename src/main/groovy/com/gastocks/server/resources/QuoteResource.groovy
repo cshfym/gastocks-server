@@ -44,4 +44,10 @@ class QuoteResource {
         quoteService.queueAllSymbolsForQuoteAudit()
     }
 
+    @ResponseBody
+    @RequestMapping(value="/audit/reload", method=RequestMethod.POST)
+    BasicResponse doQuoteAuditReload() {
+        quoteService.doQueueSymbolsForAuditReload()
+    }
+
 }

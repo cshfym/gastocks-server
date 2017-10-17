@@ -13,20 +13,35 @@ class QuoteAuditMessageSender {
     @Autowired
     ApplicationContext applicationContext
 
-    /* Queue for simulation requests */
-    final static String QUEUE_QUOTE_AUDIT_BACKFILL = "com.gastocks.queue.quote.audit"
+    /* Queue for audit requests */
+    final static String QUEUE_QUOTE_AUDIT = "com.gastocks.queue.quote.audit"
+
+    /* Queue for audit reload/correction requests */
+    final static String QUEUE_QUOTE_AUDIT_RELOAD = "com.gastocks.queue.quote.audit.reload"
 
     /**
      * Queues a symbol for quote audit processing
      * @param identifier
      */
-    void queueRequest(String identifier) {
+    void queueAuditRequest(String identifier) {
 
         JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
 
         log.info "Queueing an symbol for quote audit processing: [${identifier}]"
 
-        jmsTemplate.convertAndSend(QUEUE_QUOTE_AUDIT_BACKFILL, identifier)
+        jmsTemplate.convertAndSend(QUEUE_QUOTE_AUDIT, identifier)
     }
 
+    /**
+     * Queues a symbol for quote audit correction/reload processing
+     * @param identifier
+     */
+    void queueAuditReloadRequest(String auditId) {
+
+        JmsTemplate jmsTemplate = applicationContext.getBean(JmsTemplate.class)
+
+        log.info "Queueing a quote audit correction/reload processing with id [${auditId}]"
+
+        jmsTemplate.convertAndSend(QUEUE_QUOTE_AUDIT_RELOAD, auditId)
+    }
 }

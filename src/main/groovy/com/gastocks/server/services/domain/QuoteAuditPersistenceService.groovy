@@ -32,12 +32,20 @@ class QuoteAuditPersistenceService {
         quoteAuditRepository.save(persistableQuoteAudit)
     }
 
+    PersistableQuoteAudit findById(String id) {
+        quoteAuditRepository.findOne(id)
+    }
+
     List<PersistableQuoteAudit> findAll() {
         quoteAuditRepository.findAll()
     }
 
+    void deleteAudit(PersistableQuoteAudit audit) {
+        quoteAuditRepository.delete(audit)
+    }
+
     @Transactional
-    void removeAllAudits() {
+    void deleteAllAudits() {
 
         int count = 0
         def startStopwatch = System.currentTimeMillis()
