@@ -97,7 +97,14 @@ class QuoteService {
     @Transactional
     void runQuoteAuditForIdentifier(String identifier) {
 
-        double allowablePriceChangePercentThreshold = 0.30  // 10% one-day jump
+        // Establish the set of allowable thresholds
+        List<PriceChangeThreshold> thresholds = []
+        thresholds << new PriceChangeThreshold(priceRangeLow: 0.000, priceRangeHigh: 9.999, thresholdPercentage: 1000.00)     //1000%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 10.000, priceRangeHigh: 19.999, thresholdPercentage: 2.00)      //200%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 20.000, priceRangeHigh: 29.999, thresholdPercentage: 1.00)      //100%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 30.000, priceRangeHigh: 39.999, thresholdPercentage: 0.50)      //50%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 40.000, priceRangeHigh: 49.999, thresholdPercentage: 0.25)      //25%
+        thresholds << new PriceChangeThreshold(priceRangeLow: 50.000, priceRangeHigh: 99999999.999, thresholdPercentage: 0.1) //10%
 
         def startSymbolStopwatch = System.currentTimeMillis()
 
@@ -123,12 +130,17 @@ class QuoteService {
                 return
             }
 
+            // Find the threshold % applicable to this price
+            def thresholdRange = thresholds.find { threshold ->
+                (quote.price >= threshold.priceRangeLow) && (quote.price <= threshold.priceRangeHigh)
+            }
+
             // Check for irregular price jumps
             double priceChange = Math.abs(quote.price - lastQuote.price).round(3)
-            double priceChangePercentage = (quote.previousDayClose > 0) ? (quote.priceChange / quote.previousDayClose).round(4) : 0.0000
-            if (priceChangePercentage > allowablePriceChangePercentThreshold) {
+            double priceChangePercentage = (quote.price > 0) ? (priceChange / quote.price).round(4) : 0.0000
+            if (priceChangePercentage > thresholdRange.thresholdPercentage) {
                 persistQuoteAudit(symbol, quote, "Quote price change of [${priceChange}] from [${lastQuote.price}] to [${quote.price}] " +
-                        "greater than allowable threshold of [${allowablePriceChangePercentThreshold}%] (changed [${priceChangePercentage}%])")
+                        "greater than allowable threshold of [${thresholdRange.thresholdPercentage}%] (changed [${priceChangePercentage}%])")
                 breakSymbolSearch = true
                 return
             }
@@ -182,5 +194,11 @@ class QuoteService {
         log.info("Found [${missingDates.size()}] missing quote dates for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms] ")
 
         missingDates ? true : false
+    }
+
+    private class PriceChangeThreshold {
+        double priceRangeLow
+        double priceRangeHigh
+        double thresholdPercentage
     }
 }

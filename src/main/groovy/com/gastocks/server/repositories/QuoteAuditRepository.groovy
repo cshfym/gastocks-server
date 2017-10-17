@@ -8,5 +8,4 @@ interface QuoteAuditRepository extends CrudRepository<PersistableQuoteAudit, Str
 
     PersistableQuoteAudit findBySymbol(PersistableSymbol symbol)
 
-    void deleteBySymbol(PersistableSymbol symbol)
 }

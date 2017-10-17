@@ -36,16 +36,11 @@ class QuoteAuditPersistenceService {
         quoteAuditRepository.findAll()
     }
 
-    PersistableQuoteAudit findAllBySymbol(PersistableSymbol symbol) {
-        quoteAuditRepository.findBySymbol(symbol)
-    }
-
-    // TODO This could probably be improved by using a single HQL statement
     @Transactional
     void removeAllAudits() {
 
-        def startStopwatch = System.currentTimeMillis()
         int count = 0
+        def startStopwatch = System.currentTimeMillis()
 
         log.info("Removing ALL entities for QueueAudit")
 
@@ -55,7 +50,7 @@ class QuoteAuditPersistenceService {
             count++
         }
 
-        log.info("ALL [${count}] QueueAudit entities removed in [${System.currentTimeMillis() - startStopwatch} ms]")
+        log.info("Completed removal; [${count}] QueueAudit entities removed in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
 }

@@ -44,5 +44,4 @@ class QuoteResource {
         quoteService.queueAllSymbolsForQuoteAudit()
     }
 
-
 }
