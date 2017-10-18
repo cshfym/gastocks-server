@@ -63,7 +63,7 @@ class SymbolService {
 
         def startStopwatch = System.currentTimeMillis()
 
-        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         def symbols = allSymbols.collect { persistableSymbol ->
             symbolConverter.fromPersistableSymbol(persistableSymbol)
@@ -84,7 +84,7 @@ class SymbolService {
      */
     BasicResponse backfillAllSymbols() {
 
-        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         allSymbols.each { symbol ->
             symbolExtendedQueueSender.queueRequest(symbol.identifier)
@@ -182,7 +182,7 @@ class SymbolService {
      */
     BasicResponse backfillAllSymbolsPriceChangeData() {
 
-        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         allSymbols.each { symbol ->
             quotePriceChangeQueueSender.queueRequest(symbol.identifier)

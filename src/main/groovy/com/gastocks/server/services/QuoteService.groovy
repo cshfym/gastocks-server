@@ -90,7 +90,7 @@ class QuoteService {
             return new BasicResponse(success: false, message: ex.message)
         }
 
-        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> allSymbols = symbolPersistenceService.findAllActiveSymbols()
         allSymbols.each { symbol ->
             quoteAuditMessageSender.queueAuditRequest(symbol.identifier)
         }

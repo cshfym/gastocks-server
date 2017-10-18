@@ -31,16 +31,29 @@ class AVTimeSeriesAdjustedHandlerService {
     ExchangeMarketPersistenceService exchangeMarketPersistenceService
 
     /**
-     * Fetch all active symbols and persist quote response, if available.
+     * Fetch all active symbols and queue for quote fetch
      */
-    void fetchAndPersistAllQuotes() {
+    void queueAllSymbolsForQuoteFetch() {
 
-        List<PersistableSymbol> symbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> symbols = symbolPersistenceService.findAllActiveSymbols()
 
         log.info("Loaded [${String.valueOf(symbols.size())}] active symbols, queueing symbols for quote processing.")
 
         symbols.eachWithIndex { symbol, index ->
-            // if (index > 0) { return }
+            queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
+        }
+    }
+
+    /**
+     * Fetch partial list of symbols and queue for quote fetch
+     */
+    void queuePartialSymbolListForQuoteFetch(List<String> identifiers) {
+
+        List<PersistableSymbol> symbols = symbolPersistenceService.findByIdentifiers(identifiers)
+
+        log.info("Loaded [${String.valueOf(symbols.size())}] symbols from list provided, queueing symbols for quote processing.")
+
+        symbols.eachWithIndex { symbol, index ->
             queueService.queueWithPersistableSymbol(symbol, SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA)
         }
     }

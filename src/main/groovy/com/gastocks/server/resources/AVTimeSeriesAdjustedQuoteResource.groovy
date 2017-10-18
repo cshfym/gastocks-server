@@ -7,6 +7,7 @@ import com.gastocks.server.services.avtimeseriesadjusted.AVTimeSeriesAdjustedQuo
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -86,9 +87,21 @@ class AVTimeSeriesAdjustedQuoteResource {
     @RequestMapping(value="batchAll", method=RequestMethod.POST)
     BasicResponse doBatchAll() {
 
-        fetchAndPersistService.fetchAndPersistAllQuotes()
+        fetchAndPersistService.queueAllSymbolsForQuoteFetch()
 
         new BasicResponse(success: true, message: "")
     }
 
+    /**
+     * Fetch and persist partial list of quotes by identifier.
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="batch", method=RequestMethod.POST)
+    BasicResponse doBatch(@RequestBody List<String> identifiers) {
+
+        fetchAndPersistService.queuePartialSymbolListForQuoteFetch(identifiers)
+
+        new BasicResponse(success: true, message: "")
+    }
 }

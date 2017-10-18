@@ -1,6 +1,5 @@
 package com.gastocks.server.jms.services.avtimeseriesadjusted
 
-import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedQuote
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.jms.QueueableSymbol

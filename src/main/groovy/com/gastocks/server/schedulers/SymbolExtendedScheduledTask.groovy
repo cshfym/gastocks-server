@@ -21,7 +21,7 @@ class SymbolExtendedScheduledTask {
     @Scheduled(cron = '${symbol.extended.backfill.daily.schedule}')
     void process() {
 
-        List<PersistableSymbol> symbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> symbols = symbolPersistenceService.findAllActiveSymbols()
 
         log.info("Loaded [${String.valueOf(symbols.size())}] active symbols, queueing symbols for extended data backfill processing.")
 

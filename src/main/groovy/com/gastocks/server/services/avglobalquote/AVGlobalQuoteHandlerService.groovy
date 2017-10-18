@@ -30,7 +30,7 @@ class AVGlobalQuoteHandlerService {
      */
     void fetchAndQueueAllQuotesForAllSymbols() {
 
-        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllSymbols()
+        List<PersistableSymbol> activeSymbols = symbolPersistenceService.findAllActiveSymbols()
 
         log.info("Loaded [${String.valueOf(activeSymbols.size())}] active symbols, queueing symbols for quote processing.")
 
