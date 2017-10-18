@@ -14,4 +14,7 @@ class TechnicalQuote extends Quote {
     MACDTechnicalData macdParameters
 
     RSITechnicalData rsiParameters
+
+    OBVTechnicalData onBalanceVolumeData
+
 }

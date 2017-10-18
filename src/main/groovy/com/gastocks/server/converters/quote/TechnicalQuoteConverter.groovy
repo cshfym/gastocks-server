@@ -3,6 +3,7 @@ package com.gastocks.server.converters.quote
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.technical.response.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
+import com.gastocks.server.models.technical.response.OBVTechnicalData
 import com.gastocks.server.models.technical.response.RSITechnicalData
 import com.gastocks.server.models.technical.response.TechnicalQuote
 import com.gastocks.server.models.technical.response.TechnicalQuoteMetadata
@@ -61,6 +62,11 @@ class TechnicalQuoteConverter {
                 overSoldCrossoverNegative: technicalData.rsiTechnicalData.overSoldCrossoverNegative,
                 centerLineCrossoverNegative: technicalData.rsiTechnicalData.centerLineCrossoverNegative,
                 centerLineCrossoverPositive: technicalData.rsiTechnicalData.centerLineCrossoverPositive
+            ),
+
+            // On-Balance Volume Data
+            onBalanceVolumeData: new OBVTechnicalData(
+                onBalanceVolume: technicalData.onBalanceVolumeData.onBalanceVolume
             ),
 
             // Averages

@@ -36,6 +36,9 @@ class TechnicalQuoteService {
     @Autowired
     RSIService rsiService
 
+    @Autowired
+    OBVService onBalanceVolumeService
+
     /**
      * Retrieve all technical quotes for a given symbol identifier
      * Implicitly ordered by quote date descending
@@ -88,6 +91,9 @@ class TechnicalQuoteService {
         // RSI
         rsiService.buildRSITechnicalData(technicalDataWrapperList, quoteData, parameters.rsiRequestParameters)
         rsiService.buildRSISignalData(technicalDataWrapperList)
+
+        // OBV
+        onBalanceVolumeService.buildOBVTechnicalData(technicalDataWrapperList, quoteData)
 
         technicalDataWrapperList
     }
