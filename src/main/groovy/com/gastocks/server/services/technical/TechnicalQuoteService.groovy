@@ -93,7 +93,7 @@ class TechnicalQuoteService {
         rsiService.buildRSISignalData(technicalDataWrapperList)
 
         // OBV
-        onBalanceVolumeService.buildOBVTechnicalData(technicalDataWrapperList, quoteData)
+        onBalanceVolumeService.buildOBVTechnicalData(technicalDataWrapperList, quoteData, parameters.onBalanceVolumeRequestParameters)
 
         technicalDataWrapperList
     }

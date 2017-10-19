@@ -74,7 +74,8 @@ class SimulationService {
         TechnicalQuoteRequestParameters technicalQuoteRequestParameters =
             new TechnicalQuoteRequestParameters(
                 macdRequestParameters: simulationRequest.macdParameters,
-                rsiRequestParameters: simulationRequest.rsiRequestParameters
+                rsiRequestParameters: simulationRequest.rsiRequestParameters,
+                onBalanceVolumeRequestParameters: simulationRequest.onBalanceVolumeRequestParameters
             )
 
         List<TechnicalQuote> quotes = technicalQuoteService.getTechnicalQuotesForSymbol(simulationSymbol.symbol, technicalQuoteRequestParameters)

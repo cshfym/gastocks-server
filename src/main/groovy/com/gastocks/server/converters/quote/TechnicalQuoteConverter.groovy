@@ -66,7 +66,9 @@ class TechnicalQuoteConverter {
 
             // On-Balance Volume Data
             onBalanceVolumeData: new OBVTechnicalData(
-                onBalanceVolume: technicalData.onBalanceVolumeData.onBalanceVolume
+                onBalanceVolume: technicalData.onBalanceVolumeData.onBalanceVolume,
+                onBalanceVolumeShort: technicalData.onBalanceVolumeData.onBalanceVolumeShort,
+                onBalanceVolumeLong: technicalData.onBalanceVolumeData.onBalanceVolumeLong
             ),
 
             // Averages

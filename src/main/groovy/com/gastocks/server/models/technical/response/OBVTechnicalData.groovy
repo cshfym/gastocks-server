@@ -6,5 +6,8 @@ package com.gastocks.server.models.technical.response
 class OBVTechnicalData {
 
     int onBalanceVolume
+    double onBalanceVolumeShort
+    double onBalanceVolumeLong
+
 
 }

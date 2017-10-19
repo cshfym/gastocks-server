@@ -1,6 +1,7 @@
 package com.gastocks.server.models.simulation
 
 import com.gastocks.server.models.technical.request.MACDRequestParameters
+import com.gastocks.server.models.technical.request.OBVRequestParameters
 import com.gastocks.server.models.technical.request.RSIRequestParameters
 
 import java.beans.Transient
@@ -33,6 +34,8 @@ class SimulationRequest {
     MACDRequestParameters macdParameters
 
     RSIRequestParameters rsiRequestParameters
+
+    OBVRequestParameters onBalanceVolumeRequestParameters
 
     @Transient
     @Override

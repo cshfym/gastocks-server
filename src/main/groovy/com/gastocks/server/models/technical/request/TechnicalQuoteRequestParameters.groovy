@@ -6,4 +6,6 @@ class TechnicalQuoteRequestParameters {
 
     RSIRequestParameters rsiRequestParameters
 
+    OBVRequestParameters onBalanceVolumeRequestParameters
+
 }
