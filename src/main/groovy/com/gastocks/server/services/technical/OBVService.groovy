@@ -5,16 +5,17 @@ import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.request.OBVRequestParameters
 import com.gastocks.server.models.technical.response.OBVTechnicalData
 import groovy.util.logging.Slf4j
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Slf4j
 @Service
 class OBVService {
 
+    static double OBV_RATIO_ADJUSTMENT = 1000 // i.e. express OBV in units of 1,000.
+
     void buildOBVTechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, OBVRequestParameters requestParameters) {
 
-        OBVTechnicalData previousOnBalanceVolume
+        OBVTechnicalData previousOnBalanceVolumeData
 
         quoteData.eachWithIndex { quote, ix ->
 
@@ -26,28 +27,29 @@ class OBVService {
 
             if (ix == 0) {
                 onBalanceVolumeData.onBalanceVolume = 0
-                previousOnBalanceVolume = onBalanceVolumeData
+                previousOnBalanceVolumeData = onBalanceVolumeData
                 return
             }
 
-            double priceChange = quote.priceChange - quoteData[ix-1].price
+            double priceChange = quote.price - quoteData[ix-1].price
+
+            // double adjustedVolume = ((double) quote.volume /  OBV_RATIO_ADJUSTMENT).round(2)
 
             if (priceChange == 0) {
-                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolume.onBalanceVolume
+                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume
             } else if (priceChange > 0) {
-                onBalanceVolumeData.onBalanceVolume += quote.volume
+                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume + quote.volume //  adjustedVolume
             } else {
-                onBalanceVolumeData.onBalanceVolume -= quote.volume
+                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume - quote.volume // adjustedVolume
             }
 
             onBalanceVolumeData.onBalanceVolumeShort = TechnicalToolsService.calculateEMA(onBalanceVolumeData.onBalanceVolume,
-                    previousOnBalanceVolume.onBalanceVolume, requestParameters.onBalanceVolumeShortPeriod)
+                    previousOnBalanceVolumeData.onBalanceVolume, requestParameters.onBalanceVolumeShortPeriod)
 
             onBalanceVolumeData.onBalanceVolumeLong = TechnicalToolsService.calculateEMA(onBalanceVolumeData.onBalanceVolume,
-                    previousOnBalanceVolume.onBalanceVolume, requestParameters.onBalanceVolumeLongPeriod)
+                    previousOnBalanceVolumeData.onBalanceVolume, requestParameters.onBalanceVolumeLongPeriod)
 
-            previousOnBalanceVolume = onBalanceVolumeData
-
+            previousOnBalanceVolumeData = onBalanceVolumeData
         }
 
     }
