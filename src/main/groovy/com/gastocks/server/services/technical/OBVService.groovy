@@ -33,14 +33,14 @@ class OBVService {
 
             double priceChange = quote.price - quoteData[ix-1].price
 
-            // double adjustedVolume = ((double) quote.volume /  OBV_RATIO_ADJUSTMENT).round(2)
+            double adjustedVolume = ((double) quote.volume /  OBV_RATIO_ADJUSTMENT).round(2)
 
             if (priceChange == 0) {
                 onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume
             } else if (priceChange > 0) {
-                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume + quote.volume //  adjustedVolume
+                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume + adjustedVolume
             } else {
-                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume - quote.volume // adjustedVolume
+                onBalanceVolumeData.onBalanceVolume = previousOnBalanceVolumeData.onBalanceVolume - adjustedVolume
             }
 
             onBalanceVolumeData.onBalanceVolumeShort = TechnicalToolsService.calculateEMA(onBalanceVolumeData.onBalanceVolume,
