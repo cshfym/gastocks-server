@@ -3,6 +3,7 @@ package com.gastocks.server.resources
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.quote.Quote
+import com.gastocks.server.services.QuoteAuditService
 import com.gastocks.server.services.QuoteService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,9 @@ class QuoteResource {
 
     @Autowired
     QuoteService quoteService
+
+    @Autowired
+    QuoteAuditService quoteAuditService
 
     @ResponseBody
     @RequestMapping(value="/{symbol}", method=RequestMethod.GET)
@@ -41,13 +45,13 @@ class QuoteResource {
     @ResponseBody
     @RequestMapping(value="/audit", method=RequestMethod.POST)
     BasicResponse doQuoteAudit() {
-        quoteService.queueAllSymbolsForQuoteAudit()
+        quoteAuditService.queueAllSymbolsForQuoteAudit()
     }
 
     @ResponseBody
     @RequestMapping(value="/audit/reload", method=RequestMethod.POST)
     BasicResponse doQuoteAuditReload() {
-        quoteService.doQueueSymbolsForAuditReload()
+        quoteAuditService.doQueueSymbolsForAuditReload()
     }
 
 }

@@ -1,7 +1,7 @@
 package com.gastocks.server.jms.receiver
 
 import com.gastocks.server.jms.sender.QuoteAuditMessageSender
-import com.gastocks.server.services.QuoteService
+import com.gastocks.server.services.QuoteAuditService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jms.annotation.JmsListener
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component
 class QuoteAuditMessageReceiver {
 
     @Autowired
-    QuoteService quoteService
+    QuoteAuditService quoteAuditService
 
     @JmsListener(destination = QuoteAuditMessageSender.QUEUE_QUOTE_AUDIT, containerFactory = "quoteAuditFactory")
     void receiveQuoteAuditMessage(String identifier) {
 
         log.debug "Received [${identifier}] from queue ${QuoteAuditMessageSender.QUEUE_QUOTE_AUDIT}"
 
-        quoteService.runQuoteAuditForIdentifier(identifier)
+        quoteAuditService.runQuoteAuditForIdentifier(identifier)
     }
 
     @JmsListener(destination = QuoteAuditMessageSender.QUEUE_QUOTE_AUDIT_RELOAD, containerFactory = "quoteAuditReloadFactory")
@@ -27,6 +27,6 @@ class QuoteAuditMessageReceiver {
 
         log.debug "Received [${auditId}] from queue ${QuoteAuditMessageSender.QUEUE_QUOTE_AUDIT_RELOAD}"
 
-        quoteService.doQuoteAuditReload(auditId)
+        quoteAuditService.doQuoteAuditReload(auditId)
     }
 }
