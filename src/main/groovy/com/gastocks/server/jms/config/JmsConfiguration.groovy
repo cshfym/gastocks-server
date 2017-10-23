@@ -33,6 +33,9 @@ class JmsConfiguration {
     @Value('${quote.audit.reload.consumer.queue.concurrency}')
     String QUOTE_AUDIT_RELOAD_CONSUMER_QUEUE_CONCURRENCY
 
+    @Value('${company.dump.consumer.queue.concurrency}')
+    String COMPANY_DUMP_CONSUMER_QUEUE_CONCURRENCY
+
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -119,6 +122,21 @@ class JmsConfiguration {
 
         def factory = new DefaultJmsListenerContainerFactory()
         factory.setConcurrency(QUOTE_AUDIT_RELOAD_CONSUMER_QUEUE_CONCURRENCY)
+        configurer.configure(factory, connectionFactory)
+        factory
+    }
+
+    /**
+     * Bean corresponds to the "companyDumpFactory" JMS listener for consuming quote audit correction requests.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
+    @Bean
+    JmsListenerContainerFactory<?> companyDumpFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
+        def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency(COMPANY_DUMP_CONSUMER_QUEUE_CONCURRENCY)
         configurer.configure(factory, connectionFactory)
         factory
     }

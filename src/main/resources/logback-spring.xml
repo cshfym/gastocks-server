@@ -28,7 +28,6 @@
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-
     </appender>
 
     <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -49,13 +48,13 @@
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-
     </appender>
 
 
     <logger name="com.gastocks" level="info" additivity="false">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE-AUDIT" />
+        <appender-ref ref="FILE-ERROR" />
     </logger>
 
     <root level="INFO" >
