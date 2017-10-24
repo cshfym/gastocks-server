@@ -138,8 +138,8 @@ class QuotePersistenceService {
         existingQuote.price == quote.close &&
         existingQuote.dayOpen == quote.open &&
         existingQuote.dayHigh == quote.high &&
-        existingQuote.dayLow == quote.low &&
-        existingQuote.volume == quote.volume
+        existingQuote.dayLow == quote.low
+        // existingQuote.volume == quote.volume //TODO Fix this check?
     }
 
     /**

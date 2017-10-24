@@ -50,8 +50,9 @@ class ExchangePriceService extends IntrinioBaseService {
 
     /**
      * Typically called from JMS receiver service
+     * TODO: Optimize the shit out of this.
+     *  - Possibly fetch each page into memory, then dump into a queue?
      */
-    @Transactional
     void fetchAndPersistExchangePrices(IntrinioExchangeRequest request) {
 
         def startStopwatch = System.currentTimeMillis()
@@ -75,7 +76,6 @@ class ExchangePriceService extends IntrinioBaseService {
             IntrinioExchangePriceResponse priceResponse = getExchangePriceResponse(uri, base64EncodedCredentials, pageNumber)
             if (!priceResponse) {
                 log.warn("No data response fetching exchange price at URI [${uri}] and page [${pageNumber}]")
-                allPagesConsumed = true
                 return
             }
 
@@ -106,7 +106,7 @@ class ExchangePriceService extends IntrinioBaseService {
 
         try {
             String exchangePricesText = connectionService.getData(fullUri, RequestMethod.GET, base64EncodedCredentials)
-            response =gson.fromJson(exchangePricesText, IntrinioExchangePriceResponse.class)
+            response = gson.fromJson(exchangePricesText, IntrinioExchangePriceResponse.class)
         } catch (Exception ex) {
             throw ex
         }
@@ -114,12 +114,8 @@ class ExchangePriceService extends IntrinioBaseService {
         response
     }
 
+    @Transactional
     void doHandlePriceResponse(IntrinioExchangePriceResponse exchangePriceResponse, PersistableExchangeMarket exchangeMarket) {
-
-        /**
-         *  1. Find symbol from ticker - if not exists, create it!
-         *  2. Find quote data for date and symbol, if it exists - update, otherwise create
-         */
 
         exchangePriceResponse.data?.each { IntrinioExchangePriceQuote priceQuote ->
 
@@ -139,12 +135,15 @@ class ExchangePriceService extends IntrinioBaseService {
 
             PersistableQuote existingQuote = quotePersistenceService.findQuoteBySymbolAndQuoteDate(symbol, quoteDate)
             if (existingQuote && quotePersistenceService.quotesEqual(existingQuote, priceQuote)) {
-                log.info("Bypassing quote update from IntrinioExchangePriceQuote for existing quote on [${existingQuote.quoteDate}]")
-                return
+                log.info("Bypassing quote update from IntrinioExchangePriceQuote for [${symbol.identifier}] existing quote on [${existingQuote.quoteDate}]")
+            } else {
+                log.info("Persisting NEW quote IntrinioExchangePriceQuote for [${symbol.identifier}] on [${quoteDate.toString()}] for [${priceQuote.close}]")
+                try {
+                    quotePersistenceService.persistNewQuote(priceQuote, symbol)
+                } catch (Exception ex) {
+                    log.warn ("Exception persisting priceQuote [${symbol.identifier}] on date [${priceQuote.date}]: ${ex.message}")
+                }
             }
-
-            log.info("Persisting NEW quote IntrinioExchangePriceQuote for [${symbol.identifier}] on [${quoteDate.toString()}] for [${priceQuote.close}]")
-            quotePersistenceService.persistNewQuote(priceQuote, symbol)
         }
 
     }
