@@ -26,8 +26,8 @@ import java.text.SimpleDateFormat
 @Service
 class QuoteAuditService {
 
-    final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormat.forPattern("YYYY-MM-dd")
-    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd")
+    final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd")
+    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     @Autowired
     DateUtility dateUtility
