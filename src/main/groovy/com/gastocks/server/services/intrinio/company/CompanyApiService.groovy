@@ -1,6 +1,6 @@
-package com.gastocks.server.services.company
+package com.gastocks.server.services.intrinio.company
 
-import com.gastocks.server.jms.sender.CompanyQueueSender
+import com.gastocks.server.jms.sender.IntrinioCompanyQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.symbol.Symbol
 import com.gastocks.server.services.SymbolService
@@ -14,7 +14,7 @@ class CompanyApiService {
     SymbolService symbolService
 
     @Autowired
-    CompanyQueueSender companyQueueSender
+    IntrinioCompanyQueueSender companyQueueSender
 
 
     BasicResponse backfill() {

@@ -36,6 +36,9 @@ class JmsConfiguration {
     @Value('${company.dump.consumer.queue.concurrency}')
     String COMPANY_DUMP_CONSUMER_QUEUE_CONCURRENCY
 
+    @Value('${exchange.price.consumer.queue.concurrency}')
+    String EXCHANGE_PRICE_CONSUMER_QUEUE_CONCURRENCY
+
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -127,13 +130,13 @@ class JmsConfiguration {
     }
 
     /**
-     * Bean corresponds to the "companyDumpFactory" JMS listener for consuming quote audit correction requests.
+     * Bean corresponds to the "intrinioCompanyDumpFactory" JMS listener for consuming quote audit correction requests.
      * @param connectionFactory
      * @param configurer
      * @return {@JmsListenerContainerFactory}
      */
     @Bean
-    JmsListenerContainerFactory<?> companyDumpFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+    JmsListenerContainerFactory<?> intrinioCompanyDumpFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
 
         def factory = new DefaultJmsListenerContainerFactory()
         factory.setConcurrency(COMPANY_DUMP_CONSUMER_QUEUE_CONCURRENCY)
@@ -141,7 +144,20 @@ class JmsConfiguration {
         factory
     }
 
+    /**
+     * Bean corresponds to the "intrinioExchangePriceFactory" JMS listener for consuming quote audit correction requests.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
+    @Bean
+    JmsListenerContainerFactory<?> intrinioExchangePriceFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
 
+        def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency(EXCHANGE_PRICE_CONSUMER_QUEUE_CONCURRENCY)
+        configurer.configure(factory, connectionFactory)
+        factory
+    }
 
     @Bean // Serialize message content to json using TextMessage
     MessageConverter jacksonJmsMessageConverter() {

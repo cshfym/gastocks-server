@@ -52,7 +52,7 @@ class AVTimeSeriesAdjustedProcessingService {
         if (quote) {
             avQuote.dailyQuoteList.eachWithIndex { dailyQuote, ix ->
                 if (ix > AVTSA_MAX_QUOTE_PERIODS) { return }
-                PersistableQuote existingQuote = quotePersistenceService.findQuote(persistableSymbol, new Date(dailyQuote.date.millis))
+                PersistableQuote existingQuote = quotePersistenceService.findQuoteBySymbolAndQuoteDate(persistableSymbol, new Date(dailyQuote.date.millis))
                 if (existingQuote) {
                    log.trace("Existing quote for symbol [${symbol.identifier}] on [${dailyQuote.date.toString()}] found, updating!")
                     quotePersistenceService.updateQuote(existingQuote, dailyQuote)

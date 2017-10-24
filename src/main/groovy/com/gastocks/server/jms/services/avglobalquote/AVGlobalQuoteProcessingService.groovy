@@ -67,7 +67,7 @@ class AVGlobalQuoteProcessingService {
 
         def avQuote = (AVGlobalQuote) quote
         if (avQuote) {
-             def existingQuote = quotePersistenceService.findQuote(persistableSymbol, new Date(avQuote.lastUpdated.millis))
+             def existingQuote = quotePersistenceService.findQuoteBySymbolAndQuoteDate(persistableSymbol, new Date(avQuote.lastUpdated.millis))
              if (existingQuote) {
                  quotePersistenceService.updateQuote(existingQuote, avQuote)
                  log.info ("Updating existing quote for [${persistableSymbol.identifier} - ${persistableSymbol.exchangeMarket.shortName}] on [${avQuote.lastUpdated.toString()}]")

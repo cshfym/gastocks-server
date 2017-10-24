@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
+import javax.transaction.Transactional
+
 /**
  * Service class for dealing with persistence-object-based requests.
  */
@@ -44,5 +46,10 @@ class SymbolPersistenceService {
     void inactivateSymbol(PersistableSymbol symbol) {
         symbol.active = false
         symbolRepository.save(symbol)
+    }
+
+    @Transactional
+    PersistableSymbol save(PersistableSymbol persistableSymbol) {
+        symbolRepository.save(persistableSymbol)
     }
 }
