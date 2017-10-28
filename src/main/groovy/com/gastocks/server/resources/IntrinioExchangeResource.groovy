@@ -28,7 +28,14 @@ class IntrinioExchangeResource {
     @ResponseBody
     @RequestMapping(value="/pricebackfill", method=RequestMethod.POST)
     BasicResponse backfill(@RequestBody IntrinioExchangeRequest request) {
-        exchangePriceApiService.backfill(request)
+
+        try {
+            exchangePriceApiService.backfill(request)
+        } catch (Exception ex) {
+            log.error ("Exception calling /pricebackfill", ex)
+            return new BasicResponse(success: false, message: ex.message)
+        }
+
         new BasicResponse(success: true)
     }
 

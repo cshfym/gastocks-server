@@ -1,8 +1,9 @@
 package com.gastocks.server.models.avtimeseriesadjusted
 
+import com.gastocks.server.models.IQuote
 import org.joda.time.DateTime
 
-class AVTimeSeriesAdjustedDay {
+class AVTimeSeriesAdjustedDay implements IQuote {
 
     public double dayOpen
     public double dayHigh

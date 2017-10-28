@@ -10,4 +10,10 @@ class IntrinioExchangePriceResponse {
     int totalPages
     int pageSize
     int resultCount
+
+    @Override
+    String toString() {
+        "IntrinioExchangePriceResponse: Page [${currentPage}] of [${totalPages}], page size [${pageSize}], " +
+                "with datas [${data?.size()}], and result count [${resultCount}]"
+    }
 }

@@ -7,11 +7,13 @@ import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.intrinio.IntrinioExchangePriceQuote
 import com.gastocks.server.repositories.QuoteRepository
+import com.gastocks.server.util.NumberUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
+import javax.transaction.Transactional
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -27,6 +29,10 @@ class QuotePersistenceService {
     @Autowired
     QuoteRepository quoteRepository
 
+    @Autowired
+    NumberUtility numberUtility
+
+    @Transactional
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
 
         def persistableQuote = new PersistableQuote(
@@ -43,6 +49,7 @@ class QuotePersistenceService {
         quoteRepository.save(persistableQuote)
     }
 
+    @Transactional
     void persistNewQuote(AVGlobalQuote quote, PersistableSymbol symbol) {
 
         def persistableQuote = new PersistableQuote(
@@ -62,23 +69,31 @@ class QuotePersistenceService {
         quoteRepository.save(persistableQuote)
     }
 
+    @Transactional
     void persistNewQuote(IntrinioExchangePriceQuote quote, PersistableSymbol symbol) {
 
-        def persistableQuote = new PersistableQuote(
-                symbol: symbol,
-                price: quote.close,
-                dayOpen: quote.open,
-                dayHigh: quote.high,
-                dayLow: quote.low,
-                previousDayClose: 0.0d,
-                priceChange: 0.0d,
-                priceChangePercentage: 0.0d,
-                volume: quote.volume,
-                quoteDate: SHORT_DATE_FORMAT.parse(quote.date))
+        def persistableQuote
 
-        log.debug("Saving quote: ${persistableQuote.toString()} (IntrinioExchangePriceQuote)")
+        try {
+            persistableQuote = new PersistableQuote(
+                    symbol: symbol,
+                    price: numberUtility.safeProcessDouble(quote.close),
+                    dayOpen: numberUtility.safeProcessDouble(quote.open),
+                    dayHigh: numberUtility.safeProcessDouble(quote.high),
+                    dayLow: numberUtility.safeProcessDouble(quote.low),
+                    previousDayClose: 0.0d,
+                    priceChange: 0.0d,
+                    priceChangePercentage: 0.0d,
+                    volume: numberUtility.safeProcessInteger(quote.volume),
+                    quoteDate: SHORT_DATE_FORMAT.parse(quote.date))
 
-        quoteRepository.save(persistableQuote)
+            log.debug("Saving quote: ${persistableQuote.toString()} (IntrinioExchangePriceQuote)")
+
+            quoteRepository.save(persistableQuote)
+        } catch (Exception ex) {
+            log.error ("Exception saving quote ${persistableQuote.toString()}", ex)
+        }
+
     }
 
     /**
@@ -86,6 +101,7 @@ class QuotePersistenceService {
      * @param existingQuote
      * @param quote
      */
+    @Transactional
     void updateQuote(PersistableQuote existingQuote, AVGlobalQuote quote) {
 
         if (quotesEqual(existingQuote, quote)) {
@@ -128,25 +144,11 @@ class QuotePersistenceService {
     }
 
     /**
-     * Compares a {@link IntrinioExchangePriceQuote with a @link PersistableQuote}
-     * @param existingQuote
-     * @param quote
-     * @return boolean
-     */
-    boolean quotesEqual(PersistableQuote existingQuote, IntrinioExchangePriceQuote quote) {
-
-        existingQuote.price == quote.close &&
-        existingQuote.dayOpen == quote.open &&
-        existingQuote.dayHigh == quote.high &&
-        existingQuote.dayLow == quote.low
-        // existingQuote.volume == quote.volume //TODO Fix this check?
-    }
-
-    /**
      * Update existing quote from AVTimeSeriesAdjustedDay quote
      * @param existingQuote
      * @param quote
      */
+    @Transactional
     void updateQuote(PersistableQuote existingQuote, AVTimeSeriesAdjustedDay quote) {
 
         existingQuote.with {
@@ -168,6 +170,7 @@ class QuotePersistenceService {
      * Update existing {@link PersistableQuote}
      * @param existingQuote
      */
+    @Transactional
     void updateQuote(PersistableQuote existingQuote) {
         quoteRepository.save(existingQuote)
     }
@@ -185,6 +188,7 @@ class QuotePersistenceService {
         quotes
     }
 
+    @Transactional
     void deleteQuote(PersistableQuote quote) {
         quoteRepository.delete(quote)
     }

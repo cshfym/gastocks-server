@@ -1,5 +1,6 @@
 package com.gastocks.server.services.intrinio.exchangeprices
 
+import com.gastocks.server.jms.sender.IntrinioExchangePriceQueueSender
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMethod
 
-import javax.transaction.Transactional
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -50,8 +50,6 @@ class ExchangePriceService extends IntrinioBaseService {
 
     /**
      * Typically called from JMS receiver service
-     * TODO: Optimize the shit out of this.
-     *  - Possibly fetch each page into memory, then dump into a queue?
      */
     void fetchAndPersistExchangePrices(IntrinioExchangeRequest request) {
 
@@ -71,21 +69,33 @@ class ExchangePriceService extends IntrinioBaseService {
         if (request.exchange == NYSE_EXCHANGE) { exchangeMarket = exchangeMarketPersistenceService.findByShortName("NYSE") }
         if (request.exchange == NASDAQ_EXCHANGE) { exchangeMarket = exchangeMarketPersistenceService.findByShortName("NASDAQ") }
 
+        // Accumulate all pages into this collection
+        List<IntrinioExchangePriceResponse> priceResponses = []
+
         while(!allPagesConsumed) {
+
+            if (pageNumber == request.endPage) { break }
 
             IntrinioExchangePriceResponse priceResponse = getExchangePriceResponse(uri, base64EncodedCredentials, pageNumber)
             if (!priceResponse) {
                 log.warn("No data response fetching exchange price at URI [${uri}] and page [${pageNumber}]")
-                return
+                break
             }
 
-            doHandlePriceResponse(priceResponse, exchangeMarket)
+            log.info("Successfully fetched Intrinio exchange price response for [${uri}], " +
+                    "page [${priceResponse.currentPage}] of [${priceResponse.totalPages}] with [${priceResponse.data?.size()}] entities.")
+
+            priceResponses << priceResponse
 
             pageNumber = priceResponse.currentPage + 1
 
             if (pageNumber > priceResponse.totalPages) {
                 allPagesConsumed = true
             }
+        }
+
+        priceResponses.each { priceResponse ->
+            doHandlePriceResponse(priceResponse, exchangeMarket)
         }
 
         log.info("Completed IntrinoExchangeRequest [${request.toString()}] in [${System.currentTimeMillis() - startStopwatch} ms]")
@@ -114,8 +124,9 @@ class ExchangePriceService extends IntrinioBaseService {
         response
     }
 
-    @Transactional
     void doHandlePriceResponse(IntrinioExchangePriceResponse exchangePriceResponse, PersistableExchangeMarket exchangeMarket) {
+
+        Map<IntrinioExchangePriceQuote,PersistableSymbol> quoteSymbolPersistMap = [:]
 
         exchangePriceResponse.data?.each { IntrinioExchangePriceQuote priceQuote ->
 
@@ -134,17 +145,21 @@ class ExchangePriceService extends IntrinioBaseService {
             }
 
             PersistableQuote existingQuote = quotePersistenceService.findQuoteBySymbolAndQuoteDate(symbol, quoteDate)
-            if (existingQuote && quotePersistenceService.quotesEqual(existingQuote, priceQuote)) {
+            if (existingQuote) {
                 log.info("Bypassing quote update from IntrinioExchangePriceQuote for [${symbol.identifier}] existing quote on [${existingQuote.quoteDate}]")
             } else {
-                log.info("Persisting NEW quote IntrinioExchangePriceQuote for [${symbol.identifier}] on [${quoteDate.toString()}] for [${priceQuote.close}]")
-                try {
-                    quotePersistenceService.persistNewQuote(priceQuote, symbol)
-                } catch (Exception ex) {
-                    log.warn ("Exception persisting priceQuote [${symbol.identifier}] on date [${priceQuote.date}]: ${ex.message}")
-                }
+                quoteSymbolPersistMap.put(priceQuote, symbol)
             }
         }
 
+
+        quoteSymbolPersistMap.each { IntrinioExchangePriceQuote priceQuote, PersistableSymbol symbol ->
+            log.info("Persisting quote with symbol [${symbol.identifier}] and priceQuote [${priceQuote}]")
+            try {
+                quotePersistenceService.persistNewQuote(priceQuote, symbol)
+            } catch (Exception ex) {
+                log.warn("Exception caught persisting quote [${priceQuote.date}] for symbol [${symbol.identifier}]: ${ex.message}", ex)
+            }
+        }
     }
 }

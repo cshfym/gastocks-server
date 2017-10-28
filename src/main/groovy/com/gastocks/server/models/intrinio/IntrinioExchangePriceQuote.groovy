@@ -1,6 +1,8 @@
 package com.gastocks.server.models.intrinio
 
-class IntrinioExchangePriceQuote {
+import com.gastocks.server.models.IQuote
+
+class IntrinioExchangePriceQuote implements IQuote {
 
     String date
     String ticker
@@ -23,4 +25,8 @@ class IntrinioExchangePriceQuote {
     String figiTicker
     double splitRatio
 
+    @Override
+    String toString() {
+        "IntrinioExchangePriceQuote: [${ticker}] on [${date}], open [${open}], high [${high}], low [${low}], close [${close}], volume [${volume}]"
+    }
 }

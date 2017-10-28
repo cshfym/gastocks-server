@@ -5,9 +5,10 @@ class IntrinioExchangeRequest {
     String exchange
     String date
     int startPage
+    int endPage
 
     @Override
     String toString() {
-        "IntrinioExchangeRequest: exchange [${exchange}], date [${date}], startPage [${startPage}]"
+        "IntrinioExchangeRequest: exchange [${exchange}], date [${date}], startPage [${startPage}], endPage [${endPage}]"
     }
 }
