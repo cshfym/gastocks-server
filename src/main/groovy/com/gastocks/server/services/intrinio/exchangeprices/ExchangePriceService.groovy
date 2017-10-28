@@ -1,6 +1,5 @@
 package com.gastocks.server.services.intrinio.exchangeprices
 
-import com.gastocks.server.jms.sender.IntrinioExchangePriceQueueSender
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
