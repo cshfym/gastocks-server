@@ -27,4 +27,15 @@ class IntrinioCompanyResource {
         new BasicResponse(success: true)
     }
 
+    /**
+     * Convenience API to trigger load of company data from Intrinio
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/convertall", method=RequestMethod.POST)
+    BasicResponse conver() {
+        companyApiService.convertall()
+        new BasicResponse(success: true)
+    }
+
 }

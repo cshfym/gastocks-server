@@ -58,4 +58,15 @@ class CompanyService extends IntrinioBaseService {
         }
     }
 
+    void fetchAndConvertCompanyDumpData() {
+
+        List<PersistableCompanyDump> companyDumpList = companyDumpRepository.findAll()
+
+        companyDumpList.each { companyDump ->
+
+        }
+
+
+    }
+
 }

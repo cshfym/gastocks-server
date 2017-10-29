@@ -16,6 +16,8 @@ class CompanyApiService {
     @Autowired
     IntrinioCompanyQueueSender companyQueueSender
 
+    @Autowired
+    CompanyService companyService
 
     BasicResponse backfill() {
 
@@ -28,4 +30,7 @@ class CompanyApiService {
         new BasicResponse(success: true, message: "Queued [${allSymbols.size()}] symbols for company dump")
     }
 
+    BasicResponse convertall() {
+        companyService.fetchAndConvertCompanyDumpData()
+    }
 }
