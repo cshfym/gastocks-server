@@ -32,7 +32,7 @@ class PersistableCompany {
     PersistableExchangeMarket exchangeMarket
 
     String name
-    String legalEntityIdentifier
+    String legalEntityIdentifier // Legal Entity Identifier for the company
     String legalName
     int employeeCount
 
@@ -52,7 +52,7 @@ class PersistableCompany {
     String incorporatedCountry
 
     String entityLegalForm
-    String cik
+    String cik // Central Index Key issued by the SEC, which is the unique identifier all company filings are issued under
     String sic
     Date latestFilingDate
 
@@ -61,5 +61,6 @@ class PersistableCompany {
 
     String template
 
+    String jsonDump
 }
 

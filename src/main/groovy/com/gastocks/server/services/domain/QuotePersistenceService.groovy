@@ -29,9 +29,6 @@ class QuotePersistenceService {
     @Autowired
     QuoteRepository quoteRepository
 
-    @Autowired
-    NumberUtility numberUtility
-
     @Transactional
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
 
@@ -77,14 +74,14 @@ class QuotePersistenceService {
         try {
             persistableQuote = new PersistableQuote(
                     symbol: symbol,
-                    price: numberUtility.safeProcessDouble(quote.close),
-                    dayOpen: numberUtility.safeProcessDouble(quote.open),
-                    dayHigh: numberUtility.safeProcessDouble(quote.high),
-                    dayLow: numberUtility.safeProcessDouble(quote.low),
+                    price: NumberUtility.safeProcessDouble(quote.close),
+                    dayOpen: NumberUtility.safeProcessDouble(quote.open),
+                    dayHigh: NumberUtility.safeProcessDouble(quote.high),
+                    dayLow: NumberUtility.safeProcessDouble(quote.low),
                     previousDayClose: 0.0d,
                     priceChange: 0.0d,
                     priceChangePercentage: 0.0d,
-                    volume: numberUtility.safeProcessInteger(quote.volume),
+                    volume: NumberUtility.safeProcessInteger(quote.volume),
                     quoteDate: SHORT_DATE_FORMAT.parse(quote.date))
 
             log.debug("Saving quote: ${persistableQuote.toString()} (IntrinioExchangePriceQuote)")

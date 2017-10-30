@@ -31,6 +31,6 @@ class CompanyApiService {
     }
 
     BasicResponse convertall() {
-        companyService.fetchAndConvertCompanyDumpData()
+        companyService.fetchAndQueueAllCompanyDumpRecords()
     }
 }
