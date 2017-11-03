@@ -34,7 +34,7 @@ class PersistableCompany {
     String name
     String legalEntityIdentifier // Legal Entity Identifier for the company
     String legalName
-    int employeeCount
+    String employeeCount
 
     String shortDescription
     String longDescription

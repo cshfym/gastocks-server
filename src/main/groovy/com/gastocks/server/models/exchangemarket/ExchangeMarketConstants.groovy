@@ -6,7 +6,7 @@ class ExchangeMarketConstants {
     static final String NEW_YORK_STOCK_EXCHANGE = "NYSE"
     static final String NASDAQ_STOCK_EXCHANGE = "NASDAQ"
 
-    final static List<String> NASDAQ_ALTERNATES = ["NasdaqGS","NasdaqCM"]
+    final static List<String> NASDAQ_ALTERNATES = ["NASDAQGS","NASDAQCM"]
     final static List<String> NEW_YORK_STOCK_EXCHANGE_ALTERNATES = ["NYSE MKT","NYSE ARCA"]
 
     static String resolveMarketName(String market) {

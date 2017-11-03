@@ -232,7 +232,7 @@ class SymbolService {
             } else {
                 quote.previousDayClose = previousQuote.price
                 quote.priceChange = (quote.price - previousQuote.price).round(3)
-                quote.priceChangePercentage = (quote.previousDayClose > 0) ? (quote.priceChange / quote.previousDayClose).round(4) : 0.0000
+                quote.priceChangePercentage = (quote.previousDayClose > 0) ? ((double)(quote.priceChange / quote.previousDayClose)).round(4) : 0.0000
             }
 
             quoteService.quotePersistenceService.updateQuote(quote)

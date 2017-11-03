@@ -11,7 +11,6 @@ import com.gastocks.server.services.domain.IndustryPersistenceService
 import com.gastocks.server.services.domain.SectorPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.util.DateUtility
-import com.gastocks.server.util.NumberUtility
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,44 +32,87 @@ class CompanyConverter {
     @Autowired
     SectorPersistenceService sectorPersistenceService
 
+    final static String EMPTY_STRING = ""
 
     PersistableCompany fromJson(String companyJson) {
 
         def jsonSlurper = new JsonSlurper()
         def companyData = jsonSlurper.parseText(companyJson)
 
-        new PersistableCompany(
-            symbol: resolvePersistableSymbol(companyData.ticker as String),
-            exchangeMarket: resolvePersistableExchangeMarket(companyData.stock_exchange),
-            sector: resolvePersistableSector(companyData.sector),
-            industry: resolvePersistableIndustry(companyData.industry_category, companyData.industry_group),
-            latestFilingDate: DateUtility.parseDateString(companyData.latest_filing_date as String),
-            name: companyData.name,
-            legalEntityIdentifier: companyData.lei,
-            legalName: companyData.legal_name,
-            employeeCount: NumberUtility.safeProcessInteger(companyData.employees as String),
-            shortDescription: companyData.short_description,
-            longDescription: companyData.long_description,
-            ceo: companyData.ceo,
-            companyUrl: companyData.company_url,
-            businessAddress: companyData.business_address,
-            mailingAddress: companyData.mailing_address,
-            businessPhoneNumber: companyData.business_phone_no,
-            headquarterAddressLine1: companyData.hq_address1,
-            headquarterAddressLine2: companyData.hq_address2,
-            headquarterAddressCity: companyData.hq_address_city,
-            headquarterAddressPostalCode: companyData.hq_address_postal_code,
-            headquarterState: companyData.hq_state,
-            incorporatedState: companyData.inc_state,
-            incorporatedCountry: companyData.inc_country,
-            entityLegalForm: companyData.entity_legal_form,
-            cik: companyData.cik,
-            sic: NumberUtility.safeProcessInteger(companyData.sic as String), // Safe parse int
-            entityStatus: companyData.entity_status,
-            standardizedActive: companyData.standardized_active,
-            template: companyData.template,
-            jsonDump: companyJson
-        )
+        PersistableSymbol persistableSymbol
+        try {
+            persistableSymbol = resolvePersistableSymbol(companyData.ticker)
+        } catch (Exception ex) {
+            log.warn("Could not resolve persistable symbol from ticker [${companyData.ticker}], aborting.")
+            return
+        }
+
+
+        Date latestFilingDate
+        try {
+            latestFilingDate = DateUtility.parseDateString(companyData.latest_filing_date)
+        } catch (Exception ex) {
+            latestFilingDate = null
+        }
+
+        PersistableExchangeMarket exchangeMarket
+        try {
+            exchangeMarket = resolvePersistableExchangeMarket(companyData.stock_exchange)
+        } catch (Exception ex) {
+            exchangeMarket = exchangeMarketPersistenceService.findByShortName(ExchangeMarketConstants.NEW_YORK_STOCK_EXCHANGE)
+        }
+
+        PersistableSector sector
+        try {
+            sector = resolvePersistableSector(companyData.sector)
+        } catch (Exception ex) {
+            sector = sectorPersistenceService.findByDescription("n/a")
+        }
+
+        PersistableIndustry industry
+        try {
+            resolvePersistableIndustry(companyData.industry_category, companyData.industry_group)
+        } catch (Exception ex) {
+            industry = industryPersistenceService.findByDescription("n/a")
+        }
+
+        try {
+            new PersistableCompany(
+                symbol: persistableSymbol,
+                exchangeMarket: exchangeMarket,
+                sector: sector,
+                industry: industry,
+                latestFilingDate: latestFilingDate,
+                name: companyData.name,
+                legalEntityIdentifier: companyData.lei ?: EMPTY_STRING,
+                legalName: companyData.legal_name ?: EMPTY_STRING,
+                employeeCount: companyData.employees ?: EMPTY_STRING,
+                shortDescription: companyData.short_description ?: EMPTY_STRING,
+                longDescription: companyData.long_description ?: EMPTY_STRING,
+                ceo: companyData.ceo ?: EMPTY_STRING,
+                companyUrl: companyData.company_url ?: EMPTY_STRING,
+                businessAddress: companyData.business_address ?: EMPTY_STRING,
+                mailingAddress: companyData.mailing_address ?: EMPTY_STRING,
+                businessPhoneNumber: companyData.business_phone_no ?: EMPTY_STRING,
+                headquarterAddressLine1: companyData.hq_address1 ?: EMPTY_STRING,
+                headquarterAddressLine2: companyData.hq_address2 ?: EMPTY_STRING,
+                headquarterAddressCity: companyData.hq_address_city ?: EMPTY_STRING,
+                headquarterAddressPostalCode: companyData.hq_address_postal_code ?: EMPTY_STRING,
+                headquarterState: companyData.hq_state ?: EMPTY_STRING,
+                incorporatedState: companyData.inc_state ?: EMPTY_STRING,
+                incorporatedCountry: companyData.inc_country ?: EMPTY_STRING,
+                entityLegalForm: companyData.entity_legal_form ?: EMPTY_STRING,
+                cik: companyData.cik ?: EMPTY_STRING,
+                sic: companyData.sic ?: EMPTY_STRING, // Safe parse int
+                entityStatus: companyData.entity_status ?: false,
+                standardizedActive: companyData.standardized_active ?: false,
+                template: companyData.template ?: EMPTY_STRING,
+                jsonDump: companyJson)
+
+        } catch (Exception ex) {
+            log.error("Exception: ", ex)
+        }
+
     }
 
     PersistableSymbol resolvePersistableSymbol(String identifier) {
