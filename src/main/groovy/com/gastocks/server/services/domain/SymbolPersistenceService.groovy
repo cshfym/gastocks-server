@@ -49,7 +49,7 @@ class SymbolPersistenceService {
     }
 
     @Transactional
-    PersistableSymbol save(PersistableSymbol persistableSymbol) {
+    PersistableSymbol persistSymbol(PersistableSymbol persistableSymbol) {
         symbolRepository.save(persistableSymbol)
     }
 }

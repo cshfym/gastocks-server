@@ -11,9 +11,6 @@ import com.gastocks.server.repositories.CompanyDumpRepository
 import com.gastocks.server.services.HTTPConnectionService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.services.intrinio.IntrinioBaseService
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -92,7 +89,7 @@ class CompanyService extends IntrinioBaseService implements IGenericServiceInvok
         PersistableCompanyDump companyDump = companyDumpRepository.findOne(identifier)
 
         try {
-            PersistableCompany company = companyConverter.fromJson(companyDump.jsonDump)
+            PersistableCompany company = companyConverter.fromJsonDump(companyDump)
             log.info("${company}")
         } catch (Exception ex) {
             log.error("Error: ", ex)

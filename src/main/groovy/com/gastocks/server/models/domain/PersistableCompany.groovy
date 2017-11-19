@@ -43,8 +43,7 @@ class PersistableCompany {
     String businessAddress
     String mailingAddress
     String businessPhoneNumber
-    String headquarterAddressLine1
-    String headquarterAddressLine2
+    String headquarterAddress
     String headquarterAddressCity
     String headquarterAddressPostalCode
     String headquarterState

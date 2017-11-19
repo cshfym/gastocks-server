@@ -7,4 +7,5 @@ import org.springframework.data.repository.CrudRepository
 interface CompanyDumpRepository extends CrudRepository<PersistableCompanyDump, String> {
 
     PersistableCompanyDump findBySymbol(PersistableSymbol symbol)
+
 }

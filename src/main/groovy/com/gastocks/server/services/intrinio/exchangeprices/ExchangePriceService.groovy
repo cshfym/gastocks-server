@@ -134,7 +134,7 @@ class ExchangePriceService extends IntrinioBaseService {
             PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(priceQuote.ticker)
             if (!symbol) {
                 log.info("Existing ticker [${priceQuote.ticker}] not found! Persisting.")
-                symbol = symbolPersistenceService.save(
+                symbol = symbolPersistenceService.persistSymbol(
                     new PersistableSymbol(
                         identifier: priceQuote.ticker,
                         description: "Created from Intrinio data feed - resolve!",

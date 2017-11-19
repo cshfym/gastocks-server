@@ -17,9 +17,10 @@ CREATE TABLE `sector` (
 
 CREATE TABLE `industry` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
-  `description` varchar(100) COLLATE utf8mb4_bin NOT NULL,
+  `category` varchar(100) COLLATE utf8mb4_bin NOT NULL,
+  `group` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `description_UNIQUE` (`description`),
+  UNIQUE KEY `description_UNIQUE` (`category`),
   UNIQUE KEY `IDX_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 

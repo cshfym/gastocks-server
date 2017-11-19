@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository
 
 interface IndustryRepository extends CrudRepository<PersistableIndustry, String> {
 
-    PersistableIndustry findByDescription(String description)
+    PersistableIndustry findByCategoryAndSubCategory(String category, String subCategory)
 
 }

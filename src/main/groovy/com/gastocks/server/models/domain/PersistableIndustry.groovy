@@ -17,10 +17,12 @@ class PersistableIndustry {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     String id
 
-    String description
+    String category
+
+    String subCategory
 
     @Override
     String toString() {
-        "PersistableIndustry [${description}]"
+        "PersistableIndustry [${category}, ${subCategory}]"
     }
 }

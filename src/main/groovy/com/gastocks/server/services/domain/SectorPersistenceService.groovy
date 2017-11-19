@@ -6,6 +6,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+import javax.transaction.Transactional
+
 /**
  * Service class for dealing with persistence-object-based requests.
  */
@@ -18,6 +20,11 @@ class SectorPersistenceService {
 
     PersistableSector findByDescription(String description) {
         sectorRepository.findByDescription(description)
+    }
+
+    @Transactional
+    PersistableSector persistNewSector(PersistableSector sector) {
+        sectorRepository.save(sector)
     }
 
 }
