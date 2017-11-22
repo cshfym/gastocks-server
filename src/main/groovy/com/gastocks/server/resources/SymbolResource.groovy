@@ -4,6 +4,7 @@ import com.gastocks.server.jms.sender.SymbolExtendedQueueSender
 import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.ViewSymbolExtended
 import com.gastocks.server.models.symbol.Symbol
+import com.gastocks.server.models.vse.VSERequestParameters
 import com.gastocks.server.services.SymbolService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,11 +30,9 @@ class SymbolResource {
     }
 
     @ResponseBody
-    @RequestMapping(value="/vse", method=RequestMethod.GET)
-    List<ViewSymbolExtended> getViewSymbolExtended(
-        @RequestParam(value="maxQuotePrice", required=false) double maxQuotePrice,
-        @RequestParam(value="minQuotePrice", required=false) double minQuotePrice) {
-        symbolService.findAllViewSymbolExtendedWithParameters(maxQuotePrice, minQuotePrice)
+    @RequestMapping(value="/vse", method=RequestMethod.POST)
+    List<ViewSymbolExtended> getViewSymbolExtended(@RequestBody VSERequestParameters parameters) {
+        symbolService.findAllViewSymbolExtendedWithParameters(parameters)
     }
 
     /**

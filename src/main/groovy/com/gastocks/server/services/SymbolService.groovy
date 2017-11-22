@@ -9,6 +9,7 @@ import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.domain.PersistableSymbolExtended
 import com.gastocks.server.models.domain.ViewSymbolExtended
 import com.gastocks.server.models.symbol.Symbol
+import com.gastocks.server.models.vse.VSERequestParameters
 import com.gastocks.server.services.domain.SymbolExtendedPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.services.domain.ViewSymbolExtendedPersistenceService
@@ -74,8 +75,8 @@ class SymbolService {
         symbols
     }
 
-    List<ViewSymbolExtended> findAllViewSymbolExtendedWithParameters(double maxQuotePrice = null, double minQuotePrice = null) {
-        viewSymbolExtendedPersistenceService.findAllWithParameters(maxQuotePrice, minQuotePrice)
+    List<ViewSymbolExtended> findAllViewSymbolExtendedWithParameters(VSERequestParameters parameters) {
+        viewSymbolExtendedPersistenceService.findAllWithParameters(parameters)
     }
 
     /**
