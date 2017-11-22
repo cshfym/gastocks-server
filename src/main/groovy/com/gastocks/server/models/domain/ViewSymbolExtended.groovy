@@ -12,11 +12,23 @@ class ViewSymbolExtended {
 
     String identifier
 
-    String description
+    String companyName
 
-    String industry
+    String companyDescription
+
+    String companyUrl
 
     String sector
+
+    String industryCategory
+
+    String industrySubCategory
+
+    int employees
+
+    String ceo
+
+    String headquartersState
 
     @Column(name="max_price")
     double maxPrice
