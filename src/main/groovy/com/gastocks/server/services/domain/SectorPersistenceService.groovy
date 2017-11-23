@@ -22,6 +22,10 @@ class SectorPersistenceService {
         sectorRepository.findByDescription(description)
     }
 
+    List<PersistableSector> findAll() {
+        sectorRepository.findAll()
+    }
+
     @Transactional
     PersistableSector persistNewSector(PersistableSector sector) {
         sectorRepository.save(sector)

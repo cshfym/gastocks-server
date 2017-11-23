@@ -18,6 +18,10 @@ class IndustryPersistenceService {
     @Autowired
     IndustryRepository industryRepository
 
+    List<PersistableIndustry> findAllIndustries() {
+        industryRepository.findAll()
+    }
+
     PersistableIndustry findByCategoryAndSubCategory(String category, String subCategory) {
         industryRepository.findByCategoryAndSubCategory(category, subCategory)
     }

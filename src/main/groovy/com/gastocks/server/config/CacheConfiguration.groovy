@@ -24,6 +24,8 @@ class CacheConfiguration {
     static final String FIND_ALL_QUOTES_FOR_SYMBOL = "findAllQuotesForSymbol"
     static final String GET_SIMULATION_SUMMARY_BY_ID = "getSimulationSummaryById"
     static final String VIEW_SYMBOL_EXTENDED = "viewSymbolExtended"
+    static final String ALL_SECTORS = "allSectors"
+    static final String ALL_INDUSTRIES = "allIndustries"
 
     @Bean
     CacheManager cacheManager() {
@@ -35,7 +37,9 @@ class CacheConfiguration {
                 GET_TECHNICAL_QUOTES_FOR_SYMBOL,
                 FIND_ALL_QUOTES_FOR_SYMBOL,
                 GET_SIMULATION_SUMMARY_BY_ID,
-                VIEW_SYMBOL_EXTENDED
+                VIEW_SYMBOL_EXTENDED,
+                ALL_SECTORS,
+                ALL_INDUSTRIES
         )
     }
 
