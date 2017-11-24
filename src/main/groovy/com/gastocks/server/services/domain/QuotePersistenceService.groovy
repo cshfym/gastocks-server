@@ -3,10 +3,16 @@ package com.gastocks.server.services.domain
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
+import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.domain.PersistableSector
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.intrinio.IntrinioExchangePriceQuote
+import com.gastocks.server.models.sector.TechnicalSectorQuote
+import com.gastocks.server.repositories.CompanyRepository
 import com.gastocks.server.repositories.QuoteRepository
+import com.gastocks.server.repositories.SectorRepository
+import com.gastocks.server.services.intrinio.company.CompanyService
 import com.gastocks.server.util.NumberUtility
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +34,12 @@ class QuotePersistenceService {
 
     @Autowired
     QuoteRepository quoteRepository
+
+    @Autowired
+    SectorPersistenceService sectorPersistenceService
+
+    @Autowired
+    CompanyService companyService
 
     @Transactional
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
@@ -182,6 +194,13 @@ class QuotePersistenceService {
         def startStopwatch = System.currentTimeMillis()
         def quotes = quoteRepository.findAllBySymbol(symbol)
         log.info("Loaded [${quotes?.size()}] quotes for symbol [${symbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        quotes
+    }
+
+    List<PersistableQuote> findAllQuotesForSymbolsIn(List<PersistableSymbol> symbols) {
+        def startStopwatch = System.currentTimeMillis()
+        def quotes = quoteRepository.findAllBySymbolIn(symbols)
+        log.info("Loaded [${quotes?.size()}] quotes for [${symbols.size()}] symbols in [${System.currentTimeMillis() - startStopwatch} ms]")
         quotes
     }
 

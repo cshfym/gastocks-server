@@ -21,21 +21,25 @@ class CacheConfiguration {
     static final String ALL_SYMBOLS = "allSymbols"
     static final String GET_QUOTES_FOR_SYMBOL = "getQuotesForSymbol"
     static final String GET_TECHNICAL_QUOTES_FOR_SYMBOL = "getTechnicalQuotesForSymbol"
+    static final String GET_TECHNICAL_QUOTE_FOR_SECTOR = "getTechnicalQuoteForSector"
     static final String FIND_ALL_QUOTES_FOR_SYMBOL = "findAllQuotesForSymbol"
+    static final String FIND_ALL_COMPANIES_BY_SECTOR = "findAllCompaniesBySector"
     static final String GET_SIMULATION_SUMMARY_BY_ID = "getSimulationSummaryById"
     static final String VIEW_SYMBOL_EXTENDED = "viewSymbolExtended"
     static final String ALL_SECTORS = "allSectors"
     static final String ALL_INDUSTRIES = "allIndustries"
 
     @Bean
-    CacheManager cacheManager() {
+    static CacheManager cacheManager() {
         return new ConcurrentMapCacheManager(
                 ACTIVE_SYMBOLS,
                 ALL_HOLIDAY_CALENDARS,
                 ALL_SYMBOLS,
                 GET_QUOTES_FOR_SYMBOL,
                 GET_TECHNICAL_QUOTES_FOR_SYMBOL,
+                GET_TECHNICAL_QUOTE_FOR_SECTOR,
                 FIND_ALL_QUOTES_FOR_SYMBOL,
+                FIND_ALL_COMPANIES_BY_SECTOR,
                 GET_SIMULATION_SUMMARY_BY_ID,
                 VIEW_SYMBOL_EXTENDED,
                 ALL_SECTORS,
@@ -45,7 +49,7 @@ class CacheConfiguration {
 
     @CacheEvict(allEntries = true, value = "viewSymbolExtended")
     @Scheduled(fixedDelay = 43200000L, initialDelay = 43200000L) // Every 12 hours.
-    void reportCacheEvict() {
+    static void reportCacheEvict() {
         log.info "Flushing cache [${VIEW_SYMBOL_EXTENDED}] at [${new Date().toString()}]"
     }
 

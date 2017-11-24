@@ -10,4 +10,5 @@ interface QuoteRepository extends CrudRepository<PersistableQuote, String> {
 
     List<PersistableQuote> findAllBySymbol(PersistableSymbol symbol)
 
+    List<PersistableQuote> findAllBySymbolIn(List<PersistableSymbol> symbol)
 }

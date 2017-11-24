@@ -1,18 +1,22 @@
 package com.gastocks.server.services.intrinio.company
 
+import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.company.CompanyConverter
 import com.gastocks.server.jms.models.GenericIdServiceMessage
 import com.gastocks.server.jms.models.IGenericServiceInvoker
 import com.gastocks.server.jms.sender.GenericMessageQueueSender
 import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableCompanyDump
+import com.gastocks.server.models.domain.PersistableSector
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.CompanyDumpRepository
+import com.gastocks.server.repositories.CompanyRepository
 import com.gastocks.server.services.HTTPConnectionService
 import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.services.intrinio.IntrinioBaseService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMethod
 
@@ -26,6 +30,9 @@ class CompanyService extends IntrinioBaseService implements IGenericServiceInvok
     CompanyDumpRepository companyDumpRepository
 
     @Autowired
+    CompanyRepository companyRepository
+
+    @Autowired
     SymbolPersistenceService symbolPersistenceService
 
     @Autowired
@@ -36,6 +43,11 @@ class CompanyService extends IntrinioBaseService implements IGenericServiceInvok
 
     @Autowired
     CompanyConverter companyConverter
+
+    @Cacheable(value = CacheConfiguration.FIND_ALL_COMPANIES_BY_SECTOR)
+    List<PersistableCompany> findAllCompaniesBySector(PersistableSector sector) {
+        companyRepository.findAllBySector(sector)
+    }
 
     /**
      * Typically called from JMS receiver service

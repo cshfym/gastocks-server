@@ -2,16 +2,21 @@ package com.gastocks.server.services.technical
 
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.TechnicalQuoteConverter
+import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.domain.PersistableSector
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.exception.QuoteNotFoundException
+import com.gastocks.server.models.sector.TechnicalSectorQuote
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
 import com.gastocks.server.models.technical.response.TechnicalQuote
 import com.gastocks.server.models.technical.response.TechnicalQuoteMetadata
 import com.gastocks.server.models.technical.response.TechnicalQuoteParameters
 import com.gastocks.server.services.domain.QuotePersistenceService
+import com.gastocks.server.services.domain.SectorPersistenceService
 import com.gastocks.server.services.domain.SymbolPersistenceService
+import com.gastocks.server.services.intrinio.company.CompanyService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
@@ -103,7 +108,7 @@ class TechnicalQuoteService {
      * @param quote
      * @param quoteData
      */
-    protected void calculateAveragesAndHighLows(PersistableQuote quote, List<PersistableQuote> quoteData, TechnicalDataWrapper wrapper) {
+    protected static void calculateAveragesAndHighLows(PersistableQuote quote, List<PersistableQuote> quoteData, TechnicalDataWrapper wrapper) {
 
         // Capture quote date from input quote, iterate backward
         List<PersistableQuote> relevantQuotes = quoteData.findAll { it.quoteDate <= quote.quoteDate }
