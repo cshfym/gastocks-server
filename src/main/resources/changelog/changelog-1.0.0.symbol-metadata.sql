@@ -3,8 +3,24 @@ start transaction;
 use `ga_stocks`;
 
 DROP TABLE symbol_metadata;
+DELETE FROM `sector_performance`;
+DROP TABLE `sector_performance`;
 DROP TABLE industry;
 DROP TABLE sector;
+
+CREATE TABLE `sector_performance` (
+  `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `sector_id` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `quote_date` date DEFAULT NULL,
+  `price` double(9,3) DEFAULT '0.000',
+  `day_open` double(9,3) DEFAULT '0.000',
+  `day_high` double(9,3) DEFAULT '0.000',
+  `day_low` double(9,3) DEFAULT '0.000',
+  `volume` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `IDX_SectorId_QuoteDate` (`sector_id`,`quote_date`),
+  CONSTRAINT `FK_SectorPerformance_Sector` FOREIGN KEY (`sector_id`) REFERENCES `sector` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `sector` (
   `id` varchar(36) COLLATE utf8mb4_bin NOT NULL,

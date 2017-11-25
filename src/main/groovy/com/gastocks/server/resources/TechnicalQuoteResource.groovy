@@ -1,6 +1,8 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.domain.PersistableSectorPerformance
 import com.gastocks.server.models.exception.QuoteNotFoundException
 import com.gastocks.server.models.sector.TechnicalSectorQuote
 import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
@@ -44,10 +46,17 @@ class TechnicalQuoteResource {
     }
 
     @ResponseBody
-    @RequestMapping(value="/sector/{sector}", method=RequestMethod.POST)
-    List<TechnicalSectorQuote> getTechnicalQuoteForSector(@PathVariable("sector") String sector, @RequestBody TechnicalQuoteRequestParameters requestParameters) {
+    @RequestMapping(value="/sector/{sector}", method=RequestMethod.GET)
+    List<PersistableSectorPerformance> getTechnicalQuoteForSector(@PathVariable("sector") String sector) {
 
-        technicalSectorQuoteService.getTechnicalQuoteForSector(sector, requestParameters)
+        technicalSectorQuoteService.getTechnicalQuoteForSector(sector)
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/sector/{sector}", method=RequestMethod.POST)
+    BasicResponse calculateAndPersistSectorPerformance(@PathVariable("sector") String sector) {
+
+        technicalSectorQuoteService.calculateAndPersistSectorPerformanceQuotes(sector)
     }
 
 }
