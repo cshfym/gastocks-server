@@ -2,6 +2,7 @@ package com.gastocks.server.services.technical
 
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.converters.quote.TechnicalQuoteConverter
+import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSector
@@ -48,7 +49,6 @@ class TechnicalSectorQuoteService {
     @Autowired
     SectorPerformancePersistenceService sectorPerformancePersistenceService
 
-    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     @Cacheable(value = CacheConfiguration.GET_TECHNICAL_QUOTE_FOR_SECTOR)
     List<PersistableSectorPerformance> getTechnicalQuoteForSector(String sector) {
@@ -73,7 +73,7 @@ class TechnicalSectorQuoteService {
         List<PersistableQuote> allQuotesForSymbolsInSector = quotePersistenceService.findAllQuotesForSymbolsIn(symbolsInSector)
         log.info("Found [${allQuotesForSymbolsInSector}] quotes for sector [${sector}]!")
 
-        Date thresholdDate = SHORT_DATE_FORMAT.parse("2014-01-01")
+        Date thresholdDate = GlobalConstants.SHORT_DATE_FORMAT.parse("2014-01-01")
         List<PersistableQuote> filteredQuotesForSymbolsInSector = allQuotesForSymbolsInSector.findAll { quote -> quote.quoteDate >= thresholdDate }
 
         log.info("Found [${filteredQuotesForSymbolsInSector.size()}] quotes for sector [${sector}] after filtering out by threshold date [${thresholdDate.toString()}]")

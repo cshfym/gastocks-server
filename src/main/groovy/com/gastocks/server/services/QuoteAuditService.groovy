@@ -3,6 +3,7 @@ package com.gastocks.server.services
 import com.gastocks.server.jms.sender.QuoteAuditMessageSender
 import com.gastocks.server.jms.sender.SymbolQueueSender
 import com.gastocks.server.models.BasicResponse
+import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableQuoteAudit
 import com.gastocks.server.models.domain.PersistableSymbol
@@ -13,21 +14,15 @@ import com.gastocks.server.services.domain.SymbolPersistenceService
 import com.gastocks.server.util.DateUtility
 import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 import javax.transaction.Transactional
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 @Slf4j
 @Service
 class QuoteAuditService {
 
-    final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd")
-    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     @Autowired
     DateUtility dateUtility
@@ -192,14 +187,14 @@ class QuoteAuditService {
 
         List<String> missingDates = []
 
-        def today = SHORT_DATE_FORMATTER.parseDateTime(SHORT_DATE_FORMATTER.print(new DateTime()))
+        def today = GlobalConstants.SHORT_DATE_FORMATTER.parseDateTime(GlobalConstants.SHORT_DATE_FORMATTER.print(new DateTime()))
 
         List<String> searchForDates = dateUtility.buildChronologicalDateListNoWeekends(symbol.exchangeMarket, today)
 
         // VV Dates are coming out adjusted for time zone or some shit. :angryshower:
         List<PersistableQuote> allQuotesForSymbol = quotePersistenceService.findAllQuotesForSymbol(symbol)
         allQuotesForSymbol.sort { q1, q2 -> q2.quoteDate <=> q1.quoteDate}
-        List<String> quoteDates = allQuotesForSymbol.collect { SHORT_DATE_FORMAT.format(it.quoteDate) }
+        List<String> quoteDates = allQuotesForSymbol.collect { GlobalConstants.SHORT_DATE_FORMAT.format(it.quoteDate) }
 
         searchForDates.each { searchDate ->
             if (!quoteDates.contains(searchDate)) {

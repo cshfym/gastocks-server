@@ -3,6 +3,7 @@ package com.gastocks.server.services.domain
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
+import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSector
@@ -29,8 +30,6 @@ import java.text.SimpleDateFormat
 @Slf4j
 @Service
 class QuotePersistenceService {
-
-    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     @Autowired
     QuoteRepository quoteRepository
@@ -94,7 +93,7 @@ class QuotePersistenceService {
                     priceChange: 0.0d,
                     priceChangePercentage: 0.0d,
                     volume: NumberUtility.safeProcessInteger(quote.volume),
-                    quoteDate: SHORT_DATE_FORMAT.parse(quote.date))
+                    quoteDate: GlobalConstants.SHORT_DATE_FORMAT.parse(quote.date))
 
             log.debug("Saving quote: ${persistableQuote.toString()} (IntrinioExchangePriceQuote)")
 

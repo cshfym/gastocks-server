@@ -1,5 +1,6 @@
 package com.gastocks.server.services.intrinio.exchangeprices
 
+import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableExchangeMarket
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSymbol
@@ -19,9 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMethod
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 @Slf4j
 @Service
 class ExchangePriceService extends IntrinioBaseService {
@@ -37,8 +35,6 @@ class ExchangePriceService extends IntrinioBaseService {
 
     @Autowired
     HTTPConnectionService connectionService
-
-    final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     final static String NYSE_EXCHANGE = "^XNYS"
     final static String NASDAQ_EXCHANGE = "^XNAS"
@@ -129,7 +125,7 @@ class ExchangePriceService extends IntrinioBaseService {
 
         exchangePriceResponse.data?.each { IntrinioExchangePriceQuote priceQuote ->
 
-            Date quoteDate = SHORT_DATE_FORMAT.parse(priceQuote.date)
+            Date quoteDate = GlobalConstants.SHORT_DATE_FORMAT.parse(priceQuote.date)
 
             PersistableSymbol symbol = symbolPersistenceService.findByIdentifier(priceQuote.ticker)
             if (!symbol) {
