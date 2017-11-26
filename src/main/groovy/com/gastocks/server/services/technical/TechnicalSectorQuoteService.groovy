@@ -1,21 +1,11 @@
 package com.gastocks.server.services.technical
 
 import com.gastocks.server.config.CacheConfiguration
-import com.gastocks.server.converters.quote.TechnicalQuoteConverter
-import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
 import com.gastocks.server.models.domain.PersistableSector
 import com.gastocks.server.models.domain.PersistableSectorPerformance
 import com.gastocks.server.models.domain.PersistableSymbol
-import com.gastocks.server.models.exception.QuoteNotFoundException
-import com.gastocks.server.models.sector.TechnicalSectorQuote
-import com.gastocks.server.models.technical.TechnicalDataWrapper
-import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
-import com.gastocks.server.models.technical.response.TechnicalQuote
-import com.gastocks.server.models.technical.response.TechnicalQuoteMetadata
-import com.gastocks.server.models.technical.response.TechnicalQuoteParameters
-import com.gastocks.server.repositories.SectorPerformanceRepository
 import com.gastocks.server.services.domain.QuotePersistenceService
 import com.gastocks.server.services.domain.SectorPerformancePersistenceService
 import com.gastocks.server.services.domain.SectorPersistenceService
@@ -27,8 +17,6 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 import javax.transaction.Transactional
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 @Slf4j
 @Service
@@ -59,7 +47,7 @@ class TechnicalSectorQuoteService {
     }
 
     @Transactional
-    void calculateAndPersistSectorPerformanceQuotes(String sector) {
+    void calculateAndPersistSectorPerformanceByQuoteDate(String sector, Date quoteDate) {
 
         def startStopwatch = System.currentTimeMillis()
 
@@ -70,17 +58,10 @@ class TechnicalSectorQuoteService {
         Map<Date,PersistableSectorPerformance> sectorQuoteMap = [:]
         Map<Date,Integer> sectorQuoteCountMap = [:]
 
-        List<PersistableQuote> allQuotesForSymbolsInSector = quotePersistenceService.findAllQuotesForSymbolsIn(symbolsInSector)
-        log.info("Found [${allQuotesForSymbolsInSector}] quotes for sector [${sector}]!")
+        List<PersistableQuote> allQuotesForSymbolsInSector = quotePersistenceService.findAllQuotesForSymbolsByDateIn(quoteDate, symbolsInSector)
+        log.info("Found [${allQuotesForSymbolsInSector.size()}] quotes for sector [${sector}] on quote date [${quoteDate.toString()}]")
 
-        Date thresholdDate = GlobalConstants.SHORT_DATE_FORMAT.parse("2014-01-01")
-        List<PersistableQuote> filteredQuotesForSymbolsInSector = allQuotesForSymbolsInSector.findAll { quote -> quote.quoteDate >= thresholdDate }
-
-        log.info("Found [${filteredQuotesForSymbolsInSector.size()}] quotes for sector [${sector}] after filtering out by threshold date [${thresholdDate.toString()}]")
-
-        addQuotesToSectorQuoteMap(sectorQuoteMap, sectorQuoteCountMap, filteredQuotesForSymbolsInSector, persistableSector)
-
-        log.info("Loaded [${sectorQuoteMap?.size()}] quotes for sector [${sector}] in [${System.currentTimeMillis() - startStopwatch} ms]")
+        addQuotesToSectorQuoteMap(sectorQuoteMap, sectorQuoteCountMap, allQuotesForSymbolsInSector, persistableSector)
 
         List<PersistableSectorPerformance> sectorPerformanceList = []
 
@@ -88,11 +69,11 @@ class TechnicalSectorQuoteService {
         sectorQuoteMap.each { key, sectorPerformance ->
             int quoteCountForDate = sectorQuoteCountMap.getOrDefault(key, 0)
             if (sectorPerformance) {
-                sectorPerformance.price = ((double)(sectorPerformance.price / quoteCountForDate)).round(4)
-                sectorPerformance.dayOpen = ((double)(sectorPerformance.dayOpen / quoteCountForDate)).round(4)
-                sectorPerformance.dayHigh = ((double)(sectorPerformance.dayHigh / quoteCountForDate)).round(4)
-                sectorPerformance.dayLow = ((double)(sectorPerformance.dayLow / quoteCountForDate)).round(4)
-                sectorPerformance.volume = ((double)(sectorPerformance.volume / quoteCountForDate)).round(4)
+                sectorPerformance.price = ((double)(sectorPerformance.price / quoteCountForDate)).round(3)
+                sectorPerformance.dayOpen = ((double)(sectorPerformance.dayOpen / quoteCountForDate)).round(3)
+                sectorPerformance.dayHigh = ((double)(sectorPerformance.dayHigh / quoteCountForDate)).round(3)
+                sectorPerformance.dayLow = ((double)(sectorPerformance.dayLow / quoteCountForDate)).round(3)
+                sectorPerformance.volume = ((double)(sectorPerformance.volume / quoteCountForDate)).round(3)
                 sectorPerformanceList << sectorPerformance
             }
         }
@@ -100,6 +81,8 @@ class TechnicalSectorQuoteService {
         sectorPerformanceList.each { sectorPerformance ->
             sectorPerformancePersistenceService.persistSectorPerformance(sectorPerformance)
         }
+
+        log.info("Finished processing sector quote [${sector}] for quote date [${quoteDate.toString()}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
     protected static void addQuotesToSectorQuoteMap(Map<Date,PersistableSectorPerformance> sectorQuoteMap, Map<Date,Integer> sectorQuoteCountMap,

@@ -1,12 +1,14 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.jms.models.SectorQuoteBackfillMessage
+import com.gastocks.server.jms.sender.SectorQuoteBackfillQueueSender
 import com.gastocks.server.models.BasicResponse
-import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.constants.GlobalConstants
 import com.gastocks.server.models.domain.PersistableSectorPerformance
 import com.gastocks.server.models.exception.QuoteNotFoundException
-import com.gastocks.server.models.sector.TechnicalSectorQuote
 import com.gastocks.server.models.technical.request.TechnicalQuoteRequestParameters
 import com.gastocks.server.models.technical.response.TechnicalQuote
+import com.gastocks.server.schedulers.SectorQuoteBackfillScheduledTask
 import com.gastocks.server.services.technical.TechnicalQuoteService
 import com.gastocks.server.services.technical.TechnicalSectorQuoteService
 import groovy.util.logging.Slf4j
@@ -25,6 +27,12 @@ class TechnicalQuoteResource {
 
     @Autowired
     TechnicalSectorQuoteService technicalSectorQuoteService
+
+    @Autowired
+    SectorQuoteBackfillQueueSender queueSender
+
+    @Autowired
+    SectorQuoteBackfillScheduledTask sectorQuoteBackfillScheduledTask
 
     @ResponseBody
     @RequestMapping(value="/{symbol}", method=RequestMethod.POST)
@@ -48,15 +56,28 @@ class TechnicalQuoteResource {
     @ResponseBody
     @RequestMapping(value="/sector/{sector}", method=RequestMethod.GET)
     List<PersistableSectorPerformance> getTechnicalQuoteForSector(@PathVariable("sector") String sector) {
-
         technicalSectorQuoteService.getTechnicalQuoteForSector(sector)
     }
 
     @ResponseBody
-    @RequestMapping(value="/sector/{sector}", method=RequestMethod.POST)
-    BasicResponse calculateAndPersistSectorPerformance(@PathVariable("sector") String sector) {
-
-        technicalSectorQuoteService.calculateAndPersistSectorPerformanceQuotes(sector)
+    @RequestMapping(value="/sector/{sector}/{date}", method=RequestMethod.POST)
+    BasicResponse queueSectorPerformanceBackfillByDate(@PathVariable("sector") String sector, @PathVariable("date") String quoteDate) {
+        queueSender.queueRequest(
+            new SectorQuoteBackfillMessage(
+                sector: sector,
+                date: GlobalConstants.SHORT_DATE_FORMAT.parse(quoteDate))
+        )
+        new BasicResponse(success: true)
     }
 
+    /**
+     * Convenience method to trigger the scheduled cron.
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/sector/backfill", method=RequestMethod.POST)
+    BasicResponse doBackfillSectorsWithScheduledTask() {
+        sectorQuoteBackfillScheduledTask.process()
+        new BasicResponse(success: true)
+    }
 }

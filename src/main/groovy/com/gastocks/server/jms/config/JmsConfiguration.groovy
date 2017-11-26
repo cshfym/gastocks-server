@@ -39,6 +39,9 @@ class JmsConfiguration {
     @Value('${generic.service.id.message.queue.concurrency}')
     String GENERIC_SERVICE_ID_MESSAGE_QUEUE_CONCURRENCY
 
+    @Value('${sector.quote.backfill.consumer.queue.concurrency}')
+    String SECTOR_QUOTE_BACKFILL_CONSUMER_QUEUE_CONCURRENCY
+
     /**
      * Bean corresponds to the "quoteFactory" JMS listener for consuming symbols and loading quotes.
      * @param connectionFactory
@@ -158,6 +161,22 @@ class JmsConfiguration {
         configurer.configure(factory, connectionFactory)
         factory
     }
+
+    /**
+     * Bean corresponds to the "genericServiceMessageFactory" JMS listener for consuming symbols and loading quotes.
+     * @param connectionFactory
+     * @param configurer
+     * @return {@JmsListenerContainerFactory}
+     */
+    @Bean
+    JmsListenerContainerFactory<?> sectorQuoteBackfillMessageFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
+        def factory = new DefaultJmsListenerContainerFactory()
+        factory.setConcurrency(SECTOR_QUOTE_BACKFILL_CONSUMER_QUEUE_CONCURRENCY)
+        configurer.configure(factory, connectionFactory)
+        factory
+    }
+
 
     @Bean // Serialize message content to json using TextMessage
     MessageConverter jacksonJmsMessageConverter() {

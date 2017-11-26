@@ -30,11 +30,15 @@ class SectorPerformancePersistenceService {
         if (!existingSectorPerformance) {
             // Create
             sectorPerformanceRepository.save(sectorPerformance)
-            log.info("Saved new PersistableSectorPerformance for sector [${sectorPerformance.sector.description}] and quote date [${sectorPerformance.quoteDate}]")
+            log.info("CREATED PersistableSectorPerformance for sector [${sectorPerformance.sector.description}] and quote date [${sectorPerformance.quoteDate}]")
             sectorPerformance
         } else {
             // Update if necessary
-            if (sectorPerformanceRecordsAreIdentical(existingSectorPerformance, sectorPerformance)) { return existingSectorPerformance }
+            if (sectorPerformanceRecordsAreIdentical(existingSectorPerformance, sectorPerformance)) {
+                log.info("Bypassing update to sector [${sectorPerformance.sector.description}] and quote date [${sectorPerformance.quoteDate.toString()}], " +
+                        "calculated sector quote is identical to previously persisted value.")
+                return existingSectorPerformance
+            }
             existingSectorPerformance.price = sectorPerformance.price
             existingSectorPerformance.dayOpen = sectorPerformance.dayOpen
             existingSectorPerformance.dayHigh = sectorPerformance.dayHigh

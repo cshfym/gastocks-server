@@ -22,6 +22,10 @@ class SectorPersistenceService {
         sectorRepository.findByDescription(description)
     }
 
+    PersistableSector findById(String id) {
+        sectorRepository.findOne(id)
+    }
+
     List<PersistableSector> findAll() {
         sectorRepository.findAll()
     }

@@ -196,10 +196,10 @@ class QuotePersistenceService {
         quotes
     }
 
-    List<PersistableQuote> findAllQuotesForSymbolsIn(List<PersistableSymbol> symbols) {
+    List<PersistableQuote> findAllQuotesForSymbolsByDateIn(Date quoteDate, List<PersistableSymbol> symbols) {
         def startStopwatch = System.currentTimeMillis()
-        def quotes = quoteRepository.findAllBySymbolIn(symbols)
-        log.info("Loaded [${quotes?.size()}] quotes for [${symbols.size()}] symbols in [${System.currentTimeMillis() - startStopwatch} ms]")
+        def quotes = quoteRepository.findAllByQuoteDateAndSymbolIn(quoteDate, symbols)
+        log.info("Loaded [${quotes?.size()}] quotes for [${symbols.size()}] symbols on [${quoteDate.toString()}] in [${System.currentTimeMillis() - startStopwatch} ms]")
         quotes
     }
 
