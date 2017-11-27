@@ -30,9 +30,9 @@ import org.springframework.web.servlet.DispatcherServlet
 @EnableAutoConfiguration(exclude = FlywayAutoConfiguration.class)
 @EnableAspectJAutoProxy(proxyTargetClass=true)
 @Import([
-        JmsConfiguration.class,
-        CacheConfiguration.class,
-        TaskExecutorConfiguration.class
+    JmsConfiguration.class,
+    CacheConfiguration.class,
+    TaskExecutorConfiguration.class
 ])
 class Application extends SpringBootServletInitializer {
 

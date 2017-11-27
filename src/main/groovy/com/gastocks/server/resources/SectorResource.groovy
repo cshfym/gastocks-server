@@ -22,4 +22,10 @@ class SectorResource {
         sectorApiService.findAllSectors()
     }
 
+    @ResponseBody
+    @RequestMapping(value="/{identifier}", method=RequestMethod.GET)
+    PersistableSector getSectorBySymbolIdentifier(@PathVariable("identifier") String identifier) {
+        sectorApiService.findSectorBySymbolIdentifier(identifier)
+    }
+
 }

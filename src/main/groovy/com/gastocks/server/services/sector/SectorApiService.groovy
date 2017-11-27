@@ -19,4 +19,10 @@ class SectorApiService {
     List<PersistableSector> findAllSectors() {
         sectorPersistenceService.findAll()?.sort { s1, s2 -> s1.description <=> s2.description }
     }
+
+    @Cacheable(value = CacheConfiguration.SECTOR_BY_SYMBOL_IDENTIFIER)
+    PersistableSector findSectorBySymbolIdentifier(String identifier) {
+        sectorPersistenceService.findBySymbolIdentifier(identifier)
+    }
+
 }

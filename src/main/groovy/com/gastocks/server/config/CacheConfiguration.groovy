@@ -27,6 +27,7 @@ class CacheConfiguration {
     static final String GET_SIMULATION_SUMMARY_BY_ID = "getSimulationSummaryById"
     static final String VIEW_SYMBOL_EXTENDED = "viewSymbolExtended"
     static final String ALL_SECTORS = "allSectors"
+    static final String SECTOR_BY_SYMBOL_IDENTIFIER = "findSectorBySymbol"
     static final String ALL_INDUSTRIES = "allIndustries"
 
     @Bean
@@ -42,6 +43,7 @@ class CacheConfiguration {
                 FIND_ALL_COMPANIES_BY_SECTOR,
                 GET_SIMULATION_SUMMARY_BY_ID,
                 VIEW_SYMBOL_EXTENDED,
+                SECTOR_BY_SYMBOL_IDENTIFIER,
                 ALL_SECTORS,
                 ALL_INDUSTRIES
         )

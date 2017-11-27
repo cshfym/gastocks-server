@@ -2,6 +2,7 @@ package com.gastocks.server.services.domain
 
 import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableCompanyDump
+import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.repositories.CompanyDumpRepository
 import com.gastocks.server.repositories.CompanyRepository
 import groovy.util.logging.Slf4j
@@ -22,6 +23,10 @@ class CompanyPersistenceService {
 
     @Autowired
     CompanyRepository companyRepository
+
+    PersistableCompany findByPersistableSymbol(PersistableSymbol symbol) {
+        companyRepository.findBySymbol(symbol)
+    }
 
     @Transactional
     PersistableCompanyDump persistCompanyDump(PersistableCompanyDump companyDump) {
