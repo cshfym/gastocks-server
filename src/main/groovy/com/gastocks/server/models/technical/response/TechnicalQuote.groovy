@@ -17,4 +17,6 @@ class TechnicalQuote extends Quote {
 
     OBVTechnicalData onBalanceVolumeData
 
+    EMVTechnicalData emvTechnicalData
+
 }

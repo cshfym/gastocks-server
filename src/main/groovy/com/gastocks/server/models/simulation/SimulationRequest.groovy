@@ -1,5 +1,6 @@
 package com.gastocks.server.models.simulation
 
+import com.gastocks.server.models.technical.request.EMVRequestParameters
 import com.gastocks.server.models.technical.request.MACDRequestParameters
 import com.gastocks.server.models.technical.request.OBVRequestParameters
 import com.gastocks.server.models.technical.request.RSIRequestParameters
@@ -36,6 +37,8 @@ class SimulationRequest {
     RSIRequestParameters rsiRequestParameters
 
     OBVRequestParameters onBalanceVolumeRequestParameters
+
+    EMVRequestParameters emvRequestParameters
 
     @Transient
     @Override

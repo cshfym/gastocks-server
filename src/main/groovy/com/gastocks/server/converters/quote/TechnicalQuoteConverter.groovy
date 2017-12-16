@@ -1,6 +1,7 @@
 package com.gastocks.server.converters.quote
 
 import com.gastocks.server.models.domain.PersistableQuote
+import com.gastocks.server.models.technical.response.EMVTechnicalData
 import com.gastocks.server.models.technical.response.MACDTechnicalData
 import com.gastocks.server.models.technical.TechnicalDataWrapper
 import com.gastocks.server.models.technical.response.OBVTechnicalData
@@ -69,6 +70,21 @@ class TechnicalQuoteConverter {
                 onBalanceVolume: technicalData.onBalanceVolumeData.onBalanceVolume,
                 onBalanceVolumeShort: technicalData.onBalanceVolumeData.onBalanceVolumeShort,
                 onBalanceVolumeLong: technicalData.onBalanceVolumeData.onBalanceVolumeLong
+            ),
+
+            // Ease of Movement Data
+            emvTechnicalData: new EMVTechnicalData(
+                periods: technicalData.emvTechnicalData.periods,
+                volume: technicalData.emvTechnicalData.volume,
+                boxRatio: technicalData.emvTechnicalData.boxRatio,
+                easeOfMovement: technicalData.emvTechnicalData.easeOfMovement,
+                easeOfMovementSMA: technicalData.emvTechnicalData.easeOfMovementSMA,
+                smaCrossoverPositive: technicalData.emvTechnicalData.smaCrossoverPositive,
+                smaCrossoverNegative: technicalData.emvTechnicalData.smaCrossoverNegative,
+                easyMovement: technicalData.emvTechnicalData.easyMovement,
+                difficultMovement: technicalData.emvTechnicalData.difficultMovement,
+                volumeTriggerPercentage: technicalData.emvTechnicalData.volumeTriggerPercentage,
+                highLowTriggerPercentage: technicalData.emvTechnicalData.highLowTriggerPercentage
             ),
 
             // Averages

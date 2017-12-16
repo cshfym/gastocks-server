@@ -44,6 +44,9 @@ class TechnicalQuoteService {
     @Autowired
     OBVService onBalanceVolumeService
 
+    @Autowired
+    EMVService emvService
+
     /**
      * Retrieve all technical quotes for a given symbol identifier
      * Implicitly ordered by quote date descending
@@ -82,6 +85,9 @@ class TechnicalQuoteService {
             def wrapper = new TechnicalDataWrapper(
                     quoteDate: quote.quoteDate,
                     price: quote.price,
+                    high: quote.dayHigh,
+                    low: quote.dayLow,
+                    volume: quote.volume,
                     quoteParameters: new TechnicalQuoteParameters(priceChangeFromLastQuote: false)
             )
             calculateAveragesAndHighLows(quote, quoteData, wrapper)
@@ -99,6 +105,10 @@ class TechnicalQuoteService {
 
         // OBV
         onBalanceVolumeService.buildOBVTechnicalData(technicalDataWrapperList, quoteData, parameters.onBalanceVolumeRequestParameters)
+
+        // EMV
+        emvService.buildEMVTechnicalData(technicalDataWrapperList, quoteData, parameters.emvRequestParameters)
+        emvService.buildEMVSignalData(technicalDataWrapperList, parameters.emvRequestParameters)
 
         technicalDataWrapperList
     }

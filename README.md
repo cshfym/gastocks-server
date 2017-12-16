@@ -25,6 +25,9 @@ https://finance.yahoo.com/news/overbought-vs-oversold-means-traders-030200320.ht
 
 6. Price Range or trading range.
 
+7. Evaluate each ticker:
+    - Analyze every significant price change (up, down)
+    - What statistical event preceeded to the price change?
 
 https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule
 

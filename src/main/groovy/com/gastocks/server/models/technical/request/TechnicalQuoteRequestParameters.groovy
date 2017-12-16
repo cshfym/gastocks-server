@@ -8,4 +8,6 @@ class TechnicalQuoteRequestParameters {
 
     OBVRequestParameters onBalanceVolumeRequestParameters
 
+    EMVRequestParameters emvRequestParameters
+
 }
