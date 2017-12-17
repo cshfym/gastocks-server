@@ -10,6 +10,9 @@ class RSITechnicalData {
     int overBoughtLine
     int overSoldLine
 
+    int periodsOverBought
+    int periodsOverSold
+
     double priceGain
     double priceLoss
 

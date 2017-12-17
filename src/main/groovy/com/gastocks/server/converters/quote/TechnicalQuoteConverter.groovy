@@ -57,6 +57,8 @@ class TechnicalQuoteConverter {
                 relativeStrengthIndex: technicalData.rsiTechnicalData.relativeStrengthIndex,
                 overBought: technicalData.rsiTechnicalData.overBought,
                 overSold: technicalData.rsiTechnicalData.overSold,
+                periodsOverBought: technicalData.rsiTechnicalData.periodsOverBought,
+                periodsOverSold: technicalData.rsiTechnicalData.periodsOverSold,
                 overBoughtCrossoverPositive: technicalData.rsiTechnicalData.overBoughtCrossoverPositive,
                 overBoughtCrossoverNegative: technicalData.rsiTechnicalData.overBoughtCrossoverNegative,
                 overSoldCrossoverPositive: technicalData.rsiTechnicalData.overSoldCrossoverPositive,

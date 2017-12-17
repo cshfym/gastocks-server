@@ -32,6 +32,8 @@ class RSIService {
                 overSoldLine = parameters.overSoldLine
                 averagePriceGain = 0.0d
                 averagePriceLoss = 0.0d
+                periodsOverBought = 0
+                periodsOverSold = 0
             }
 
             if (ix == 0) {
@@ -76,7 +78,7 @@ class RSIService {
         }
     }
 
-    void buildRSISignalData(List<TechnicalDataWrapper> technicalDataList) {
+    static void buildRSISignalData(List<TechnicalDataWrapper> technicalDataList) {
 
         technicalDataList.eachWithIndex { TechnicalDataWrapper technicalData, ix ->
 
@@ -108,30 +110,62 @@ class RSIService {
             // Middle crossovers
             if (rsiData.relativeStrengthIndex >= 50.0d && rsiDataYesterday.relativeStrengthIndex < 50.0d) { rsiData.centerLineCrossoverPositive = true }
             if (rsiData.relativeStrengthIndex <= 50.0d && rsiDataYesterday.relativeStrengthIndex > 50.0d) { rsiData.centerLineCrossoverNegative = true }
+
+            // Calculate periods overbought/oversold
+            calculatePeriodsOverBought(technicalDataList, ix)
+            calculatePeriodsOverSold(technicalDataList, ix)
         }
     }
 
-    double calculateFirstIntervalAverageGain(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
+    static void calculatePeriodsOverBought(List<TechnicalDataWrapper> technicalDataList, int currentIndex) {
+
+        if (!technicalDataList[currentIndex].rsiTechnicalData.overBought) {  // Not currently overbought
+            technicalDataList[currentIndex].rsiTechnicalData.periodsOverBought = 0
+            return
+        }
+
+        if (currentIndex == 0) { return }
+
+        if (technicalDataList[currentIndex - 1].rsiTechnicalData.overBought) {
+            technicalDataList[currentIndex].rsiTechnicalData.periodsOverBought = technicalDataList[currentIndex - 1].rsiTechnicalData.periodsOverBought + 1
+        }
+    }
+
+    static void calculatePeriodsOverSold(List<TechnicalDataWrapper> technicalDataList, int currentIndex) {
+
+        if (!technicalDataList[currentIndex].rsiTechnicalData.overSold) {  // Not currently overbought
+            technicalDataList[currentIndex].rsiTechnicalData.periodsOverSold = 0
+            return
+        }
+
+        if (currentIndex == 0) { return }
+
+        if (technicalDataList[currentIndex - 1].rsiTechnicalData.overSold) {
+            technicalDataList[currentIndex].rsiTechnicalData.periodsOverSold = technicalDataList[currentIndex - 1].rsiTechnicalData.periodsOverSold + 1
+        }
+    }
+
+    static double calculateFirstIntervalAverageGain(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
         double intervalGainTotal = 0.0d
         for (int i = startIndex; i < (endIndex + 1); i++) { intervalGainTotal += technicalWrapperDataList[i].rsiTechnicalData.priceGain }
         (intervalGainTotal / (endIndex - startIndex)).round(4)
     }
 
-    double calculateFirstIntervalAverageLoss(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
+    static double calculateFirstIntervalAverageLoss(int startIndex, int endIndex, List<TechnicalDataWrapper> technicalWrapperDataList) {
         double intervalLossTotal = 0.0d
         for (int i = startIndex; i < (endIndex + 1); i++) { intervalLossTotal += technicalWrapperDataList[i].rsiTechnicalData.priceLoss }
         (intervalLossTotal / (endIndex - startIndex)).round(4)
     }
 
-    double calculateSubsequentIntervalAverage(int interval, double previousAverage, double current) {
+    static double calculateSubsequentIntervalAverage(int interval, double previousAverage, double current) {
         (double)(((previousAverage * (interval - 1)) + current) / interval).round(4)
     }
 
-    double calculateRelativeStrength(double averageGain, double averageLoss) {
+    static double calculateRelativeStrength(double averageGain, double averageLoss) {
         averageLoss ? ((double)(averageGain / averageLoss)).round(4) : 0.00d
     }
 
-    double calculateRelativeStrengthIndex(double relativeStrength) {
+    static double calculateRelativeStrengthIndex(double relativeStrength) {
         (100 - (100 / (1 + relativeStrength))).round(4)
     }
 }
