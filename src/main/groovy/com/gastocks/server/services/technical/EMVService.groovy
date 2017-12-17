@@ -21,7 +21,7 @@ class EMVService {
     TechnicalToolsService technicalToolsService
 
 
-    void buildEMVTechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, EMVRequestParameters parameters) {
+    static void buildEMVTechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, EMVRequestParameters parameters) {
 
         EMVTechnicalData previousEMVTechnicalData
 

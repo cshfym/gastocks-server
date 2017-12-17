@@ -39,7 +39,12 @@ class MACDService {
                 technicalWrapper.macdTechnicalData = new MACDTechnicalData(
                     emaShort: emaShort,
                     emaLong: emaLong,
-                    macd: macd)
+                    macd: macd,
+                    aboveSignalLine: false,
+                    belowSignalLine: false,
+                    periodsAboveSignalLine: 0,
+                    periodsBelowSignalLine: 0
+                )
             }
         }
     }
@@ -62,6 +67,16 @@ class MACDService {
 
                 macdTechnicalData.macdSignalLine = technicalToolsService.calculateEMA(macdTechnicalData.macd, macdTechnicalDataYesterday.macdSignalLine, MACD_SIGNAL_DAYS)
                 macdTechnicalData.macdHist = (macdTechnicalData.macd - macdTechnicalData.macdSignalLine).round(4)
+
+                // Above/below signal line?
+                if (macdTechnicalData.macd >= macdTechnicalData.macdSignalLine) {
+                    macdTechnicalData.aboveSignalLine = true
+                    macdTechnicalData.belowSignalLine = false
+                }
+                if (macdTechnicalData.macd < macdTechnicalData.macdSignalLine) {
+                    macdTechnicalData.aboveSignalLine = false
+                    macdTechnicalData.belowSignalLine = true
+                }
 
                 // Positive MACD center line crossover
                 if ((macdTechnicalData.macd >= 0.0) && (macdTechnicalDataYesterday.macd < 0.0 )) {
@@ -86,7 +101,40 @@ class MACDService {
                     macdTechnicalData.signalCrossoverPositive = false
                 }
             }
+
+            // Calculate periods overbought/oversold
+            calculatePeriodsAboveSignal(technicalDataList, ix)
+            calculatePeriodsBelowSignal(technicalDataList, ix)
         }
     }
 
+    static void calculatePeriodsAboveSignal(List<TechnicalDataWrapper> technicalDataList, int currentIndex) {
+
+        if (!technicalDataList[currentIndex].macdTechnicalData.aboveSignalLine) {  // Not currently above signal line
+            technicalDataList[currentIndex].macdTechnicalData.periodsAboveSignalLine = 0
+            return
+        }
+
+        if (currentIndex == 0) { return }
+
+        if (technicalDataList[currentIndex - 1].macdTechnicalData.aboveSignalLine) {
+            technicalDataList[currentIndex].macdTechnicalData.periodsAboveSignalLine =
+                    technicalDataList[currentIndex - 1].macdTechnicalData.periodsAboveSignalLine + 1
+        }
+    }
+
+    static void calculatePeriodsBelowSignal(List<TechnicalDataWrapper> technicalDataList, int currentIndex) {
+
+        if (!technicalDataList[currentIndex].macdTechnicalData.belowSignalLine) {  // Not currently below signal line
+            technicalDataList[currentIndex].macdTechnicalData.periodsBelowSignalLine = 0
+            return
+        }
+
+        if (currentIndex == 0) { return }
+
+        if (technicalDataList[currentIndex - 1].macdTechnicalData.belowSignalLine) {
+            technicalDataList[currentIndex].macdTechnicalData.periodsBelowSignalLine =
+                    technicalDataList[currentIndex - 1].macdTechnicalData.periodsBelowSignalLine + 1
+        }
+    }
 }

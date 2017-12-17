@@ -38,10 +38,14 @@ class TechnicalQuoteConverter {
                 macd: technicalData.macdTechnicalData.macd,
                 macdSignalLine: technicalData.macdTechnicalData.macdSignalLine,
                 macdHist: technicalData.macdTechnicalData.macdHist,
+                aboveSignalLine: technicalData.macdTechnicalData.aboveSignalLine,
+                belowSignalLine: technicalData.macdTechnicalData.belowSignalLine,
                 centerCrossoverNegative: technicalData.macdTechnicalData.centerCrossoverNegative,
                 centerCrossoverPositive: technicalData.macdTechnicalData.centerCrossoverPositive,
                 signalCrossoverNegative: technicalData.macdTechnicalData.signalCrossoverNegative,
-                signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive
+                signalCrossoverPositive: technicalData.macdTechnicalData.signalCrossoverPositive,
+                periodsAboveSignalLine: technicalData.macdTechnicalData.periodsAboveSignalLine,
+                periodsBelowSignalLine: technicalData.macdTechnicalData.periodsBelowSignalLine
             ),
 
             //RSI Data
