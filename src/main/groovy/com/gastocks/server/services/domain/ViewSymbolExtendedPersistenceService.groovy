@@ -36,7 +36,7 @@ class ViewSymbolExtendedPersistenceService {
         filteredEntries
     }
 
-    boolean vseMeetsFilteringCriteria(VSERequestParameters parameters, ViewSymbolExtended viewSymbolExtended) {
+    static boolean vseMeetsFilteringCriteria(VSERequestParameters parameters, ViewSymbolExtended viewSymbolExtended) {
 
         boolean vseMeetsFilteringCriteria = true
 
@@ -49,7 +49,7 @@ class ViewSymbolExtendedPersistenceService {
         vseMeetsFilteringCriteria
     }
 
-    boolean quoteMeetsMinMaxParameters(VSERequestParameters parameters, ViewSymbolExtended viewSymbolExtended) {
+    static boolean quoteMeetsMinMaxParameters(VSERequestParameters parameters, ViewSymbolExtended viewSymbolExtended) {
         (viewSymbolExtended.maxPrice <= parameters.maxQuotePrice) && (viewSymbolExtended.minPrice >= parameters.minQuotePrice)
     }
 }

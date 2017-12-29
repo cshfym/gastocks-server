@@ -192,7 +192,7 @@ class SimulationService {
     /**
      * Global buy indicator = used to override all other technical buy indicators.
      */
-    boolean inspectAnyGlobalBuyIndicators(SimulationRequest request, TechnicalQuote quote) {
+    static boolean inspectAnyGlobalBuyIndicators(SimulationRequest request, TechnicalQuote quote) {
 
         // If the stock price remains the same, do not allow buy.
         if ((request.onlyTransactOnPriceChange) && (!quote.quoteParameters.priceChangeFromLastQuote)) { return false }

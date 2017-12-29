@@ -26,7 +26,7 @@ class SwaggerConfig {
 
     }
 
-    private ApiInfo metaData() {
+    static private ApiInfo metaData() {
         new ApiInfo(
                 "Spring Boot REST API",
                 "Spring Boot REST API for Online Store",

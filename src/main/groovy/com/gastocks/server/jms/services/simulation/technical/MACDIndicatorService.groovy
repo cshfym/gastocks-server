@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class MACDIndicatorService {
 
-    boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
+    static boolean getMACDBuyIndicator(TechnicalQuote quote, MACDRequestParameters requestParameters, int index) {
 
         if (index > 0 && quote.macdParameters.signalCrossoverPositive) {
             // If aboveCenter parameter, only initiate BUY if signal line is > 0
@@ -21,7 +21,7 @@ class MACDIndicatorService {
         false
     }
 
-    boolean getMACDSellIndicator(TechnicalQuote quote) {
+    static boolean getMACDSellIndicator(TechnicalQuote quote) {
         quote.macdParameters.signalCrossoverNegative
     }
 

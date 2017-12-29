@@ -14,7 +14,7 @@ class RSIService {
     /* Ignore the first N quote periods to allow the RSI to smooth out */
     final static int IGNORE_RSI_INITIAL_PERIODS = 15
 
-    void buildRSITechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, RSIRequestParameters parameters) {
+    static void buildRSITechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, RSIRequestParameters parameters) {
 
         RSITechnicalData previousRSITechnicalData
 

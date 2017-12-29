@@ -14,7 +14,7 @@ class ExceptionHandlerController {
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(value= HttpStatus.NOT_FOUND)
     @ResponseBody
-    ErrorResponse requestHandlingNoHandlerFound() {
+    static ErrorResponse requestHandlingNoHandlerFound() {
         new ErrorResponse("HTTP_404", "Not Found")
     }
 }

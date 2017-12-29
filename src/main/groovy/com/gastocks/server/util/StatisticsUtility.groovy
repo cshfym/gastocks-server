@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 @Component
 class StatisticsUtility {
 
-    double getMean(List data) {
+    static double getMean(List data) {
 
         double sum = 0.0
         data.each {
@@ -15,7 +15,7 @@ class StatisticsUtility {
         (data) ? sum / data.size() : 0.0d
     }
 
-    double getVariance(List data) {
+    static double getVariance(List data) {
 
         double mean = getMean(data)
         double temp = 0
@@ -26,7 +26,7 @@ class StatisticsUtility {
         (data) ? (double)(temp / (data.size() - 1)).round(2) : 0.0d
     }
 
-    double getStandardDeviation(List data) {
+    static double getStandardDeviation(List data) {
         def standardDeviation = Math.sqrt(getVariance(data))
         if (!standardDeviation || Double.isNaN(standardDeviation)) {
             return 0.0d

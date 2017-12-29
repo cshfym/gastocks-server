@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class SymbolConverter {
 
-    Symbol fromPersistableSymbol(PersistableSymbol persistableSymbol) {
+    static Symbol fromPersistableSymbol(PersistableSymbol persistableSymbol) {
 
         new Symbol(
             identifier: persistableSymbol.identifier,

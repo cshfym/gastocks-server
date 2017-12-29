@@ -170,7 +170,7 @@ class SymbolService {
                 "in [${System.currentTimeMillis() - startStopwatch} ms] with terminateBackfill [${terminateBackfill}]")
     }
 
-    boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, double max52Weeks, double min52Weeks, double avg52Weeks, double standardDev) {
+    static boolean symbolExtendedValuesAreIdentical(PersistableSymbolExtended symbolExtended, double max52Weeks, double min52Weeks, double avg52Weeks, double standardDev) {
         (symbolExtended.maximum52Weeks == max52Weeks) &&
         (symbolExtended.minimum52Weeks == min52Weeks) &&
         (symbolExtended.average52Weeks == avg52Weeks) &&

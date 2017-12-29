@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class EnhancedSymbolConverter {
 
-    EnhancedSymbol fromPersistableSymbol(PersistableSymbol persistableSymbol, PersistableSymbolExtended symbolExtended) {
+    static EnhancedSymbol fromPersistableSymbol(PersistableSymbol persistableSymbol, PersistableSymbolExtended symbolExtended) {
 
         new EnhancedSymbol(
             identifier: persistableSymbol.identifier,

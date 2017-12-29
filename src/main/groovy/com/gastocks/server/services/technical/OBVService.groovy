@@ -13,7 +13,7 @@ class OBVService {
 
     static double OBV_RATIO_ADJUSTMENT = 1000 // i.e. express OBV in units of 1,000.
 
-    void buildOBVTechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, OBVRequestParameters requestParameters) {
+    static void buildOBVTechnicalData(List<TechnicalDataWrapper> technicalWrapperDataList, List<PersistableQuote> quoteData, OBVRequestParameters requestParameters) {
 
         OBVTechnicalData previousOnBalanceVolumeData
 

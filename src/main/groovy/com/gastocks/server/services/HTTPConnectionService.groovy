@@ -13,7 +13,7 @@ class HTTPConnectionService {
 
     final static String  EMPTY_STRING = ""
 
-    String getData(String address, RequestMethod method, String base64EncodedAuthorization) {
+    static String getData(String address, RequestMethod method, String base64EncodedAuthorization) {
 
         def response = null
 

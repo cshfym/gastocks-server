@@ -179,7 +179,7 @@ class JmsConfiguration {
 
 
     @Bean // Serialize message content to json using TextMessage
-    MessageConverter jacksonJmsMessageConverter() {
+    static MessageConverter jacksonJmsMessageConverter() {
         def converter = new MappingJackson2MessageConverter()
         converter.with {
             targetType = MessageType.TEXT

@@ -50,7 +50,7 @@ class SectorPerformancePersistenceService {
         }
     }
 
-    protected boolean sectorPerformanceRecordsAreIdentical(PersistableSectorPerformance existingSectorPerformance, PersistableSectorPerformance newSectorPerformance) {
+    static protected boolean sectorPerformanceRecordsAreIdentical(PersistableSectorPerformance existingSectorPerformance, PersistableSectorPerformance newSectorPerformance) {
         existingSectorPerformance.quoteDate == newSectorPerformance.quoteDate &&
         existingSectorPerformance.price == newSectorPerformance.price &&
         existingSectorPerformance.dayOpen == newSectorPerformance.dayOpen &&

@@ -15,7 +15,7 @@ class RSIIndicatorService {
         3.
      */
 
-    boolean getRSIBuyIndicator(TechnicalQuote quote) {
+    static boolean getRSIBuyIndicator(TechnicalQuote quote) {
 
         // RSI is trending upward, out of overbought territory, signaling a potential BUY action
         if (quote.rsiParameters.overSoldCrossoverPositive) { return true }
@@ -23,7 +23,7 @@ class RSIIndicatorService {
         false
     }
 
-    boolean getRSISellIndicator(TechnicalQuote quote) {
+    static boolean getRSISellIndicator(TechnicalQuote quote) {
 
         // RSI is trending downward, out of oversold territory, signaling a potential SELL action
         if (quote.rsiParameters.overBoughtCrossoverNegative) { return true }

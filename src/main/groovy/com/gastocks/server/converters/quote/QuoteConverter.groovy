@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class QuoteConverter {
 
-    Quote fromPersistableQuote(PersistableQuote persistableQuote) {
+    static Quote fromPersistableQuote(PersistableQuote persistableQuote) {
 
         new Quote(
             quoteDate: persistableQuote.quoteDate,

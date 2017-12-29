@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class TechnicalQuoteConverter {
 
-    TechnicalQuote fromPersistableQuote(PersistableQuote persistableQuote, TechnicalDataWrapper technicalData) {
+    static TechnicalQuote fromPersistableQuote(PersistableQuote persistableQuote, TechnicalDataWrapper technicalData) {
 
         new TechnicalQuote(
             quoteDate: persistableQuote.quoteDate,
