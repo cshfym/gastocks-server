@@ -246,7 +246,7 @@ class SymbolService {
         log.info("Done backfilling price change data for [${persistableSymbol.identifier}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
-    boolean allPriceDataAvailable(PersistableQuote quote) {
+    static boolean allPriceDataAvailable(PersistableQuote quote) {
         quote.previousDayClose && quote.priceChange && quote.priceChangePercentage
     }
 

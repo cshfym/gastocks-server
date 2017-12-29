@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat
 
 class GlobalConstants {
 
+    static final String DB_DATE_FORMAT_STRING = "MMM dd, yyyy"
+
     static final String SHORT_DATE_FORMAT_STRING = "yyyy-MM-dd"
 
     static final DateFormat SHORT_DATE_FORMAT = new SimpleDateFormat(SHORT_DATE_FORMAT_STRING)

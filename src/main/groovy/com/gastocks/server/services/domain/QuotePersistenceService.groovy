@@ -4,25 +4,23 @@ import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.avglobalquote.AVGlobalQuote
 import com.gastocks.server.models.avtimeseriesadjusted.AVTimeSeriesAdjustedDay
 import com.gastocks.server.models.constants.GlobalConstants
-import com.gastocks.server.models.domain.PersistableCompany
 import com.gastocks.server.models.domain.PersistableQuote
-import com.gastocks.server.models.domain.PersistableSector
 import com.gastocks.server.models.domain.PersistableSymbol
 import com.gastocks.server.models.intrinio.IntrinioExchangePriceQuote
-import com.gastocks.server.models.sector.TechnicalSectorQuote
-import com.gastocks.server.repositories.CompanyRepository
 import com.gastocks.server.repositories.QuoteRepository
-import com.gastocks.server.repositories.SectorRepository
-import com.gastocks.server.services.intrinio.company.CompanyService
+import com.gastocks.server.services.redis.RedisConnectionService
 import com.gastocks.server.util.NumberUtility
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 import javax.transaction.Transactional
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 /**
  * Service layer for quote-related persistence operations.
@@ -33,12 +31,6 @@ class QuotePersistenceService {
 
     @Autowired
     QuoteRepository quoteRepository
-
-    @Autowired
-    SectorPersistenceService sectorPersistenceService
-
-    @Autowired
-    CompanyService companyService
 
     @Transactional
     void persistNewQuote(AVTimeSeriesAdjustedDay quote, PersistableSymbol symbol) {
@@ -206,5 +198,34 @@ class QuotePersistenceService {
     @Transactional
     void deleteQuote(PersistableQuote quote) {
         quoteRepository.delete(quote)
+    }
+
+    /**
+     * Caching Stuff
+     */
+
+    @Autowired
+    RedisConnectionService redisConnectionService
+
+    Gson gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .setDateFormat(GlobalConstants.DB_DATE_FORMAT_STRING)
+            .create()
+
+    List<PersistableQuote> getAllQuotesFromCache(String identifier) {
+
+        String stringResults = redisConnectionService.getFromCache(identifier)
+
+        if (!stringResults) { return null }
+
+        Type collectionType = new TypeToken<List<PersistableQuote>>(){}.getType()
+        (List<PersistableQuote>) gson.fromJson(stringResults, collectionType)
+    }
+
+    void putAllQuotesInCache(String identifier, List<PersistableQuote> persistableQuotes) {
+
+        String rawCollectionString = gson.toJson(persistableQuotes)
+
+        redisConnectionService.setCache(identifier, rawCollectionString)
     }
 }
