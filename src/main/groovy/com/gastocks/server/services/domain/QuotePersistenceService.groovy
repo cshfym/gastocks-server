@@ -14,6 +14,9 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
+
 import java.lang.reflect.Type
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -70,7 +73,8 @@ class QuotePersistenceService {
     }
 
     @Transactional
-    void persistNewQuote(IntrinioExchangePriceQuote quote, PersistableSymbol symbol) {
+    @CachePut(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#symbol.id")
+    PersistableQuote persistNewQuote(IntrinioExchangePriceQuote quote, PersistableSymbol symbol) {
 
         def persistableQuote
 
@@ -94,6 +98,7 @@ class QuotePersistenceService {
             log.error ("Exception saving quote ${persistableQuote.toString()}", ex)
         }
 
+        persistableQuote
     }
 
     /**
@@ -102,6 +107,7 @@ class QuotePersistenceService {
      * @param quote
      */
     @Transactional
+    @CacheEvict(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#existingQuote.symbol.id")
     void updateQuote(PersistableQuote existingQuote, AVGlobalQuote quote) {
 
         if (quotesEqual(existingQuote, quote)) {
@@ -131,7 +137,7 @@ class QuotePersistenceService {
      * @param quote
      * @return boolean
      */
-    boolean quotesEqual(PersistableQuote existingQuote, AVGlobalQuote quote) {
+    static boolean quotesEqual(PersistableQuote existingQuote, AVGlobalQuote quote) {
 
         existingQuote.price == quote.latestPrice &&
         existingQuote.dayOpen == quote.currentTradingDayOpen &&
@@ -149,6 +155,7 @@ class QuotePersistenceService {
      * @param quote
      */
     @Transactional
+    @CacheEvict(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#existingQuote.symbol.id")
     void updateQuote(PersistableQuote existingQuote, AVTimeSeriesAdjustedDay quote) {
 
         existingQuote.with {
@@ -171,6 +178,7 @@ class QuotePersistenceService {
      * @param existingQuote
      */
     @Transactional
+    @CacheEvict(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#existingQuote.symbol.id")
     void updateQuote(PersistableQuote existingQuote) {
         quoteRepository.save(existingQuote)
     }
@@ -179,7 +187,7 @@ class QuotePersistenceService {
         quoteRepository.findBySymbolAndQuoteDate(symbol, lastUpdated)
     }
 
-    @Cacheable(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL)
+    @Cacheable(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#symbol.id")
     List<PersistableQuote> findAllQuotesForSymbol(PersistableSymbol symbol) {
 
         def startStopwatch = System.currentTimeMillis()
@@ -196,6 +204,7 @@ class QuotePersistenceService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfiguration.FIND_ALL_QUOTES_FOR_SYMBOL, key = "#quote.symbol.id")
     void deleteQuote(PersistableQuote quote) {
         quoteRepository.delete(quote)
     }
