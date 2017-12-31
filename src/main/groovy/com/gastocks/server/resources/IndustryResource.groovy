@@ -1,7 +1,7 @@
 package com.gastocks.server.resources
 
 import com.gastocks.server.models.domain.PersistableIndustry
-import com.gastocks.server.services.Industry.IndustryApiService
+import com.gastocks.server.services.industry.IndustryApiService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller

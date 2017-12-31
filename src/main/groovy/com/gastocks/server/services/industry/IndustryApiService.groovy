@@ -1,4 +1,4 @@
-package com.gastocks.server.services.Industry
+package com.gastocks.server.services.industry
 
 import com.gastocks.server.config.CacheConfiguration
 import com.gastocks.server.models.domain.PersistableIndustry
