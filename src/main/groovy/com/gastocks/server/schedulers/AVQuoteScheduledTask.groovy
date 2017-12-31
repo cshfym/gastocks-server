@@ -18,7 +18,7 @@ class AVQuoteScheduledTask {
     @Value('${av.quote.daily.processing.enabled}')
     boolean avGlobalQuoteProcessingEnabled
 
-    @Scheduled(cron = '${av.quote.daily.schedule}')
+    // @Scheduled(cron = '${av.quote.daily.schedule}')
     void process() {
 
         if (!avGlobalQuoteProcessingEnabled) { return }

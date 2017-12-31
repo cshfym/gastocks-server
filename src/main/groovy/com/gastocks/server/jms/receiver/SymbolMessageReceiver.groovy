@@ -27,7 +27,7 @@ class SymbolMessageReceiver {
     @Autowired
     AVGlobalQuoteProcessingService globalQuoteProcessingService
 
-    @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA, containerFactory = "quoteFactory")
+    // @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA, containerFactory = "quoteFactory")
     void receiveAVTSAQueuedSymbol(QueueableSymbol symbol) {
 
         log.info "Received <{ ${symbol} }> in ${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVTSA}"
@@ -35,7 +35,7 @@ class SymbolMessageReceiver {
         timeSeriesAdjustedProcessingService.processSymbol(symbol, timeSeriesAdjustedQuoteService)
     }
 
-    @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ, containerFactory = "quoteFactory")
+    // @JmsListener(destination = SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ, containerFactory = "quoteFactory")
     void receiveGQQueuedSymbol(QueueableSymbol symbol) {
 
         log.info "Received <{ ${symbol} }> in ${SymbolQueueSender.SYMBOL_QUEUE_DESTINATION_AVGQ}"

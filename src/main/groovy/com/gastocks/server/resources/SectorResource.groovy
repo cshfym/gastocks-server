@@ -1,6 +1,8 @@
 package com.gastocks.server.resources
 
+import com.gastocks.server.models.BasicResponse
 import com.gastocks.server.models.domain.PersistableSector
+import com.gastocks.server.schedulers.SectorQuoteBackfillScheduledTask
 import com.gastocks.server.services.sector.SectorApiService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +18,9 @@ class SectorResource {
     @Autowired
     SectorApiService sectorApiService
 
+    @Autowired
+    SectorQuoteBackfillScheduledTask sectorQuoteBackfillScheduledTask
+
     @ResponseBody
     @RequestMapping(method=RequestMethod.GET)
     List<PersistableSector> findAllSectors() {
@@ -26,6 +31,13 @@ class SectorResource {
     @RequestMapping(value="/{identifier}", method=RequestMethod.GET)
     PersistableSector getSectorBySymbolIdentifier(@PathVariable("identifier") String identifier) {
         sectorApiService.findSectorBySymbolIdentifier(identifier)
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/backfill", method=RequestMethod.POST)
+    BasicResponse backfill() {
+        sectorQuoteBackfillScheduledTask.process()
+        new BasicResponse(success: true)
     }
 
 }

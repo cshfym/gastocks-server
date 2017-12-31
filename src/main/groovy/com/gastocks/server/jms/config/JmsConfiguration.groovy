@@ -15,8 +15,8 @@ import javax.jms.ConnectionFactory
 @Configuration
 class JmsConfiguration {
 
-    @Value('${symbol.consumer.queue.concurrency}')
-    String SYMBOL_CONSUMER_QUEUE_CONCURRENCY
+    // @Value('${symbol.consumer.queue.concurrency}')
+    // String SYMBOL_CONSUMER_QUEUE_CONCURRENCY
 
     @Value('${simulation.consumer.queue.concurrency}')
     String SIMULATION_CONSUMER_QUEUE_CONCURRENCY
@@ -47,7 +47,7 @@ class JmsConfiguration {
      * @param connectionFactory
      * @param configurer
      * @return {@JmsListenerContainerFactory}
-     */
+
     @Bean
     JmsListenerContainerFactory<?> quoteFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
 
@@ -56,6 +56,7 @@ class JmsConfiguration {
         configurer.configure(factory, connectionFactory)
         factory
     }
+    */
 
     /**
      * Bean corresponds to the "simulationFactory" JMS listener for consuming simulation requests.

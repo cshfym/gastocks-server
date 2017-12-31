@@ -82,6 +82,11 @@ class TechnicalSectorQuoteService {
             sectorPerformancePersistenceService.persistSectorPerformance(sectorPerformance)
         }
 
+        sectorQuoteMap.clear()
+        companiesInSector.clear()
+        symbolsInSector.clear()
+        allQuotesForSymbolsInSector.clear()
+
         log.info("Finished processing sector quote [${sector}] for quote date [${quoteDate.toString()}] in [${System.currentTimeMillis() - startStopwatch} ms]")
     }
 
